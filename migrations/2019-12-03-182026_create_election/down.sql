@@ -1,2 +1,2 @@
-DROP TABLE elections;
 DROP TABLE choices;
+DROP TABLE elections;

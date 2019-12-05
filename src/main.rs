@@ -17,14 +17,13 @@ use crate::resolvers::{Query, Mutation};
 use futures::future::FutureResult;
 use failure::Error;
 use crate::JWTError::{InvalidJWTFormat, InvalidRequestFormat, InvalidSignature};
-use r2d2::Pool;
-use r2d2_diesel::ConnectionManager;
-use diesel::{MysqlConnection};
+use db::DbPool;
+use crate::db::create_db_pool;
+use serde::{Serialize};
 
 mod schema;
 mod resolvers;
-mod models;
-mod db_schema;
+mod db;
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
@@ -32,7 +31,7 @@ const ENDPOINT_URL: &str = "ENDPOINT_URL";
 const GRAPHQL_PLAYGROUND: &str = "GRAPHQL_PLAYGROUND";
 
 pub struct Context {
-    pub db: Pool<ConnectionManager<MysqlConnection>>,
+    pub db: DbPool,
     pub user: Option<Box<User>>
 }
 
@@ -40,7 +39,7 @@ pub struct User {
     pub id: String
 }
 
-#[derive(Debug, Fail)]
+#[derive(Debug, Fail, Serialize)]
 #[allow(clippy::enum_variant_names)]
 enum JWTError {
     #[fail(display = "JWT Token failed to validate")]
@@ -51,13 +50,18 @@ enum JWTError {
     InvalidJWTFormat {reason: String}
 }
 
+#[derive(Serialize)]
+struct JsonError {
+    error: String
+}
+
 fn get_user(req: &Request<Body>, keys: Arc<KeyStore>) -> Result<Option<Box<User>>, Error> {
     let issuer = std::env::var(JWT_ISSUER).expect("JWT_ISSUER must be set");
     let audience = std::env::var(ENDPOINT_URL).expect("ENDPOINT_URL must be set");
 
     let jwt: Option<String> = match req.headers().get(AUTHORIZATION) {
         Some(header) => {
-            let header_string = &header.to_str().map_err(|_| InvalidRequestFormat {reason: "Authorization header isn't a string".to_string()})?;
+            let header_string = header.to_str().map_err(|_| InvalidRequestFormat {reason: "Authorization header isn't a string".to_string()})?;
             Some(header_string.replace("Bearer ", ""))
         },
         None => None
@@ -69,7 +73,7 @@ fn get_user(req: &Request<Body>, keys: Arc<KeyStore>) -> Result<Option<Box<User>
             let audiences = decoded.payload().get_array("aud");
             let audience_valid = match audiences {
                 Some(audiences) => {
-                    let audiences = audiences.iter()
+                    let audiences: Vec<String> = audiences.iter()
                         .map(|x| Ok(x.as_str().ok_or(InvalidJWTFormat { reason: "Audiences array contains non strings".to_string() })?.to_string()))
                         .collect::<Result<Vec<String>, Error>>()?;
                     audiences.contains(&audience)
@@ -97,18 +101,11 @@ fn get_request_context(req: &Request<Body>, context: Arc<Context>, keys: Arc<Key
 }
 
 fn send_error(e: Error) -> Box<FutureResult<Response<Body>, hyper::Error>> {
-    let mut response = Response::new(Body::from(format!("{:?}", e)));
+    let error = JsonError {error: format!("{:?}", e)};
+    let json = serde_json::to_string(&error).expect("Serializing this type should never fail");
+    let mut response = Response::new(Body::from(json));
     *response.status_mut() = StatusCode::BAD_REQUEST;
     Box::new(future::ok(response))
-}
-
-fn connect_to_db() -> Pool<ConnectionManager<MysqlConnection>> {
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let manager = r2d2_diesel::ConnectionManager::new(&database_url);
-    r2d2::Pool::builder()
-        .max_size(15)
-        .build(manager)
-        .expect(&format!("Error creating connection pool for {}", database_url))
 }
 
 fn main() {
@@ -117,12 +114,13 @@ fn main() {
     pretty_env_logger::init();
 
     let addr = ([127, 0, 0, 1], 4000).into();
-    let db_pool = connect_to_db();
+    let db_pool = create_db_pool();
     let root_node = Arc::new(RootNode::new(Query, Mutation));
     let jwt_keys = Arc::new(KeyStore::new_from(std::env::var(JWKS_URL)
             .expect("JWKS_URL must be set").as_str()).unwrap());
     let ctx = Arc::new(Context {db: db_pool, user: None});
     let playground = std::env::var(GRAPHQL_PLAYGROUND).unwrap_or("false".to_string()).parse::<bool>().unwrap();
+    println!("Playground {}.", if playground {"enabled"} else {"disabled"});
 
     let new_service = move || {
         let root_node = root_node.clone();
@@ -144,7 +142,10 @@ fn main() {
                     let ctx = get_request_context(&req, ctx.clone(), jwt_keys.clone());
                     match ctx {
                         Ok(ctx) => Box::new(juniper_hyper::graphql(root_node, ctx, req)),
-                        Err(e) => send_error(e)
+                        Err(e) => {
+                            println!("{:?}", e);
+                            send_error(e)
+                        }
                     }
                 },
                 (&Method::POST, "/graphql") => {

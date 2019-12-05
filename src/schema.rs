@@ -1,4 +1,8 @@
 use chrono::{DateTime, Utc};
+use uuid::Uuid;
+use core::fmt;
+use failure::_core::fmt::{Formatter, Error};
+use failure::_core::str::FromStr;
 
 #[derive(juniper::GraphQLInputObject)]
 pub struct PermissionSet {
@@ -24,16 +28,35 @@ pub struct User {
     pub username: String
 }
 
-#[derive(juniper::GraphQLEnum)]
+#[derive(juniper::GraphQLEnum, Debug)]
 pub enum Importance {
     Important,
     Regular,
     Minor
 }
 
+impl fmt::Display for Importance {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        write!(f, "{:?}", self)
+    }
+}
+
+impl FromStr for Importance {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "Important" => Ok(Importance::Important),
+            "Regular" => Ok(Importance::Regular),
+            "Minor" => Ok(Importance::Minor),
+            _ => Err(())
+        }
+    }
+}
+
 #[derive(juniper::GraphQLObject)]
 pub struct Election {
-    pub id: String,
+    pub id: Uuid,
     pub name: String,
     pub description: String,
     pub choices: Vec<String>,

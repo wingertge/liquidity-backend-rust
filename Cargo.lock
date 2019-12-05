@@ -47,7 +47,9 @@ dependencies = [
  "jwks-client 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "pretty_env_logger 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "r2d2 0.8.7 (registry+https://github.com/rust-lang/crates.io-index)",
- "r2d2-diesel 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 1.0.44 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uuid 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -159,7 +161,7 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "publicsuffix 1.5.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 1.0.42 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 1.0.44 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)",
  "try_from 0.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -241,11 +243,13 @@ name = "diesel"
 version = "1.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
+ "bitflags 1.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "byteorder 1.3.2 (registry+https://github.com/rust-lang/crates.io-index)",
  "chrono 0.4.10 (registry+https://github.com/rust-lang/crates.io-index)",
  "diesel_derives 1.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
- "mysqlclient-sys 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
- "url 1.7.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "pq-sys 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "r2d2 0.8.7 (registry+https://github.com/rust-lang/crates.io-index)",
+ "uuid 0.7.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -586,7 +590,7 @@ dependencies = [
  "juniper 0.14.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 1.0.42 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 1.0.44 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio-threadpool 0.1.16 (registry+https://github.com/rust-lang/crates.io-index)",
  "url 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -603,7 +607,7 @@ dependencies = [
  "ring 0.16.9 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_derive 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 1.0.42 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 1.0.44 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -723,15 +727,6 @@ dependencies = [
  "net2 0.2.33 (registry+https://github.com/rust-lang/crates.io-index)",
  "winapi 0.2.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "ws2_32-sys 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "mysqlclient-sys"
-version = "0.2.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "pkg-config 0.3.17 (registry+https://github.com/rust-lang/crates.io-index)",
- "vcpkg 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -893,6 +888,14 @@ version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
+name = "pq-sys"
+version = "0.4.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+dependencies = [
+ "vcpkg 0.2.7 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
 name = "pretty_env_logger"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -943,15 +946,6 @@ dependencies = [
  "log 0.4.8 (registry+https://github.com/rust-lang/crates.io-index)",
  "parking_lot 0.10.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "scheduled-thread-pool 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "r2d2-diesel"
-version = "1.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-dependencies = [
- "diesel 1.4.3 (registry+https://github.com/rust-lang/crates.io-index)",
- "r2d2 0.8.7 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -1144,7 +1138,7 @@ dependencies = [
  "mime_guess 2.0.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "native-tls 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)",
- "serde_json 1.0.42 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde_json 1.0.44 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde_urlencoded 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)",
  "time 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)",
  "tokio 0.1.22 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1263,7 +1257,7 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.42"
+version = "1.0.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 dependencies = [
  "itoa 0.4.4 (registry+https://github.com/rust-lang/crates.io-index)",
@@ -1896,7 +1890,6 @@ dependencies = [
 "checksum mio 0.6.21 (registry+https://github.com/rust-lang/crates.io-index)" = "302dec22bcf6bae6dfb69c647187f4b4d0fb6f535521f7bc022430ce8e12008f"
 "checksum mio-uds 0.6.7 (registry+https://github.com/rust-lang/crates.io-index)" = "966257a94e196b11bb43aca423754d87429960a768de9414f3691d6957abf125"
 "checksum miow 0.2.1 (registry+https://github.com/rust-lang/crates.io-index)" = "8c1f2f3b1cf331de6896aabf6e9d55dca90356cc9960cca7eaaf408a355ae919"
-"checksum mysqlclient-sys 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)" = "7e9637d93448044078aaafea7419aed69d301b4a12bcc4aa0ae856eb169bef85"
 "checksum native-tls 0.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "4b2df1a4c22fd44a62147fd8f13dd0f95c9d8ca7b2610299b2a2f9cf8964274e"
 "checksum net2 0.2.33 (registry+https://github.com/rust-lang/crates.io-index)" = "42550d9fb7b6684a6d404d9fa7250c2eb2646df731d1c06afc06dcee9e1bcf88"
 "checksum nom 4.2.3 (registry+https://github.com/rust-lang/crates.io-index)" = "2ad2a91a8e869eeb30b9cb3119ae87773a8f4ae617f41b1eb9c154b2905f7bd6"
@@ -1914,13 +1907,13 @@ dependencies = [
 "checksum percent-encoding 2.1.0 (registry+https://github.com/rust-lang/crates.io-index)" = "d4fd5641d01c8f18a23da7b6fe29298ff4b55afcccdf78973b24cf3175fee32e"
 "checksum pkg-config 0.3.17 (registry+https://github.com/rust-lang/crates.io-index)" = "05da548ad6865900e60eaba7f589cc0783590a92e940c26953ff81ddbab2d677"
 "checksum ppv-lite86 0.2.6 (registry+https://github.com/rust-lang/crates.io-index)" = "74490b50b9fbe561ac330df47c08f3f33073d2d00c150f719147d7c54522fa1b"
+"checksum pq-sys 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)" = "6ac25eee5a0582f45a67e837e350d784e7003bd29a5f460796772061ca49ffda"
 "checksum pretty_env_logger 0.3.1 (registry+https://github.com/rust-lang/crates.io-index)" = "717ee476b1690853d222af4634056d830b5197ffd747726a9a1eee6da9f49074"
 "checksum proc-macro2 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)" = "9c9e470a8dc4aeae2dee2f335e8f533e2d4b347e1434e5671afc49b054592f27"
 "checksum publicsuffix 1.5.4 (registry+https://github.com/rust-lang/crates.io-index)" = "3bbaa49075179162b49acac1c6aa45fb4dafb5f13cf6794276d77bc7fd95757b"
 "checksum quick-error 1.2.2 (registry+https://github.com/rust-lang/crates.io-index)" = "9274b940887ce9addde99c4eee6b5c44cc494b182b97e73dc8ffdcb3397fd3f0"
 "checksum quote 1.0.2 (registry+https://github.com/rust-lang/crates.io-index)" = "053a8c8bcc71fcce321828dc897a98ab9760bef03a4fc36693c231e5b3216cfe"
 "checksum r2d2 0.8.7 (registry+https://github.com/rust-lang/crates.io-index)" = "22b5c5fc5fba064373f03887337b412e0e1562d63023393db77251146cb75553"
-"checksum r2d2-diesel 1.0.0 (registry+https://github.com/rust-lang/crates.io-index)" = "eb9c29bad92da76d02bc2c020452ebc3a3fe6fa74cfab91e711c43116e4fb1a3"
 "checksum rand 0.6.5 (registry+https://github.com/rust-lang/crates.io-index)" = "6d71dacdc3c88c1fde3885a3be3fbab9f35724e6ce99467f7d9c5026132184ca"
 "checksum rand 0.7.2 (registry+https://github.com/rust-lang/crates.io-index)" = "3ae1b169243eaf61759b8475a998f0a385e42042370f3a7dbaf35246eacc8412"
 "checksum rand_chacha 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)" = "556d3a1ca6600bfcbab7c7c91ccb085ac7fbbcd70e008a98742e7847f4f7bcef"
@@ -1954,7 +1947,7 @@ dependencies = [
 "checksum semver-parser 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)" = "388a1df253eca08550bef6c72392cfe7c30914bf41df5269b68cbd6ff8f570a3"
 "checksum serde 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)" = "1217f97ab8e8904b57dd22eb61cde455fa7446a9c1cf43966066da047c1f3702"
 "checksum serde_derive 1.0.103 (registry+https://github.com/rust-lang/crates.io-index)" = "a8c6faef9a2e64b0064f48570289b4bf8823b7581f1d6157c1b52152306651d0"
-"checksum serde_json 1.0.42 (registry+https://github.com/rust-lang/crates.io-index)" = "1a3351dcbc1f067e2c92ab7c3c1f288ad1a4cffc470b5aaddb4c2e0a3ae80043"
+"checksum serde_json 1.0.44 (registry+https://github.com/rust-lang/crates.io-index)" = "48c575e0cc52bdd09b47f330f646cf59afc586e9c4e3ccd6fc1f625b8ea1dad7"
 "checksum serde_urlencoded 0.5.5 (registry+https://github.com/rust-lang/crates.io-index)" = "642dd69105886af2efd227f75a520ec9b44a820d65bc133a9131f7d229fd165a"
 "checksum slab 0.4.2 (registry+https://github.com/rust-lang/crates.io-index)" = "c111b5bd5695e56cffe5129854aa230b39c93a305372fdbb2668ca2394eea9f8"
 "checksum smallvec 0.6.13 (registry+https://github.com/rust-lang/crates.io-index)" = "f7b0758c52e15a8b5e3691eae6cc559f08eee9406e548a4477ba4e67770a82b6"

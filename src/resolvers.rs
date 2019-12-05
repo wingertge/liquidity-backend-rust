@@ -1,9 +1,8 @@
 use crate::schema::{ElectionInput, Election};
 use juniper::{FieldResult};
-use crate::schema::Importance::Regular;
-use chrono::{Utc};
-use crate::{Context, models};
-use diesel::{QueryDsl, RunQueryDsl};
+use crate::Context;
+use uuid::Uuid;
+use crate::db::elections;
 
 pub struct Query;
 pub struct Mutation;
@@ -12,13 +11,11 @@ pub struct Mutation;
     Context = Context
 )]
 impl Query {
-    fn election(id: String, context: &Context) -> FieldResult<Option<Election>> {
-        use crate::db_schema::elections::dsl::elections;
-
+    fn election(id: Uuid, context: &Context) -> FieldResult<Option<Election>> {
         let conn = &*context.db.get()?;
-        let results = elections.find(id.parse::<u64>()?).load::<models::Election>(conn)?;
-        println!("{:?}", results);
-        Ok(Some(Election { id, name: "Test election".to_string(), description: "".to_string(), choices: Vec::new(), importance: Regular, start_date: Utc::now(), end_date: Utc::now() }))
+        let result = elections::find_election(&id, conn)?;
+
+        Ok(Some(result.into()))
     }
 }
 
@@ -32,8 +29,20 @@ impl Mutation {
     ) -> FieldResult<Option<Election>> {
         match &context.user {
             Some(user) => {
-
-                Ok(None)
+                use crate::db::elections;
+                let conn = &*context.db.get()?;
+                let (election, choices) = elections::create_election(&input, &user.id, conn)?;
+                Ok(Some(
+                    Election {
+                        id: election.id,
+                        name: election.name,
+                        description: election.description,
+                        start_date: election.start_date,
+                        end_date: election.end_date,
+                        importance: election.importance.parse().expect("Invalid importance"),
+                        choices: choices.iter().map(|choice| choice.value.clone()).collect()
+                    }
+                ))
             },
             None => Err("Must be logged in".into())
         }

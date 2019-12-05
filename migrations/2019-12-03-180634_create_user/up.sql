@@ -1,7 +1,6 @@
 CREATE TABLE users (
-    id VARCHAR(255),
-    username VARCHAR(255),
-    created_at DATETIME NOT NULL,
-    updated_at DATETIME NOT NULL,
-    PRIMARY KEY (`id`)
+    id VARCHAR(255) PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
+    created_at timestamptz NOT NULL,
+    updated_at timestamptz NOT NULL
 )
