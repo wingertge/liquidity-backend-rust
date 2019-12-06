@@ -42,18 +42,8 @@ impl Mutation {
 
                 use crate::db::elections;
                 let conn = &*context.db.get()?;
-                let (election, choices) = elections::create_election(&input, &user.id, conn)?;
-                Ok(Some(
-                    Election {
-                        id: election.id,
-                        name: election.name,
-                        description: election.description,
-                        start_date: election.start_date,
-                        end_date: election.end_date,
-                        importance: election.importance.parse().expect("Invalid importance"),
-                        choices: choices.iter().map(|choice| choice.value.clone()).collect()
-                    }
-                ))
+                let result = elections::create_election(&input, &user.id, conn)?;
+                Ok(Some(result.into()))
             },
             None => Err("Must be logged in".into())
         }
