@@ -30,23 +30,11 @@ table! {
     }
 }
 
-table! {
-    users (id) {
-        id -> Varchar,
-        username -> Varchar,
-        created_at -> Timestamptz,
-        updated_at -> Timestamptz,
-    }
-}
-
 joinable!(ballots -> elections (election_id));
-joinable!(ballots -> users (user_id));
 joinable!(choices -> elections (election_id));
-joinable!(elections -> users (created_by_id));
 
 allow_tables_to_appear_in_same_query!(
     ballots,
     choices,
     elections,
-    users,
 );

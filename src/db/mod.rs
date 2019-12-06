@@ -1,6 +1,5 @@
 use diesel::{PgConnection, r2d2::ConnectionManager};
 
-pub(crate) mod users;
 pub(crate) mod elections;
 pub(crate) mod models;
 pub(crate) mod schema;

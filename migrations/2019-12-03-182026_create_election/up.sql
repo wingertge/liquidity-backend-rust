@@ -1,6 +1,6 @@
 CREATE TABLE elections (
     id uuid PRIMARY KEY,
-    created_by_id VARCHAR(255) NOT NULL REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    created_by_id VARCHAR(255) NOT NULL,
     name VARCHAR(255) NOT NULL,
     description text NOT NULL,
     start_date timestamptz NOT NULL,
