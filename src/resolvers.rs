@@ -13,13 +13,7 @@ pub struct Mutation;
 )]
 impl Query {
     fn election(id: Uuid, context: &Context) -> FieldResult<Option<Election>> {
-        let perm = "view:election".to_string();
-
-        if !&context.user.as_ref()
-            .ok_or("Must be logged in to view elections")?
-            .permissions.contains(&perm) {
-            return Err("You don't have permission to view elections".into())
-        }
+        permissions::check("view:election", &context.user)?;
         let conn = &*context.db.get()?;
         let result = elections::find_election(&id, conn)?;
 
@@ -35,13 +29,9 @@ impl Mutation {
         input: ElectionInput,
         context: &Context
     ) -> FieldResult<Option<Election>> {
+        permissions::check("create:election", &context.user)?;
         match &context.user {
             Some(user) => {
-                let perm = "create:election".to_string();
-                if !user.permissions.contains(&perm) {
-                    return Err("You don't have permission to view elections".into())
-                }
-
                 use crate::db::elections;
                 let conn = &*context.db.get()?;
                 let result = elections::create_election(&input, &user.id, conn)?;
