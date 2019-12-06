@@ -91,9 +91,10 @@ fn get_user(req: &Request<Body>, keys: Arc<KeyStore>) -> Result<Option<Box<User>
                 let id = decoded.payload().sub()
                     .ok_or(InvalidJWTFormat {reason: "Missing subject from JWT".to_string()})?
                     .to_string();
+                let empty = Vec::<Value>::new();
                 let permissions = decoded.payload()
                     .get_array("permissions")
-                    .unwrap_or_else(|| &Vec::<Value>::new())
+                    .unwrap_or_else(|| &empty)
                     .iter()
                     .map(|x| x.as_str().expect("Can't convert permission to string").to_string())
                     .collect();

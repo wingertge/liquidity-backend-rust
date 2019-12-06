@@ -3,8 +3,7 @@ use super::schema::*;
 use uuid::Uuid;
 use crate::schema::Importance;
 
-#[derive(Identifiable, Queryable, Debug, Associations)]
-#[belongs_to(User, foreign_key="created_by_id")]
+#[derive(Identifiable, Queryable, Debug)]
 pub struct Election {
     pub id: Uuid,
     pub created_by_id: String,
@@ -59,19 +58,4 @@ pub struct NewChoice<'a> {
     pub election_id: &'a Uuid,
     pub ballot_index: i16,
     pub value: String
-}
-
-#[derive(Identifiable, Queryable, Debug)]
-pub struct User {
-    pub id: String,
-    pub username: String,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>
-}
-
-#[derive(Insertable)]
-#[table_name="users"]
-pub struct NewUser<'a> {
-    pub id: &'a str,
-    pub username: &'a str
 }
