@@ -20,6 +20,7 @@ use crate::JWTError::{InvalidJWTFormat, InvalidRequestFormat, InvalidSignature};
 use db::DbPool;
 use crate::db::create_db_pool;
 use serde::{Serialize};
+use serde_json::Value;
 
 mod schema;
 mod resolvers;
@@ -36,7 +37,8 @@ pub struct Context {
 }
 
 pub struct User {
-    pub id: String
+    pub id: String,
+    pub permissions: Vec<String>
 }
 
 #[derive(Debug, Fail, Serialize)]
@@ -86,8 +88,18 @@ fn get_user(req: &Request<Body>, keys: Arc<KeyStore>) -> Result<Option<Box<User>
                 Err(InvalidJWTFormat {reason: "Token wasn't issued for this service!".to_string()}.into())
             }
             else {
+                let id = decoded.payload().sub()
+                    .ok_or(InvalidJWTFormat {reason: "Missing subject from JWT".to_string()})?
+                    .to_string();
+                let permissions = decoded.payload()
+                    .get_array("permissions")
+                    .unwrap_or_else(|| &Vec::<Value>::new())
+                    .iter()
+                    .map(|x| x.as_str().expect("Can't convert permission to string").to_string())
+                    .collect();
                 Ok(Some(Box::new(User {
-                    id: decoded.payload().sub().ok_or(InvalidJWTFormat {reason: "Missing subject from JWT".to_string()})?.to_string()
+                    id,
+                    permissions
                 })))
             }
         },
