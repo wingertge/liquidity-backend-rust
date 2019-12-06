@@ -1,8 +1,9 @@
 use crate::schema::{ElectionInput, Election};
 use juniper::FieldResult;
-use crate::Context;
+use crate::context::Context;
 use uuid::Uuid;
 use crate::db::elections;
+use crate::permissions;
 
 pub struct Query;
 pub struct Mutation;
@@ -13,6 +14,7 @@ pub struct Mutation;
 impl Query {
     fn election(id: Uuid, context: &Context) -> FieldResult<Option<Election>> {
         let perm = "view:election".to_string();
+
         if !&context.user.as_ref()
             .ok_or("Must be logged in to view elections")?
             .permissions.contains(&perm) {

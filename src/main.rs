@@ -1,10 +1,8 @@
 #[macro_use] extern crate failure;
-#[macro_use] extern crate diesel;
-extern crate futures;
+extern crate pretty_env_logger;
 extern crate hyper;
 extern crate juniper;
 extern crate juniper_hyper;
-extern crate pretty_env_logger;
 
 use std::sync::Arc;
 use juniper::RootNode;
@@ -13,33 +11,17 @@ use hyper::{rt::{self, Future}, Method, Response, Body, StatusCode, Server, Requ
 use futures::future;
 use hyper::http::header::AUTHORIZATION;
 use jwks_client::keyset::KeyStore;
-use crate::resolvers::{Query, Mutation};
 use futures::future::FutureResult;
 use failure::Error;
 use crate::JWTError::{InvalidJWTFormat, InvalidRequestFormat, InvalidSignature};
-use db::DbPool;
-use crate::db::create_db_pool;
+use backend_rust::{db::create_db_pool, context::{User, Context}, resolvers::{Query, Mutation}};
 use serde::{Serialize};
 use serde_json::Value;
-
-mod schema;
-mod resolvers;
-mod db;
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
 const ENDPOINT_URL: &str = "ENDPOINT_URL";
 const GRAPHQL_PLAYGROUND: &str = "GRAPHQL_PLAYGROUND";
-
-pub struct Context {
-    pub db: DbPool,
-    pub user: Option<Box<User>>
-}
-
-pub struct User {
-    pub id: String,
-    pub permissions: Vec<String>
-}
 
 #[derive(Debug, Fail, Serialize)]
 #[allow(clippy::enum_variant_names)]
