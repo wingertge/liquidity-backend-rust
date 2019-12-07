@@ -108,7 +108,12 @@ fn main() {
     dotenv::dotenv().ok();
     pretty_env_logger::init();
 
-    let addr = ([127, 0, 0, 1], 4000).into();
+    let port = std::env::var("PORT")
+        .map(|x| x.parse::<u16>())
+        .expect("Invalid port set in environment")
+        .unwrap_or(4000);
+
+    let addr = ([127, 0, 0, 1], port).into();
     let db_pool = create_db_pool();
     let root_node = Arc::new(RootNode::new(Query, Mutation));
     let jwt_keys = Arc::new(KeyStore::new_from(std::env::var(JWKS_URL)
