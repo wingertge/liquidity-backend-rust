@@ -2,8 +2,7 @@ name: Rust
 
 on:
   push:
-    branches:
-      - !gh-pages
+    branches-ignore: gh-pages
 
 jobs:
   build:
@@ -20,6 +19,8 @@ jobs:
       run: cargo test --verbose
     - name: Generate docs
       run: cargo doc
+    - name: Patch docs index
+      run: echo "<meta http-equiv=refresh content=0;url=backend_rust/index.html>" > target/doc/index.html
     - name: Push docs to GitHub pages
       uses: JamesIves/github-pages-deploy-action@releases/v3
       with:
