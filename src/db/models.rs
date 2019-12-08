@@ -3,6 +3,7 @@ use super::schema::*;
 use uuid::Uuid;
 use crate::graphql::{self, schema::Importance};
 
+/// Election database type
 #[derive(Identifiable, Queryable, Debug)]
 pub struct Election {
     pub id: Uuid,
@@ -16,6 +17,7 @@ pub struct Election {
     pub updated_at: DateTime<Utc>
 }
 
+/// Easy conversion of database results into the GraphQL type
 impl From<(Election, Vec<Choice>)> for graphql::schema::Election {
     fn from((election, choices): (Election, Vec<Choice>)) -> Self {
         graphql::schema::Election {
@@ -30,6 +32,7 @@ impl From<(Election, Vec<Choice>)> for graphql::schema::Election {
     }
 }
 
+/// Type for inserting new elections into the database
 #[derive(Insertable)]
 #[table_name="elections"]
 pub struct NewElection<'a> {
@@ -44,6 +47,7 @@ pub struct NewElection<'a> {
     pub updated_at: &'a DateTime<Utc>
 }
 
+/// Type for election choices in the database
 #[derive(Queryable, Associations)]
 #[belongs_to(Election, foreign_key="election_id")]
 pub struct Choice {
@@ -52,6 +56,7 @@ pub struct Choice {
     pub value: String
 }
 
+/// Type for inserting new choices into the database
 #[derive(Insertable)]
 #[table_name="choices"]
 pub struct NewChoice<'a> {
