@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Choice",""],["Election",""],["NewChoice",""],["NewElection",""]]});
+initSidebarItems({"struct":[["Choice","Type for election choices in the database"],["Election","Election database type"],["NewChoice","Type for inserting new choices into the database"],["NewElection","Type for inserting new elections into the database"]]});

@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["Importance",""]],"struct":[["Election",""],["ElectionInput",""],["PermissionSet",""],["User",""]]});
+initSidebarItems({"enum":[["Importance","The importance of an election. Affects sorting and filtering."]],"struct":[["Election","An election"],["ElectionInput","Input to create a new election"],["PermissionSet","A set of roles allowed to interact with this election. Base permissions are always required in addition to these."],["User","The user object. Currently not used"]]});

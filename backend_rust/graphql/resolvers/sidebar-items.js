@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Mutation",""],["Query",""]]});
+initSidebarItems({"struct":[["Mutation","GraphQL Mutation type"],["Query","GraphQL Query type"]]});

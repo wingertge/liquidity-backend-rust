@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["context",""],["permissions",""],["resolvers",""],["schema",""]]});
+initSidebarItems({"mod":[["context","Contains the context types"],["permissions","Contains permission helpers"],["resolvers","Contains resolvers"],["schema","Contains the GraphQL schema"]]});
