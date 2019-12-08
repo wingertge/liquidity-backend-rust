@@ -19,9 +19,9 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">diesel</span>::{<span class="ident">PgConnection</span>, <span class="ident">r2d2</span>::<span class="ident">ConnectionManager</span>};
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">elections</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">models</span>;
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">mod</span> <span class="ident">schema</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">elections</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">models</span>;
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">schema</span>;
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DbConnection</span> <span class="op">=</span> <span class="ident">PgConnection</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">DbPool</span> <span class="op">=</span> <span class="ident">r2d2</span>::<span class="ident">Pool</span><span class="op">&lt;</span><span class="ident">ConnectionManager</span><span class="op">&lt;</span><span class="ident">DbConnection</span><span class="op">&gt;</span><span class="op">&gt;</span>;

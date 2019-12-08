@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["create_election",""],["find_election",""]]});

@@ -63,7 +63,7 @@
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">schema</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">uuid</span>::<span class="ident">Uuid</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">schema</span>::<span class="ident">Importance</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">graphql</span>::{<span class="self">self</span>, <span class="ident">schema</span>::<span class="ident">Importance</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Identifiable</span>, <span class="ident">Queryable</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Election</span> {
@@ -78,9 +78,9 @@
     <span class="kw">pub</span> <span class="ident">updated_at</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>
 }
 
-<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">Election</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="kw">crate</span>::<span class="ident">schema</span>::<span class="ident">Election</span> {
+<span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="ident">Election</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">graphql</span>::<span class="ident">schema</span>::<span class="ident">Election</span> {
     <span class="kw">fn</span> <span class="ident">from</span>((<span class="ident">election</span>, <span class="ident">choices</span>): (<span class="ident">Election</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">crate</span>::<span class="ident">schema</span>::<span class="ident">Election</span> {
+        <span class="ident">graphql</span>::<span class="ident">schema</span>::<span class="ident">Election</span> {
             <span class="ident">id</span>: <span class="ident">election</span>.<span class="ident">id</span>,
             <span class="ident">name</span>: <span class="ident">election</span>.<span class="ident">name</span>,
             <span class="ident">description</span>: <span class="ident">election</span>.<span class="ident">description</span>,

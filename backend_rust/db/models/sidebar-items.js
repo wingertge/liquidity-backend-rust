@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Choice",""],["Election",""],["NewChoice",""],["NewElection",""]]});

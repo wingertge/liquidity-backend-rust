@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["context",""],["db",""],["permissions",""],["resolvers",""],["schema",""]]});
+initSidebarItems({"mod":[["db",""],["graphql",""]]});
