@@ -1,8 +1,8 @@
 use diesel::{PgConnection, r2d2::ConnectionManager};
 
-pub(crate) mod elections;
-pub(crate) mod models;
-pub(crate) mod schema;
+pub mod elections;
+pub mod models;
+pub mod schema;
 
 pub type DbConnection = PgConnection;
 pub type DbPool = r2d2::Pool<ConnectionManager<DbConnection>>;

@@ -1,9 +1,7 @@
-use crate::schema::{ElectionInput, Election};
+use super::{schema::{ElectionInput, Election}, context::Context, permissions};
 use juniper::FieldResult;
-use crate::context::Context;
 use uuid::Uuid;
 use crate::db::elections;
-use crate::permissions;
 
 pub struct Query;
 pub struct Mutation;

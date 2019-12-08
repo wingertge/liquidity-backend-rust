@@ -14,7 +14,7 @@ use jwks_client::keyset::KeyStore;
 use futures::future::FutureResult;
 use failure::Error;
 use crate::JWTError::{InvalidJWTFormat, InvalidRequestFormat, InvalidSignature};
-use backend_rust::{db::create_db_pool, context::{User, Context}, resolvers::{Query, Mutation}};
+use backend_rust::{db::create_db_pool, graphql::{context::{User, Context}, resolvers::{Query, Mutation}}};
 use serde::{Serialize};
 use serde_json::Value;
 

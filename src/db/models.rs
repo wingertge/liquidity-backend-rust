@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
 use super::schema::*;
 use uuid::Uuid;
-use crate::schema::Importance;
+use crate::graphql::{self, schema::Importance};
 
 #[derive(Identifiable, Queryable, Debug)]
 pub struct Election {
@@ -16,9 +16,9 @@ pub struct Election {
     pub updated_at: DateTime<Utc>
 }
 
-impl From<(Election, Vec<Choice>)> for crate::schema::Election {
+impl From<(Election, Vec<Choice>)> for graphql::schema::Election {
     fn from((election, choices): (Election, Vec<Choice>)) -> Self {
-        crate::schema::Election {
+        graphql::schema::Election {
             id: election.id,
             name: election.name,
             description: election.description,

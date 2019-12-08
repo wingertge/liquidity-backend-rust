@@ -1,4 +1,4 @@
-use crate::context::User;
+use super::context::User;
 
 /// Check the user's permissions to ensure they are allowed to use the API function
 /// # Arguments
@@ -13,8 +13,8 @@ use crate::context::User;
 /// # Example
 ///
 /// ```
-/// # use backend_rust::context::User;
-/// # use backend_rust::permissions;
+/// # use backend_rust::graphql::context::User;
+/// # use backend_rust::graphql::permissions;
 /// // Make a mock user
 /// let user = Some(Box::new(User {
 ///     id: "".to_string(),

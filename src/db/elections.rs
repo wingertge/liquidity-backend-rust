@@ -1,11 +1,10 @@
 use super::{DbConnection, models::{Election, Choice}, schema::{elections, choices}};
 use failure::{Error, ResultExt};
-use crate::schema::ElectionInput;
 use crate::db::models::{NewElection, NewChoice};
 use chrono::Utc;
-use crate::schema::Importance::Regular;
 use diesel::{RunQueryDsl, QueryDsl, ExpressionMethods};
 use uuid::Uuid;
+use crate::graphql::schema::{ElectionInput, Importance::Regular};
 
 pub fn create_election(election: &ElectionInput, creator_id: &str, conn: &DbConnection) -> Result<(Election, Vec<Choice>), Error> {
     let id = Uuid::new_v4();
