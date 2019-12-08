@@ -2,8 +2,7 @@ name: Rust
 
 on:
   push:
-    branches:
-      - !gh-pages
+    branches-ignore: gh-pages
 
 jobs:
   build:
