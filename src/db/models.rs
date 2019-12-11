@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use super::schema::*;
+use super::schema::{choices, elections};
 use uuid::Uuid;
 use crate::graphql::{self, schema::Importance};
 
@@ -34,7 +34,7 @@ impl From<(Election, Vec<Choice>)> for graphql::schema::Election {
 
 /// Type for inserting new elections into the database
 #[derive(Insertable)]
-#[table_name="elections"]
+#[table_name = "elections"]
 pub struct NewElection<'a> {
     pub id: &'a Uuid,
     pub created_by_id: &'a str,
@@ -48,9 +48,11 @@ pub struct NewElection<'a> {
 }
 
 /// Type for election choices in the database
-#[derive(Queryable, Associations)]
-#[belongs_to(Election, foreign_key="election_id")]
+#[derive(Identifiable, Queryable, Associations)]
+#[table_name = "choices"]
+#[belongs_to(Election, foreign_key = "election_id")]
 pub struct Choice {
+    pub id: Uuid,
     pub election_id: Uuid,
     pub ballot_index: i16,
     pub value: String
@@ -60,6 +62,7 @@ pub struct Choice {
 #[derive(Insertable)]
 #[table_name="choices"]
 pub struct NewChoice<'a> {
+    pub id: Uuid,
     pub election_id: &'a Uuid,
     pub ballot_index: i16,
     pub value: String

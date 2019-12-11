@@ -9,7 +9,8 @@ table! {
 }
 
 table! {
-    choices (election_id) {
+    choices (id, election_id) {
+        id -> Uuid,
         election_id -> Uuid,
         ballot_index -> Int2,
         value -> Varchar,

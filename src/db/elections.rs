@@ -2,7 +2,7 @@ use super::{models::{Election, Choice}, schema::{elections, choices}};
 use failure::{Error, ResultExt};
 use crate::db::models::{NewElection, NewChoice};
 use chrono::Utc;
-use diesel::{RunQueryDsl, QueryDsl, ExpressionMethods};
+use diesel::{RunQueryDsl, QueryDsl, ExpressionMethods, BelongingToDsl};
 use uuid::Uuid;
 use crate::graphql::schema::{ElectionInput, Importance::Regular};
 use crate::db::DbConnection;
@@ -62,6 +62,7 @@ pub fn create_election(election: &ElectionInput, creator_id: &str, conn: &DbConn
             choices.iter().map(|choice| {
                 i += 1;
                 NewChoice {
+                    id: Uuid::new_v4(),
                     election_id: &election_result.id,
                     ballot_index: i.clone(),
                     value: choice.to_owned()
@@ -100,8 +101,7 @@ pub fn create_election(election: &ElectionInput, creator_id: &str, conn: &DbConn
 /// ```
 pub fn find_election(id: &Uuid, conn: &DbConnection) -> Result<(Election, Vec<Choice>), Error> {
     let election: Election = elections::table.find(id).first::<Election>(conn).context("Couldn't find the election")?;
-    let choices: Vec<Choice> = choices::table
-        .filter(choices::election_id.eq(&election.id))
+    let choices = Choice::belonging_to(&election)
         .order_by(choices::ballot_index.asc())
         .load::<Choice>(conn)
         .context("Failed to load associated choices")?;

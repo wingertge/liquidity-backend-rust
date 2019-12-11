@@ -11,7 +11,9 @@ CREATE TABLE elections (
 );
 
 CREATE TABLE choices (
-    election_id uuid PRIMARY KEY REFERENCES elections(id) ON DELETE CASCADE ON UPDATE CASCADE,
+    id uuid,
+    election_id uuid REFERENCES elections(id) ON DELETE CASCADE ON UPDATE CASCADE,
     ballot_index SMALLINT NOT NULL,
-    value VARCHAR(255) NOT NULL
+    value VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id, election_id)
 );
