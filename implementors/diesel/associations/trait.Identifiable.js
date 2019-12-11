@@ -1,5 +1,5 @@
 (function() {var implementors = {};
-implementors["backend_rust"] = [{text:"impl&lt;'ident&gt; <a class=\"trait\" href=\"diesel/associations/trait.Identifiable.html\" title=\"trait diesel::associations::Identifiable\">Identifiable</a> for &amp;'ident <a class=\"struct\" href=\"backend_rust/db/models/struct.Election.html\" title=\"struct backend_rust::db::models::Election\">Election</a>",synthetic:false,types:["backend_rust::db::models::Election"]},];
+implementors["backend_rust"] = [{text:"impl&lt;'ident&gt; <a class=\"trait\" href=\"diesel/associations/trait.Identifiable.html\" title=\"trait diesel::associations::Identifiable\">Identifiable</a> for &amp;'ident <a class=\"struct\" href=\"backend_rust/db/models/struct.Election.html\" title=\"struct backend_rust::db::models::Election\">Election</a>",synthetic:false,types:["backend_rust::db::models::Election"]},{text:"impl&lt;'ident&gt; <a class=\"trait\" href=\"diesel/associations/trait.Identifiable.html\" title=\"trait diesel::associations::Identifiable\">Identifiable</a> for &amp;'ident <a class=\"struct\" href=\"backend_rust/db/models/struct.Choice.html\" title=\"struct backend_rust::db::models::Choice\">Choice</a>",synthetic:false,types:["backend_rust::db::models::Choice"]},];
 
             if (window.register_implementors) {
                 window.register_implementors(implementors);

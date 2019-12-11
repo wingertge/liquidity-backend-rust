@@ -113,7 +113,7 @@
 <span class="kw">use</span> <span class="ident">failure</span>::{<span class="ident">Error</span>, <span class="ident">ResultExt</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">db</span>::<span class="ident">models</span>::{<span class="ident">NewElection</span>, <span class="ident">NewChoice</span>};
 <span class="kw">use</span> <span class="ident">chrono</span>::<span class="ident">Utc</span>;
-<span class="kw">use</span> <span class="ident">diesel</span>::{<span class="ident">RunQueryDsl</span>, <span class="ident">QueryDsl</span>, <span class="ident">ExpressionMethods</span>};
+<span class="kw">use</span> <span class="ident">diesel</span>::{<span class="ident">RunQueryDsl</span>, <span class="ident">QueryDsl</span>, <span class="ident">ExpressionMethods</span>, <span class="ident">BelongingToDsl</span>};
 <span class="kw">use</span> <span class="ident">uuid</span>::<span class="ident">Uuid</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">graphql</span>::<span class="ident">schema</span>::{<span class="ident">ElectionInput</span>, <span class="ident">Importance</span>::<span class="ident">Regular</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">db</span>::<span class="ident">DbConnection</span>;
@@ -173,6 +173,7 @@
             <span class="ident">choices</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">choice</span><span class="op">|</span> {
                 <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="ident">NewChoice</span> {
+                    <span class="ident">id</span>: <span class="ident">Uuid</span>::<span class="ident">new_v4</span>(),
                     <span class="ident">election_id</span>: <span class="kw-2">&amp;</span><span class="ident">election_result</span>.<span class="ident">id</span>,
                     <span class="ident">ballot_index</span>: <span class="ident">i</span>.<span class="ident">clone</span>(),
                     <span class="ident">value</span>: <span class="ident">choice</span>.<span class="ident">to_owned</span>()
@@ -211,8 +212,7 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_election</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">DbConnection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Election</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">election</span>: <span class="ident">Election</span> <span class="op">=</span> <span class="ident">elections</span>::<span class="ident">table</span>.<span class="ident">find</span>(<span class="ident">id</span>).<span class="ident">first</span>::<span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span>(<span class="ident">conn</span>).<span class="ident">context</span>(<span class="string">&quot;Couldn&#39;t find the election&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">choices</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">choices</span>::<span class="ident">table</span>
-        .<span class="ident">filter</span>(<span class="ident">choices</span>::<span class="ident">election_id</span>.<span class="ident">eq</span>(<span class="kw-2">&amp;</span><span class="ident">election</span>.<span class="ident">id</span>))
+    <span class="kw">let</span> <span class="ident">choices</span> <span class="op">=</span> <span class="ident">Choice</span>::<span class="ident">belonging_to</span>(<span class="kw-2">&amp;</span><span class="ident">election</span>)
         .<span class="ident">order_by</span>(<span class="ident">choices</span>::<span class="ident">ballot_index</span>.<span class="ident">asc</span>())
         .<span class="ident">load</span>::<span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span>(<span class="ident">conn</span>)
         .<span class="ident">context</span>(<span class="string">&quot;Failed to load associated choices&quot;</span>)<span class="question-mark">?</span>;

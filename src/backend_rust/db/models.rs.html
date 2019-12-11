@@ -64,9 +64,12 @@
 <span id="64">64</span>
 <span id="65">65</span>
 <span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">schema</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">schema</span>::{<span class="ident">choices</span>, <span class="ident">elections</span>};
 <span class="kw">use</span> <span class="ident">uuid</span>::<span class="ident">Uuid</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">graphql</span>::{<span class="self">self</span>, <span class="ident">schema</span>::<span class="ident">Importance</span>};
 
@@ -101,7 +104,7 @@
 
 <span class="doccomment">/// Type for inserting new elections into the database</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Insertable</span>)]</span>
-<span class="attribute">#[<span class="ident">table_name</span><span class="op">=</span><span class="string">&quot;elections&quot;</span>]</span>
+<span class="attribute">#[<span class="ident">table_name</span> <span class="op">=</span> <span class="string">&quot;elections&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NewElection</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Uuid</span>,
     <span class="kw">pub</span> <span class="ident">created_by_id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span>,
@@ -115,9 +118,11 @@
 }
 
 <span class="doccomment">/// Type for election choices in the database</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Queryable</span>, <span class="ident">Associations</span>)]</span>
-<span class="attribute">#[<span class="ident">belongs_to</span>(<span class="ident">Election</span>, <span class="ident">foreign_key</span><span class="op">=</span><span class="string">&quot;election_id&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Identifiable</span>, <span class="ident">Queryable</span>, <span class="ident">Associations</span>)]</span>
+<span class="attribute">#[<span class="ident">table_name</span> <span class="op">=</span> <span class="string">&quot;choices&quot;</span>]</span>
+<span class="attribute">#[<span class="ident">belongs_to</span>(<span class="ident">Election</span>, <span class="ident">foreign_key</span> <span class="op">=</span> <span class="string">&quot;election_id&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Choice</span> {
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">Uuid</span>,
     <span class="kw">pub</span> <span class="ident">election_id</span>: <span class="ident">Uuid</span>,
     <span class="kw">pub</span> <span class="ident">ballot_index</span>: <span class="ident">i16</span>,
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">String</span>
@@ -127,6 +132,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Insertable</span>)]</span>
 <span class="attribute">#[<span class="ident">table_name</span><span class="op">=</span><span class="string">&quot;choices&quot;</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">NewChoice</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">Uuid</span>,
     <span class="kw">pub</span> <span class="ident">election_id</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Uuid</span>,
     <span class="kw">pub</span> <span class="ident">ballot_index</span>: <span class="ident">i16</span>,
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">String</span>
