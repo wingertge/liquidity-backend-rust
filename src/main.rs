@@ -17,6 +17,7 @@ use crate::JWTError::{InvalidJWTFormat, InvalidRequestFormat, InvalidSignature};
 use backend_rust::{db::create_db_pool, graphql::{context::{User, Context}, resolvers::{Query, Mutation}}};
 use serde::{Serialize};
 use serde_json::Value;
+use backend_rust::db::DbPool;
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
@@ -90,9 +91,9 @@ fn get_user(req: &Request<Body>, keys: Arc<KeyStore>) -> Result<Option<Box<User>
     }
 }
 
-fn get_request_context(req: &Request<Body>, context: Arc<Context>, keys: Arc<KeyStore>) -> Result<Arc<Context>, Error> {
+fn get_request_context(req: &Request<Body>, db: Arc<DbPool>, keys: Arc<KeyStore>) -> Result<Arc<Context>, Error> {
     let user = get_user(req, keys)?;
-    Ok(Arc::new(Context { user, db: context.db.clone() }))
+    Ok(Arc::new(Context { user, db: db.clone() }))
 }
 
 fn send_error(e: Error) -> Box<FutureResult<Response<Body>, hyper::Error>> {
@@ -114,21 +115,20 @@ fn main() {
         .unwrap_or(4000);
 
     let addr = ([127, 0, 0, 1], port).into();
-    let db_pool = create_db_pool();
+    let db_pool = Arc::new(create_db_pool());
     let root_node = Arc::new(RootNode::new(Query, Mutation));
     let jwt_keys = Arc::new(KeyStore::new_from(std::env::var(JWKS_URL)
             .expect("JWKS_URL must be set").as_str()).unwrap());
-    let ctx = Arc::new(Context {db: db_pool, user: None});
     let playground = std::env::var(GRAPHQL_PLAYGROUND).unwrap_or("false".to_string()).parse::<bool>().unwrap();
     println!("Playground {}.", if playground {"enabled"} else {"disabled"});
 
     let new_service = move || {
         let root_node = root_node.clone();
-        let ctx = ctx.clone();
         let jwt_keys = jwt_keys.clone();
+        let db_pool = db_pool.clone();
         service_fn(move |req: Request<Body>| -> Box<dyn Future<Item = _, Error = _> + Send> {
             let root_node = root_node.clone();
-            let ctx = ctx.clone();
+            let db_pool = db_pool.clone();
             match (req.method(), req.uri().path()) {
                 (&Method::GET, "/") => {
                     if playground { Box::new(juniper_hyper::playground("/graphql")) }
@@ -139,7 +139,7 @@ fn main() {
                     }
                 },
                 (&Method::GET, "/graphql") => {
-                    let ctx = get_request_context(&req, ctx.clone(), jwt_keys.clone());
+                    let ctx = get_request_context(&req, db_pool, jwt_keys.clone());
                     match ctx {
                         Ok(ctx) => Box::new(juniper_hyper::graphql(root_node, ctx, req)),
                         Err(e) => {
@@ -149,7 +149,7 @@ fn main() {
                     }
                 },
                 (&Method::POST, "/graphql") => {
-                    let ctx = get_request_context(&req, ctx.clone(), jwt_keys.clone());
+                    let ctx = get_request_context(&req, db_pool, jwt_keys.clone());
                     match ctx {
                         Ok(ctx) => Box::new(juniper_hyper::graphql(root_node, ctx, req)),
                         Err(e) => send_error(e)

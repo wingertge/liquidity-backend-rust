@@ -1,0 +1,26 @@
+config:
+  target: "http://localhost:4000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+    - duration: 120
+      arrivalRate: 5
+      rampTo: 50
+    - duration: 120
+      arrivalRate: 50
+scenarios:
+  - flow:
+      - post:
+          url: "/graphql"
+          headers:
+            authorization: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik16UTVORFpEUWpVeVFqWTNOME5HUlRZMVFqbEJOVUpETVRkR09UaEJNa0kzT0VVek9EZ3lSZyJ9.eyJpc3MiOiJodHRwczovL2xpcXVpZGl0eS1kZXYuZXUuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDVkZDUwNTI0YmRiNzdjMGYxN2ZjNzU0MyIsImF1ZCI6WyJodHRwOi8vbG9jYWxob3N0OjQwMDAvZ3JhcGhxbCIsImh0dHBzOi8vbGlxdWlkaXR5LWRldi5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNTc2NTExNDA1LCJleHAiOjE1NzY1OTc4MDUsImF6cCI6IklvOGZFazFaRDJ1d2RheDRiV2E4Tmo1eFNWTWNoU0w1Iiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsInBlcm1pc3Npb25zIjpbImNyZWF0ZTplbGVjdGlvbiIsInVwZGF0ZTplbGVjdGlvbiIsInZpZXc6ZWxlY3Rpb24iLCJ2b3RlOmVsZWN0aW9uIl19.q1hR39ayGkC8pxtlQQ16pVswReCkuQLYvuF6txyEKVuyeBZTXFOC5OqSD5ahilKtgGECTXuBdrT2hG7iZQ2uPW1x-1DXwhVIbVeq634nyPhHY4TrazUw8xdEEujgh_FzDLX56KXe1XUy1-rTsBW5E9ZIwU4w67lNc0LE9MKC1IwWeTuEgSxTvTxFWeU0ozkXh6kh4eBT7s0NrrGyJkZyEjTdpY6v6wFo1KwtZIeSR81xB7j0LvQ_zy4qWjPxhdykYwyn7QvdYpur4PFxCPxS4WIFThjKEwGooyMkXWy-fnPZV3hkAptbqMKMcEsDXr9bT0dIFaGBTfR8t3eLHRFHOw'
+          json:
+            query: |
+              query {
+                nextElection: election(id: "fb8f5068-dc81-4189-9193-57048e294da6") {
+                  id
+                  custom_name: name
+                  description
+                  choices
+                }
+              }

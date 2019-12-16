@@ -1,7 +1,8 @@
 use crate::db::DbPool;
+use std::sync::Arc;
 
 pub struct Context {
-    pub db: DbPool,
+    pub db: Arc<DbPool>,
     pub user: Option<Box<User>>
 }
 
