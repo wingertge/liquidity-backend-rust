@@ -11,8 +11,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Setup
-      run: sudo apt-get install libpq-dev
     - name: Build
       run: cargo build --verbose
     - name: Run tests

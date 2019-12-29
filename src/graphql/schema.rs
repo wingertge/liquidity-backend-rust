@@ -3,6 +3,7 @@ use uuid::Uuid;
 use core::fmt;
 use failure::_core::fmt::{Formatter, Error};
 use failure::_core::str::FromStr;
+use serde::{Serialize, Deserialize};
 
 #[derive(juniper::GraphQLInputObject)]
 /// A set of roles allowed to interact with this election.
@@ -37,7 +38,7 @@ pub struct User {
     pub username: String
 }
 
-#[derive(juniper::GraphQLEnum, Debug)]
+#[derive(juniper::GraphQLEnum, Debug, Serialize, Deserialize, Clone)]
 /// The importance of an election. Affects sorting and filtering.
 pub enum Importance {
     Important,
@@ -64,7 +65,7 @@ impl FromStr for Importance {
     }
 }
 
-#[derive(juniper::GraphQLObject)]
+#[derive(juniper::GraphQLObject, Clone)]
 /// An election
 pub struct Election {
     /// The id of the election (not user facing)
@@ -81,6 +82,20 @@ pub struct Election {
     pub end_date: DateTime<Utc>,
     /// The importance of the election
     pub importance: Importance
+}
+
+impl Default for Election {
+    fn default() -> Self {
+        Election {
+            id: Uuid::new_v4(),
+            name: "".to_string(),
+            description: "".to_string(),
+            choices: vec![],
+            start_date: Utc::now(),
+            end_date: Utc::now(),
+            importance: Importance::Regular
+        }
+    }
 }
 
 #[derive(juniper::GraphQLInputObject)]

@@ -7,17 +7,17 @@ extern crate juniper_hyper;
 use std::sync::Arc;
 use juniper::RootNode;
 use hyper::service::service_fn;
-use hyper::{rt::{self, Future}, Method, Response, Body, StatusCode, Server, Request};
+use hyper::{rt::{self, Future}, Method, Response, Body, StatusCode, Server, Request, HeaderMap};
 use futures::future;
-use hyper::http::header::AUTHORIZATION;
+use hyper::http::header::{AUTHORIZATION, ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_ALLOW_HEADERS};
 use jwks_client::keyset::KeyStore;
 use futures::future::FutureResult;
 use failure::Error;
 use crate::JWTError::{InvalidJWTFormat, InvalidRequestFormat, InvalidSignature};
-use backend_rust::{db::create_db_pool, graphql::{context::{User, Context}, resolvers::{Query, Mutation}}};
+use backend_rust::graphql::{context::{User, Context}, resolvers::{Query, Mutation}};
 use serde::{Serialize};
 use serde_json::Value;
-use backend_rust::db::DbPool;
+use eventstore::{Connection, Credentials};
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
@@ -91,7 +91,7 @@ fn get_user(req: &Request<Body>, keys: Arc<KeyStore>) -> Result<Option<Box<User>
     }
 }
 
-fn get_request_context(req: &Request<Body>, db: Arc<DbPool>, keys: Arc<KeyStore>) -> Result<Arc<Context>, Error> {
+fn get_request_context(req: &Request<Body>, db: Arc<Connection>, keys: Arc<KeyStore>) -> Result<Arc<Context>, Error> {
     let user = get_user(req, keys)?;
     Ok(Arc::new(Context { user, db: db.clone() }))
 }
@@ -115,20 +115,33 @@ fn main() {
         .unwrap_or(4000);
 
     let addr = ([127, 0, 0, 1], port).into();
-    let db_pool = Arc::new(create_db_pool());
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let database_login = std::env::var("DATABASE_LOGIN").expect("DATABASE_LOGIN must be set");
+    let database_password = std::env::var("DATABASE_PASSWORD").expect("DATABASE_PASSWORD must be set");
+    let db = Arc::new(
+        Connection::builder()
+            .with_default_user(Credentials::new(database_login, database_password))
+            .single_node_connection(database_url.parse().unwrap())
+    );
     let root_node = Arc::new(RootNode::new(Query, Mutation));
     let jwt_keys = Arc::new(KeyStore::new_from(std::env::var(JWKS_URL)
             .expect("JWKS_URL must be set").as_str()).unwrap());
     let playground = std::env::var(GRAPHQL_PLAYGROUND).unwrap_or("false".to_string()).parse::<bool>().unwrap();
     println!("Playground {}.", if playground {"enabled"} else {"disabled"});
 
+    let mut headers = HeaderMap::new();
+    headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, "*".parse().unwrap());
+    headers.insert(ACCESS_CONTROL_ALLOW_HEADERS, "*".parse().unwrap());
+
     let new_service = move || {
         let root_node = root_node.clone();
         let jwt_keys = jwt_keys.clone();
-        let db_pool = db_pool.clone();
+        let db = db.clone();
+        let headers = headers.clone();
         service_fn(move |req: Request<Body>| -> Box<dyn Future<Item = _, Error = _> + Send> {
             let root_node = root_node.clone();
-            let db_pool = db_pool.clone();
+            let db = db.clone();
+            let headers = headers.clone();
             match (req.method(), req.uri().path()) {
                 (&Method::GET, "/") => {
                     if playground { Box::new(juniper_hyper::playground("/graphql")) }
@@ -139,9 +152,15 @@ fn main() {
                     }
                 },
                 (&Method::GET, "/graphql") => {
-                    let ctx = get_request_context(&req, db_pool, jwt_keys.clone());
+                    let ctx = get_request_context(&req, db, jwt_keys.clone());
                     match ctx {
-                        Ok(ctx) => Box::new(juniper_hyper::graphql(root_node, ctx, req)),
+                        Ok(ctx) => Box::new(
+                            juniper_hyper::graphql(root_node, ctx, req)
+                                .map(|mut res| {
+                                    *res.headers_mut() = headers;
+                                    res
+                                })
+                        ),
                         Err(e) => {
                             println!("{:?}", e);
                             send_error(e)
@@ -149,12 +168,23 @@ fn main() {
                     }
                 },
                 (&Method::POST, "/graphql") => {
-                    let ctx = get_request_context(&req, db_pool, jwt_keys.clone());
+                    let ctx = get_request_context(&req, db, jwt_keys.clone());
                     match ctx {
-                        Ok(ctx) => Box::new(juniper_hyper::graphql(root_node, ctx, req)),
+                        Ok(ctx) => Box::new(
+                            juniper_hyper::graphql(root_node, ctx, req)
+                                .map(|mut res| {
+                                    *res.headers_mut() = headers;
+                                    res
+                                })
+                        ),
                         Err(e) => send_error(e)
                     }
                 },
+                (&Method::OPTIONS, "/graphql") => {
+                    let mut response = Response::new(Body::empty());
+                    *response.headers_mut() = headers;
+                    Box::new(future::ok(response))
+                }
                 _ => {
                     let mut response = Response::new(Body::empty());
                     *response.status_mut() = StatusCode::NOT_FOUND;

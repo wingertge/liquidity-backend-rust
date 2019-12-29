@@ -1,7 +1,6 @@
 use super::{schema::{ElectionInput, Election}, context::Context, permissions};
 use juniper::FieldResult;
 use uuid::Uuid;
-use crate::db::elections;
 
 /// GraphQL Query type
 pub struct Query;
@@ -40,10 +39,10 @@ impl Query {
     /// ```
     pub fn election(id: Uuid, context: &Context) -> FieldResult<Option<Election>> {
         permissions::check("view:election", &context.user)?;
-        let conn = &*context.db.get()?;
-        let result = elections::find_election(&id, conn)?;
+        use crate::db::elections;
 
-        Ok(Some(result.into()))
+        let db = context.db.clone();
+        elections::find_election(&id, db).map_err(Into::into)
     }
 }
 
@@ -82,12 +81,11 @@ impl Mutation {
         context: &Context
     ) -> FieldResult<Option<Election>> {
         permissions::check("create:election", &context.user)?;
+        let db = context.db.clone();
         match &context.user {
             Some(user) => {
                 use crate::db::elections;
-                let conn = &*context.db.get()?;
-                let result = elections::create_election(&input, &user.id, conn)?;
-                Ok(Some(result.into()))
+                elections::create_election(input, &user.id, db).map_err(Into::into)
             },
             None => Err("Must be logged in".into())
         }
