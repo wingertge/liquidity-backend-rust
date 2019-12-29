@@ -101,12 +101,28 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="ident">uuid</span>::<span class="ident">Uuid</span>;
 <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">_core</span>::<span class="ident">fmt</span>::{<span class="ident">Formatter</span>, <span class="ident">Error</span>};
 <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">_core</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLInputObject</span>)]</span>
 <span class="doccomment">/// A set of roles allowed to interact with this election.</span>
@@ -141,7 +157,7 @@
     <span class="kw">pub</span> <span class="ident">username</span>: <span class="ident">String</span>
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLEnum</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLEnum</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
 <span class="doccomment">/// The importance of an election. Affects sorting and filtering.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Importance</span> {
     <span class="ident">Important</span>,
@@ -168,7 +184,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLObject</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLObject</span>, <span class="ident">Clone</span>)]</span>
 <span class="doccomment">/// An election</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Election</span> {
     <span class="doccomment">/// The id of the election (not user facing)</span>
@@ -185,6 +201,20 @@
     <span class="kw">pub</span> <span class="ident">end_date</span>: <span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The importance of the election</span>
     <span class="kw">pub</span> <span class="ident">importance</span>: <span class="ident">Importance</span>
+}
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">Election</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">Election</span> {
+            <span class="ident">id</span>: <span class="ident">Uuid</span>::<span class="ident">new_v4</span>(),
+            <span class="ident">name</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">description</span>: <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>(),
+            <span class="ident">choices</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+            <span class="ident">start_date</span>: <span class="ident">Utc</span>::<span class="ident">now</span>(),
+            <span class="ident">end_date</span>: <span class="ident">Utc</span>::<span class="ident">now</span>(),
+            <span class="ident">importance</span>: <span class="ident">Importance</span>::<span class="ident">Regular</span>
+        }
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLInputObject</span>)]</span>

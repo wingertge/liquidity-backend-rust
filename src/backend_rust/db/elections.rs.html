@@ -101,22 +101,15 @@
 <span id="101">101</span>
 <span id="102">102</span>
 <span id="103">103</span>
-<span id="104">104</span>
-<span id="105">105</span>
-<span id="106">106</span>
-<span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">models</span>::{<span class="ident">Election</span>, <span class="ident">Choice</span>}, <span class="ident">schema</span>::{<span class="ident">elections</span>, <span class="ident">choices</span>}};
-<span class="kw">use</span> <span class="ident">failure</span>::{<span class="ident">Error</span>, <span class="ident">ResultExt</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">db</span>::<span class="ident">models</span>::{<span class="ident">NewElection</span>, <span class="ident">NewChoice</span>};
+<span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
 <span class="kw">use</span> <span class="ident">chrono</span>::<span class="ident">Utc</span>;
-<span class="kw">use</span> <span class="ident">diesel</span>::{<span class="ident">RunQueryDsl</span>, <span class="ident">QueryDsl</span>, <span class="ident">ExpressionMethods</span>, <span class="ident">BelongingToDsl</span>};
 <span class="kw">use</span> <span class="ident">uuid</span>::<span class="ident">Uuid</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">graphql</span>::<span class="ident">schema</span>::{<span class="ident">ElectionInput</span>, <span class="ident">Importance</span>::<span class="ident">Regular</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">db</span>::<span class="ident">DbConnection</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">graphql</span>::<span class="ident">schema</span>::{<span class="ident">ElectionInput</span>, <span class="ident">Election</span>, <span class="ident">Importance</span>::<span class="ident">Regular</span>};
+<span class="kw">use</span> <span class="ident">eventstore</span>::{<span class="ident">EventData</span>, <span class="ident">Connection</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">future</span>, <span class="ident">stream</span>::<span class="ident">Stream</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">models</span>::<span class="ident">CreateElectionEvent</span>;
 
 <span class="doccomment">/// Create a new election in the database</span>
 <span class="doccomment">///</span>
@@ -146,50 +139,34 @@
 <span class="doccomment">/// let result = elections::create_election(&amp;election_input, &quot;auth0|asdqwe&quot;, &amp;conn);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_election</span>(<span class="ident">election</span>: <span class="kw-2">&amp;</span><span class="ident">ElectionInput</span>, <span class="ident">creator_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">DbConnection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Election</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_election</span>(<span class="ident">election</span>: <span class="ident">ElectionInput</span>, <span class="ident">creator_id</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">conn</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">Uuid</span>::<span class="ident">new_v4</span>();
+    <span class="kw">let</span> <span class="ident">stream_id</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;election-{}&quot;</span>, <span class="ident">id</span>);
 
-    <span class="kw">let</span> <span class="ident">new_election</span> <span class="op">=</span> <span class="ident">NewElection</span> {
-        <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">id</span>,
-        <span class="ident">created_by_id</span>: <span class="ident">creator_id</span>,
-        <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">election</span>.<span class="ident">name</span>,
-        <span class="ident">description</span>: <span class="kw-2">&amp;</span><span class="ident">election</span>.<span class="ident">description</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()),
-        <span class="ident">start_date</span>: <span class="kw-2">&amp;</span><span class="ident">election</span>.<span class="ident">start_date</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">Utc</span>::<span class="ident">now</span>),
-        <span class="ident">end_date</span>: <span class="kw-2">&amp;</span><span class="ident">election</span>.<span class="ident">end_date</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">Utc</span>::<span class="ident">now</span>),
-        <span class="ident">importance</span>: <span class="kw-2">&amp;</span><span class="ident">election</span>.<span class="ident">importance</span>.<span class="ident">as_ref</span>().<span class="ident">unwrap_or</span>(<span class="kw-2">&amp;</span><span class="ident">Regular</span>).<span class="ident">to_string</span>(),
-        <span class="ident">created_at</span>: <span class="kw-2">&amp;</span><span class="ident">Utc</span>::<span class="ident">now</span>(),
-        <span class="ident">updated_at</span>: <span class="kw-2">&amp;</span><span class="ident">Utc</span>::<span class="ident">now</span>()
+    <span class="kw">let</span> <span class="ident">event_data</span> <span class="op">=</span> <span class="ident">CreateElectionEvent</span> {
+        <span class="ident">id</span>,
+        <span class="ident">created_by_id</span>: <span class="ident">creator_id</span>.<span class="ident">to_string</span>(),
+        <span class="ident">name</span>: <span class="ident">election</span>.<span class="ident">name</span>,
+        <span class="ident">description</span>: <span class="ident">election</span>.<span class="ident">description</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()),
+        <span class="ident">start_date</span>: <span class="ident">election</span>.<span class="ident">start_date</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Utc</span>::<span class="ident">now</span>()),
+        <span class="ident">end_date</span>: <span class="ident">election</span>.<span class="ident">end_date</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Utc</span>::<span class="ident">now</span>()),
+        <span class="ident">importance</span>: <span class="ident">election</span>.<span class="ident">importance</span>.<span class="ident">unwrap_or</span>(<span class="ident">Regular</span>),
+        <span class="ident">choices</span>: <span class="ident">election</span>.<span class="ident">choices</span>.<span class="ident">unwrap_or</span>(<span class="macro">vec</span><span class="macro">!</span>[])
     };
 
-    <span class="kw">let</span> <span class="ident">election_result</span> <span class="op">=</span> <span class="ident">diesel</span>::<span class="ident">insert_into</span>(<span class="ident">elections</span>::<span class="ident">table</span>)
-        .<span class="ident">values</span>(<span class="kw-2">&amp;</span><span class="ident">new_election</span>)
-        .<span class="ident">get_result</span>::<span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span>(<span class="ident">conn</span>)
-        .<span class="ident">context</span>(<span class="string">&quot;Failed to create new election&quot;</span>)<span class="question-mark">?</span>;
+    <span class="kw">let</span> <span class="ident">event_payload</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_value</span>(<span class="ident">event_data</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
 
-    <span class="kw">let</span> <span class="ident">new_choices</span> <span class="op">=</span> <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">election</span>.<span class="ident">choices</span> {
-        <span class="prelude-val">Some</span>(<span class="ident">choices</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">i</span> <span class="op">=</span> <span class="op">-</span><span class="number">1</span>;
+    <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">EventData</span>::<span class="ident">json</span>(<span class="string">&quot;election-create&quot;</span>, <span class="ident">event_payload</span>)<span class="question-mark">?</span>;
 
-            <span class="ident">choices</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">choice</span><span class="op">|</span> {
-                <span class="ident">i</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-                <span class="ident">NewChoice</span> {
-                    <span class="ident">id</span>: <span class="ident">Uuid</span>::<span class="ident">new_v4</span>(),
-                    <span class="ident">election_id</span>: <span class="kw-2">&amp;</span><span class="ident">election_result</span>.<span class="ident">id</span>,
-                    <span class="ident">ballot_index</span>: <span class="ident">i</span>.<span class="ident">clone</span>(),
-                    <span class="ident">value</span>: <span class="ident">choice</span>.<span class="ident">to_owned</span>()
-                }
-            }).<span class="ident">collect</span>()
-        },
-        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">vec</span><span class="macro">!</span>[]
-    };
+    <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">conn</span>
+        .<span class="ident">write_events</span>(<span class="ident">stream_id</span>)
+        .<span class="ident">push_event</span>(<span class="ident">event</span>)
+        .<span class="ident">execute</span>();
 
-    <span class="kw">let</span> <span class="ident">choices_result</span> <span class="op">=</span> <span class="ident">diesel</span>::<span class="ident">insert_into</span>(<span class="ident">choices</span>::<span class="ident">table</span>)
-        .<span class="ident">values</span>(<span class="ident">new_choices</span>)
-        .<span class="ident">get_results</span>::<span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span>(<span class="ident">conn</span>)
-        .<span class="ident">context</span>(<span class="string">&quot;Failed to create choices for election&quot;</span>)<span class="question-mark">?</span>;
-
-
-    <span class="prelude-val">Ok</span>((<span class="ident">election_result</span>, <span class="ident">choices_result</span>))
+    <span class="ident">result</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">result</span><span class="op">|</span> {
+        <span class="ident">log</span>::<span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;{:?}&quot;</span>, <span class="ident">result</span>);
+        <span class="ident">event_data</span>.<span class="ident">into</span>()
+    }).<span class="ident">map_err</span>(<span class="ident">Into</span>::<span class="ident">into</span>).<span class="ident">wait</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">e</span>))
 }
 
 <span class="doccomment">/// Find an election by its id</span>
@@ -210,13 +187,22 @@
 <span class="doccomment">/// use backend_rust::db::elections;</span>
 <span class="doccomment">/// let election = elections::find_election(&amp;id, &amp;conn);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_election</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">DbConnection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">Election</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span>), <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="kw">let</span> <span class="ident">election</span>: <span class="ident">Election</span> <span class="op">=</span> <span class="ident">elections</span>::<span class="ident">table</span>.<span class="ident">find</span>(<span class="ident">id</span>).<span class="ident">first</span>::<span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span>(<span class="ident">conn</span>).<span class="ident">context</span>(<span class="string">&quot;Couldn&#39;t find the election&quot;</span>)<span class="question-mark">?</span>;
-    <span class="kw">let</span> <span class="ident">choices</span> <span class="op">=</span> <span class="ident">Choice</span>::<span class="ident">belonging_to</span>(<span class="kw-2">&amp;</span><span class="ident">election</span>)
-        .<span class="ident">order_by</span>(<span class="ident">choices</span>::<span class="ident">ballot_index</span>.<span class="ident">asc</span>())
-        .<span class="ident">load</span>::<span class="op">&lt;</span><span class="ident">Choice</span><span class="op">&gt;</span>(<span class="ident">conn</span>)
-        .<span class="ident">context</span>(<span class="string">&quot;Failed to load associated choices&quot;</span>)<span class="question-mark">?</span>;
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">find_election</span>(<span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Uuid</span>, <span class="ident">conn</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Connection</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">let</span> <span class="ident">stream</span> <span class="op">=</span> <span class="ident">conn</span>.<span class="ident">read_stream</span>(<span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;election-{}&quot;</span>, <span class="ident">id</span>))
+        .<span class="ident">forward</span>();
 
-    <span class="prelude-val">Ok</span>((<span class="ident">election</span>, <span class="ident">choices</span>))
+    <span class="ident">stream</span>.<span class="ident">iterate_over</span>()
+        .<span class="ident">fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">acc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span>, <span class="ident">item</span><span class="op">|</span> {
+            <span class="kw">let</span> <span class="ident">event</span> <span class="op">=</span> <span class="ident">item</span>.<span class="ident">event</span>.<span class="ident">unwrap</span>();
+            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">event_type</span>.<span class="ident">as_str</span>() {
+                <span class="string">&quot;election-create&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">event</span>.<span class="ident">as_json</span>::<span class="op">&lt;</span><span class="ident">CreateElectionEvent</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
+                    <span class="prelude-val">Some</span>(<span class="ident">payload</span>.<span class="ident">into</span>())
+                },
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">acc</span>
+            };
+            <span class="ident">future</span>::<span class="ident">ok</span>(<span class="ident">result</span>)
+        })
+        .<span class="ident">map_err</span>(<span class="ident">Into</span>::<span class="ident">into</span>).<span class="ident">wait</span>()
 }</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../../";window.currentCrate = "backend_rust";</script><script src="../../../aliases.js"></script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
