@@ -1,9 +1,9 @@
-use crate::db::DbPool;
 use std::sync::Arc;
+use eventstore::Connection;
 
 pub struct Context {
-    pub db: Arc<DbPool>,
-    pub user: Option<Box<User>>
+    pub db: Arc<Connection>,
+    pub user: Option<User>
 }
 
 pub struct User {

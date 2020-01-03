@@ -1,11 +1,12 @@
-use super::{models::{Election, Choice}, schema::{elections, choices}};
-use failure::{Error, ResultExt};
-use crate::db::models::{NewElection, NewChoice};
+use failure::Error;
 use chrono::Utc;
-use diesel::{RunQueryDsl, QueryDsl, ExpressionMethods, BelongingToDsl};
 use uuid::Uuid;
-use crate::graphql::schema::{ElectionInput, Importance::Regular};
-use crate::db::DbConnection;
+use crate::graphql::schema::{ElectionInput, Election, Importance::Regular};
+use eventstore::{EventData, Connection, ResolvedEvent, OperationError};
+use futures::{StreamExt, compat::{Stream01CompatExt, Future01CompatExt}};
+use std::sync::Arc;
+use super::models::CreateElectionEvent;
+use crate::db::ESResultExt;
 
 /// Create a new election in the database
 ///
@@ -20,8 +21,18 @@ use crate::db::DbConnection;
 ///
 /// # Example
 ///
-/// ```ignore
-/// //currently not tested, since it's annoying having to set up a test DB
+/// ```
+/// # futures::executor::block_on(async {
+/// # use backend_rust::graphql::schema::ElectionInput;
+/// # use eventstore::{Connection, Credentials};
+/// # use std::sync::Arc;
+/// # let conn = Arc::new(
+/// #     Connection::builder()
+/// #         .with_default_user(Credentials::new("admin", "changeit"))
+/// #         .single_node_connection(([127, 0, 0, 1], 1113).into())
+/// # );
+/// use backend_rust::db::elections;
+///
 /// let election_input = ElectionInput {
 ///     name: "test_name".to_string(),
 ///     description: Some("This is a test description".to_string()),
@@ -32,53 +43,38 @@ use crate::db::DbConnection;
 ///     importance: None
 /// };
 ///
-/// let result = elections::create_election(&election_input, "auth0|asdqwe", &conn);
-///
+/// let result = elections::create_election(election_input, "auth0|test", conn).await.unwrap().unwrap();
+/// assert_eq!(result.name, "test_name".to_string());
+/// # })
 /// ```
-pub fn create_election(election: &ElectionInput, creator_id: &str, conn: &DbConnection) -> Result<(Election, Vec<Choice>), Error> {
+pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Arc<Connection>) -> Result<Option<Election>, Error> {
     let id = Uuid::new_v4();
+    let stream_id = format!("election-{}", id);
 
-    let new_election = NewElection {
-        id: &id,
-        created_by_id: creator_id,
-        name: &election.name,
-        description: &election.description.clone().unwrap_or("".to_string()),
-        start_date: &election.start_date.unwrap_or_else(Utc::now),
-        end_date: &election.end_date.unwrap_or_else(Utc::now),
-        importance: &election.importance.as_ref().unwrap_or(&Regular).to_string(),
-        created_at: &Utc::now(),
-        updated_at: &Utc::now()
+    let event_data = CreateElectionEvent {
+        id,
+        created_by_id: creator_id.to_string(),
+        name: election.name,
+        description: election.description.unwrap_or("".to_string()),
+        start_date: election.start_date.unwrap_or_else(|| Utc::now()),
+        end_date: election.end_date.unwrap_or_else(|| Utc::now()),
+        importance: election.importance.unwrap_or(Regular),
+        choices: election.choices.unwrap_or(vec![])
     };
 
-    let election_result = diesel::insert_into(elections::table)
-        .values(&new_election)
-        .get_result::<Election>(conn)
-        .context("Failed to create new election")?;
+    let event_payload = serde_json::to_value(event_data.clone())?;
 
-    let new_choices = match &election.choices {
-        Some(choices) => {
-            let mut i = -1;
+    let event = EventData::json("election-create", event_payload)?;
 
-            choices.iter().map(|choice| {
-                i += 1;
-                NewChoice {
-                    id: Uuid::new_v4(),
-                    election_id: &election_result.id,
-                    ballot_index: i.clone(),
-                    value: choice.to_owned()
-                }
-            }).collect()
-        },
-        None => vec![]
-    };
+    let result = conn
+        .write_events(stream_id)
+        .push_event(event)
+        .execute()
+        .compat()
+        .await;
 
-    let choices_result = diesel::insert_into(choices::table)
-        .values(new_choices)
-        .get_results::<Choice>(conn)
-        .context("Failed to create choices for election")?;
-
-
-    Ok((election_result, choices_result))
+    log::info!("{:?}", result);
+    result.map(|_| Some(event_data.into())).map_err(Into::into)
 }
 
 /// Find an election by its id
@@ -94,17 +90,50 @@ pub fn create_election(election: &ElectionInput, creator_id: &str, conn: &DbConn
 ///
 /// # Example
 ///
-/// ```ignore
-/// //currently not tested, since it's annoying having to set up a test DB
-/// use backend_rust::db::elections;
-/// let election = elections::find_election(&id, &conn);
 /// ```
-pub fn find_election(id: &Uuid, conn: &DbConnection) -> Result<(Election, Vec<Choice>), Error> {
-    let election: Election = elections::table.find(id).first::<Election>(conn).context("Couldn't find the election")?;
-    let choices = Choice::belonging_to(&election)
-        .order_by(choices::ballot_index.asc())
-        .load::<Choice>(conn)
-        .context("Failed to load associated choices")?;
+/// # futures::executor::block_on(async {
+/// # use eventstore::{Connection, Credentials};
+/// # use std::sync::Arc;
+/// # use uuid::Uuid;
+/// # let conn = Arc::new(
+/// #     Connection::builder()
+/// #         .with_default_user(Credentials::new("admin", "changeit"))
+/// #         .single_node_connection(([127, 0, 0, 1], 1113).into())
+/// # );
+///
+/// use backend_rust::db::elections;
+/// let id = Uuid::new_v4();
+///
+/// let election = elections::find_election(&id, conn).await.unwrap();
+///
+/// assert_eq!(election, None);
+/// # })
+/// ```
+pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<Election>, Error> {
+    let stream = conn.read_stream(format!("election-{}", id))
+        .forward()
+        .iterate_over();
 
-    Ok((election, choices))
+    let result = stream
+        .compat()
+        .fold(Ok(None), project_election)
+        .await
+        .map_not_found()
+        .map_err(Into::into);
+
+    result
+}
+
+
+
+async fn project_election(acc: Result<Option<Election>, OperationError>, item: Result<ResolvedEvent, OperationError>) -> Result<Option<Election>, OperationError> {
+    let acc = acc?;
+    let event = item?.event.unwrap();
+    match event.event_type.as_str() {
+        "election-create" => {
+            let payload = event.as_json::<CreateElectionEvent>().unwrap();
+            Ok(Some(payload.into()))
+        },
+        _ => Ok(acc)
+    }
 }

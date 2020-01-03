@@ -1,29 +1,42 @@
-use diesel::{PgConnection, r2d2::ConnectionManager};
-use r2d2::Pool;
+use eventstore::OperationError;
 
 /// Contains Repository functions for elections
 pub mod elections;
-/// Contains database model types
-pub mod models;
-mod schema;
+mod models;
 
-pub type DbConnection = PgConnection;
-pub type DbPool = Pool<ConnectionManager<DbConnection>>;
+pub trait ESResultExt<T> {
+    fn map_not_found(self) -> Result<Option<T>, OperationError>;
+}
 
-/// Create a database pool
-///
-/// This function creates a database pool with a connection manager.
-///
-/// # Example
-///
-/// ```ignore
-/// let db_pool = Arc::new(backend_rust::db::create_db_pool());
-/// ```
-pub fn create_db_pool() -> DbPool {
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let manager = ConnectionManager::new(&database_url);
-    r2d2::Pool::builder()
-        .max_size(15)
-        .build(manager)
-        .expect(&format!("Error creating connection pool for {}", database_url))
+impl <T> ESResultExt<T> for Result<Option<T>, OperationError> {
+    /// Map "not found"-type errors as None
+    ///
+    /// # Returns
+    ///
+    /// Some(x) if the result was found, None if there was a stream not found error, Err(e) if another error was encountered
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use eventstore::OperationError;
+    /// use backend_rust::db::ESResultExt;
+    /// let some = Ok::<_, OperationError>(Some("test".to_string()));
+    /// let none = Err::<Option<String>, _>(OperationError::StreamNotFound("asd".to_string()));
+    /// let err = Err::<Option<String>, _>(OperationError::AccessDenied("asd".to_string()));
+    ///
+    /// assert_eq!(some.map_not_found().unwrap(), Some("test".to_string()));
+    /// assert_eq!(none.map_not_found().unwrap(), None);
+    /// assert!(err.map_not_found().is_err());
+    /// ```
+    fn map_not_found(self) -> Result<Option<T>, OperationError> {
+        match self {
+            Ok(x) => Ok(x),
+            Err(e) => {
+                match e {
+                    OperationError::StreamNotFound(_) | OperationError::StreamDeleted(_) => Ok(None),
+                    _ => Err(e)
+                }
+            }
+        }
+    }
 }

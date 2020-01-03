@@ -11,8 +11,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Setup
-      run: sudo apt-get install libpq-dev
+    - name: Setup DB
+      run: docker pull eventstore/eventstore
+    - name: Run DB
+      run: "docker run -d --name eventstore-node -p 2113:2113 -p 1113:1113 eventstore/eventstore"
     - name: Build
       run: cargo build --verbose
     - name: Run tests

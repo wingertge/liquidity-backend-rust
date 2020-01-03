@@ -1,4 +1,5 @@
 use super::context::User;
+use juniper::FieldError;
 
 /// Check the user's permissions to ensure they are allowed to use the API function
 /// # Arguments
@@ -15,25 +16,26 @@ use super::context::User;
 /// ```
 /// # use backend_rust::graphql::context::User;
 /// # use backend_rust::graphql::permissions;
+/// # use juniper::FieldError;
 /// // Make a mock user
-/// let user = Some(Box::new(User {
+/// let user = Some(User {
 ///     id: "".to_string(),
 ///     permissions: vec!["view:election".to_string()]
-/// }));
+/// });
 ///
 /// let valid = permissions::check("view:election", &user);
 /// let invalid = permissions::check("create:election", &user);
 /// let not_logged_in = permissions::check("create:election", &None);
 ///
 /// assert_eq!(Ok(true), valid);
-/// assert_eq!(Err("You don't have permission to view elections"), invalid);
-/// assert_eq!(Err("Must be logged in to do that"), not_logged_in);
+/// assert_eq!(Err(FieldError::from("You don't have permission to view elections")), invalid);
+/// assert_eq!(Err(FieldError::from("Must be logged in to do that")), not_logged_in);
 /// ```
-pub fn check<'a>(key: &str, user: &Option<Box<User>>) -> Result<bool, &'a str> {
+pub fn check<'a>(key: &str, user: &Option<User>) -> Result<bool, FieldError> {
     if !user.as_ref()
         .ok_or("Must be logged in to do that")?
         .permissions.contains(&key.to_string()) {
-        return Err("You don't have permission to view elections")
+        return Err("You don't have permission to view elections".into())
     }
     Ok(true)
 }
