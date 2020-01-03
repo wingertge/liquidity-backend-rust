@@ -38,7 +38,7 @@ pub struct User {
     pub username: String
 }
 
-#[derive(juniper::GraphQLEnum, Debug, Serialize, Deserialize, Clone)]
+#[derive(juniper::GraphQLEnum, Debug, Serialize, Deserialize, Clone, PartialEq)]
 /// The importance of an election. Affects sorting and filtering.
 pub enum Importance {
     Important,
@@ -65,7 +65,7 @@ impl FromStr for Importance {
     }
 }
 
-#[derive(juniper::GraphQLObject, Clone)]
+#[derive(juniper::GraphQLObject, Clone, PartialEq, Debug)]
 /// An election
 pub struct Election {
     /// The id of the election (not user facing)

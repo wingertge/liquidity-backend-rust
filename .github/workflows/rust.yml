@@ -11,6 +11,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
+    - name: Setup
+      run: "docker pull eventstore/eventstore & docker run --name eventstore-node -p 2113:2113 -p 1113: 1113 eventstore/eventstore"
     - name: Build
       run: cargo build --verbose
     - name: Run tests

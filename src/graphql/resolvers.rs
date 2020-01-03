@@ -1,13 +1,14 @@
 use super::{schema::{ElectionInput, Election}, context::Context, permissions};
 use juniper::FieldResult;
 use uuid::Uuid;
+use futures::executor::block_on;
 
 /// GraphQL Query type
 pub struct Query;
 /// GraphQL Mutation type
 pub struct Mutation;
 
-#[juniper::object(
+#[juniper::graphql_object(
     Context = Context
 )]
 impl Query {
@@ -42,11 +43,12 @@ impl Query {
         use crate::db::elections;
 
         let db = context.db.clone();
-        elections::find_election(&id, db).map_err(Into::into)
+        let result = block_on(elections::find_election(&id, db)); //TODO: Don't block as soon as futures 0.3 support arrives for eventstore
+        result.map_err(Into::into)
     }
 }
 
-#[juniper::object(
+#[juniper::graphql_object(
     Context = Context
 )]
 impl Mutation {
@@ -76,7 +78,7 @@ impl Mutation {
     //      }
     //  }
     /// ```
-    pub fn create_election(
+    pub async fn create_election(
         input: ElectionInput,
         context: &Context
     ) -> FieldResult<Option<Election>> {
@@ -85,7 +87,7 @@ impl Mutation {
         match &context.user {
             Some(user) => {
                 use crate::db::elections;
-                elections::create_election(input, &user.id, db).map_err(Into::into)
+                elections::create_election(input, &user.id, db).await.map_err(Into::into)
             },
             None => Err("Must be logged in".into())
         }

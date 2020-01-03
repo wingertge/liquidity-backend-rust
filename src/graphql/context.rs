@@ -3,7 +3,7 @@ use eventstore::Connection;
 
 pub struct Context {
     pub db: Arc<Connection>,
-    pub user: Option<Box<User>>
+    pub user: Option<User>
 }
 
 pub struct User {
