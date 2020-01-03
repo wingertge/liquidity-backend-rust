@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["elections","Contains Repository functions for elections"]]});
+initSidebarItems({"mod":[["elections","Contains Repository functions for elections"]],"trait":[["ESResultExt",""]]});

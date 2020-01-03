@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/juniper_codegen-0.14.2/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../juniper_codegen/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/git/checkouts/juniper-aa5e857cd28538c7/c2f0dd2/juniper_codegen/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../juniper_codegen/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -384,6 +384,23 @@
 <span id="384">384</span>
 <span id="385">385</span>
 <span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! This crate supplies custom derive implementations for the</span>
 <span class="doccomment">//! [juniper](https://github.com/graphql-rust/juniper) crate.</span>
@@ -391,17 +408,19 @@
 <span class="doccomment">//! You should not depend on juniper_codegen directly.</span>
 <span class="doccomment">//! You only need the `juniper` crate.</span>
 
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/juniper_codegen/0.14.2&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/juniper_codegen/0.14.0&quot;</span>)]</span>
 <span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;1024&quot;</span>]</span>
 
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
+
+<span class="kw">mod</span> <span class="ident">util</span>;
 
 <span class="kw">mod</span> <span class="ident">derive_enum</span>;
 <span class="kw">mod</span> <span class="ident">derive_input_object</span>;
 <span class="kw">mod</span> <span class="ident">derive_object</span>;
 <span class="kw">mod</span> <span class="ident">derive_scalar_value</span>;
 <span class="kw">mod</span> <span class="ident">impl_object</span>;
-<span class="kw">mod</span> <span class="ident">util</span>;
+<span class="kw">mod</span> <span class="ident">impl_union</span>;
 
 <span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
 
@@ -491,12 +510,6 @@
     <span class="ident">gen</span>.<span class="ident">into</span>()
 }
 
-<span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;ScalarValue has been renamed to GraphQLScalarValue&quot;</span>)]</span>
-<span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">ScalarValue</span>)]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_scalar_value_deprecated</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
-    <span class="ident">derive_scalar_value</span>(<span class="ident">input</span>)
-}
-
 <span class="attribute">#[<span class="ident">proc_macro_derive</span>(<span class="ident">GraphQLScalarValueInternal</span>)]</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">derive_scalar_value_internal</span>(<span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
@@ -526,7 +539,7 @@ More advanced use cases are introduced step by step.
 struct Query;
 
 // We prefix the impl Block with the procedural macro.
-#[juniper::object]
+#[juniper::graphql_object]
 impl Query {
 
     // A **warning**: only GraphQL fields can be specified in this impl block.
@@ -577,7 +590,7 @@ impl Person {
     }
 }
 
-#[juniper::object]
+#[juniper::graphql_object]
 impl Person {
     fn first_name(&amp;self) -&gt; &amp;str {
         &amp;self.first_name
@@ -617,7 +630,7 @@ impl juniper::Context for Context {}
 
 struct Query;
 
-#[juniper::object(
+#[juniper::graphql_object(
     // Here we specify the context type for this object.
     Context = Context,
 )]
@@ -647,7 +660,7 @@ struct InternalQuery;
 // Doc comments can be used to specify graphql documentation.
 /// GRAPHQL DOCUMENTATION.
 /// More info for GraphQL users....
-#[juniper::object(
+#[juniper::graphql_object(
     // You can rename the type for GraphQL by specifying the name here.
     name = &quot;Query&quot;,
     // You can also specify a description here.
@@ -710,7 +723,7 @@ struct WithLifetime&lt;&#39;a&gt; {
     value: &amp;&#39;a str,
 }
 
-#[juniper::object]
+#[juniper::graphql_object]
 impl&lt;&#39;a&gt; WithLifetime&lt;&#39;a&gt; {
     fn value(&amp;self) -&gt; &amp;str {
         self.value
@@ -731,7 +744,7 @@ You can easily specify a custom scalar though.
 
 struct Query;
 
-#[juniper::object(
+#[juniper::graphql_object(
     Scalar = MyCustomScalar,
 )]
 impl Query {
@@ -749,7 +762,7 @@ struct User {
     r#type: String,
 }
 
-#[juniper::object]
+#[juniper::graphql_object]
 impl User {
     fn r#type(&amp;self) -&gt; &amp;str {
         &amp;self.r#type
@@ -759,7 +772,7 @@ impl User {
 
 */</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">graphql_object</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">impl_object</span>::<span class="ident">build_object</span>(<span class="ident">args</span>, <span class="ident">input</span>, <span class="bool-val">false</span>);
     <span class="ident">gen</span>.<span class="ident">into</span>()
 }
@@ -767,9 +780,30 @@ impl User {
 <span class="doccomment">/// A proc macro for defining a GraphQL object.</span>
 <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">object_internal</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">graphql_object_internal</span>(<span class="ident">args</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="ident">impl_object</span>::<span class="ident">build_object</span>(<span class="ident">args</span>, <span class="ident">input</span>, <span class="bool-val">true</span>);
     <span class="ident">gen</span>.<span class="ident">into</span>()
+}
+
+<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
+<span class="attribute">#[<span class="ident">proc_macro_error</span>::<span class="ident">proc_macro_error</span>]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">graphql_union</span>(<span class="ident">attrs</span>: <span class="ident">TokenStream</span>, <span class="ident">body</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">impl_union</span>::<span class="ident">impl_union</span>(<span class="bool-val">false</span>, <span class="ident">attrs</span>, <span class="ident">body</span>) {
+        <span class="prelude-val">Ok</span>(<span class="ident">toks</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">toks</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proc_macro_error</span>::<span class="macro">abort</span><span class="macro">!</span>(<span class="ident">err</span>),
+    };
+    <span class="ident">output</span>
+}
+
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
+<span class="attribute">#[<span class="ident">proc_macro_error</span>::<span class="ident">proc_macro_error</span>]</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">graphql_union_internal</span>(<span class="ident">attrs</span>: <span class="ident">TokenStream</span>, <span class="ident">body</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
+    <span class="kw">let</span> <span class="ident">output</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">impl_union</span>::<span class="ident">impl_union</span>(<span class="bool-val">true</span>, <span class="ident">attrs</span>, <span class="ident">body</span>) {
+        <span class="prelude-val">Ok</span>(<span class="ident">toks</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">toks</span>,
+        <span class="prelude-val">Err</span>(<span class="ident">err</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">proc_macro_error</span>::<span class="macro">abort</span><span class="macro">!</span>(<span class="ident">err</span>),
+    };
+    <span class="ident">output</span>
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><aside id="help" class="hidden"><div><h1 class="hidden">Help</h1><div class="shortcuts"><h2>Keyboard Shortcuts</h2><dl><dt><kbd>?</kbd></dt><dd>Show this help dialog</dd><dt><kbd>S</kbd></dt><dd>Focus the search field</dd><dt><kbd>↑</kbd></dt><dd>Move up in search results</dd><dt><kbd>↓</kbd></dt><dd>Move down in search results</dd><dt><kbd>↹</kbd></dt><dd>Switch tab</dd><dt><kbd>&#9166;</kbd></dt><dd>Go to active search result</dd><dt><kbd>+</kbd></dt><dd>Expand all sections</dd><dt><kbd>-</kbd></dt><dd>Collapse all sections</dd></dl></div><div class="infos"><h2>Search Tricks</h2><p>Prefix searches with a type followed by a colon (e.g., <code>fn:</code>) to restrict the search to a given type.</p><p>Accepted types are: <code>fn</code>, <code>mod</code>, <code>struct</code>, <code>enum</code>, <code>trait</code>, <code>type</code>, <code>macro</code>, and <code>const</code>.</p><p>Search functions by type signature (e.g., <code>vec -> usize</code> or <code>* -> vec</code>)</p><p>Search multiple things at once by splitting your query with comma (e.g., <code>str,u8</code> or <code>String,struct:Vec,test</code>)</p></div></div></aside><script>window.rootPath = "../../";window.currentCrate = "juniper_codegen";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

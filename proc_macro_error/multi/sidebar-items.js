@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["abort_if_dirty","Abort macro execution and display all the emitted errors, if any."]]});

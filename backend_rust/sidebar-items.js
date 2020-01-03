@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["db",""],["graphql",""]]});
+initSidebarItems({"mod":[["auth",""],["db",""],["graphql",""]]});

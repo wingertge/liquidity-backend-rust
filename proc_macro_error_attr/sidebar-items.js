@@ -1,0 +1,1 @@
+initSidebarItems({"attr":[["proc_macro_error","Either this attribute or [`proc_macro_error::entry_point`][ep] MUST be present on the top level of your macro."]]});

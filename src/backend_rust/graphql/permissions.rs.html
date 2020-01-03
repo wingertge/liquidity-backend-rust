@@ -37,8 +37,11 @@
 <span id="37">37</span>
 <span id="38">38</span>
 <span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">context</span>::<span class="ident">User</span>;
+<span class="kw">use</span> <span class="ident">juniper</span>::<span class="ident">FieldError</span>;
 
 <span class="doccomment">/// Check the user&#39;s permissions to ensure they are allowed to use the API function</span>
 <span class="doccomment">/// # Arguments</span>
@@ -55,25 +58,26 @@
 <span class="doccomment">/// ```</span>
 <span class="doccomment">/// # use backend_rust::graphql::context::User;</span>
 <span class="doccomment">/// # use backend_rust::graphql::permissions;</span>
+<span class="doccomment">/// # use juniper::FieldError;</span>
 <span class="doccomment">/// // Make a mock user</span>
-<span class="doccomment">/// let user = Some(Box::new(User {</span>
+<span class="doccomment">/// let user = Some(User {</span>
 <span class="doccomment">///     id: &quot;&quot;.to_string(),</span>
 <span class="doccomment">///     permissions: vec![&quot;view:election&quot;.to_string()]</span>
-<span class="doccomment">/// }));</span>
+<span class="doccomment">/// });</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// let valid = permissions::check(&quot;view:election&quot;, &amp;user);</span>
 <span class="doccomment">/// let invalid = permissions::check(&quot;create:election&quot;, &amp;user);</span>
 <span class="doccomment">/// let not_logged_in = permissions::check(&quot;create:election&quot;, &amp;None);</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(Ok(true), valid);</span>
-<span class="doccomment">/// assert_eq!(Err(&quot;You don&#39;t have permission to view elections&quot;), invalid);</span>
-<span class="doccomment">/// assert_eq!(Err(&quot;Must be logged in to do that&quot;), not_logged_in);</span>
+<span class="doccomment">/// assert_eq!(Err(FieldError::from(&quot;You don&#39;t have permission to view elections&quot;)), invalid);</span>
+<span class="doccomment">/// assert_eq!(Err(FieldError::from(&quot;Must be logged in to do that&quot;)), not_logged_in);</span>
 <span class="doccomment">/// ```</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> {
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">check</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">key</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">bool</span>, <span class="ident">FieldError</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="op">!</span><span class="ident">user</span>.<span class="ident">as_ref</span>()
         .<span class="ident">ok_or</span>(<span class="string">&quot;Must be logged in to do that&quot;</span>)<span class="question-mark">?</span>
         .<span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">key</span>.<span class="ident">to_string</span>()) {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;You don&#39;t have permission to view elections&quot;</span>)
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="string">&quot;You don&#39;t have permission to view elections&quot;</span>.<span class="ident">into</span>())
     }
     <span class="prelude-val">Ok</span>(<span class="bool-val">true</span>)
 }

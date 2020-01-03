@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/juniper-0.14.2/src/validation/rules/overlapping_fields_can_be_merged.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>overlapping_fields_can_be_merged.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../juniper/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/git/checkouts/juniper-aa5e857cd28538c7/c2f0dd2/juniper/src/validation/rules/overlapping_fields_can_be_merged.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>overlapping_fields_can_be_merged.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../juniper/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2133,17 +2133,6 @@
 <span id="2133">2133</span>
 <span id="2134">2134</span>
 <span id="2135">2135</span>
-<span id="2136">2136</span>
-<span id="2137">2137</span>
-<span id="2138">2138</span>
-<span id="2139">2139</span>
-<span id="2140">2140</span>
-<span id="2141">2141</span>
-<span id="2142">2142</span>
-<span id="2143">2143</span>
-<span id="2144">2144</span>
-<span id="2145">2145</span>
-<span id="2146">2146</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">ast</span>::{<span class="ident">Arguments</span>, <span class="ident">Definition</span>, <span class="ident">Document</span>, <span class="ident">Field</span>, <span class="ident">Fragment</span>, <span class="ident">FragmentSpread</span>, <span class="ident">Selection</span>, <span class="ident">Type</span>},
@@ -2899,7 +2888,7 @@
             <span class="ident">expect_fails_rule</span>, <span class="ident">expect_fails_rule_with_schema</span>, <span class="ident">expect_passes_rule</span>,
             <span class="ident">expect_passes_rule_with_schema</span>, <span class="ident">RuleError</span>,
         },
-        <span class="ident">value</span>::{<span class="ident">DefaultScalarValue</span>, <span class="ident">ScalarRefValue</span>, <span class="ident">ScalarValue</span>},
+        <span class="ident">value</span>::{<span class="ident">DefaultScalarValue</span>, <span class="ident">ScalarValue</span>},
     };
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -3526,7 +3515,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">SomeBox</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3552,7 +3540,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">StringBox</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3584,7 +3571,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntBox</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3616,7 +3602,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NonNullStringBox1</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3638,7 +3623,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NonNullStringBox1Impl</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3670,7 +3654,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NonNullStringBox2</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3692,7 +3675,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">NonNullStringBox2Impl</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3724,7 +3706,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Node</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3749,7 +3730,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Edge</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3771,7 +3751,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Connection</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
@@ -3793,7 +3772,6 @@
     <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">QueryRoot</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
     {
         <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
         <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();

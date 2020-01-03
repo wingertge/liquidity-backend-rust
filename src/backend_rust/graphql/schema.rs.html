@@ -157,7 +157,7 @@
     <span class="kw">pub</span> <span class="ident">username</span>: <span class="ident">String</span>
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLEnum</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLEnum</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>, <span class="ident">Deserialize</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="doccomment">/// The importance of an election. Affects sorting and filtering.</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Importance</span> {
     <span class="ident">Important</span>,
@@ -184,7 +184,7 @@
     }
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLObject</span>, <span class="ident">Clone</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLObject</span>, <span class="ident">Clone</span>, <span class="ident">PartialEq</span>, <span class="ident">Debug</span>)]</span>
 <span class="doccomment">/// An election</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Election</span> {
     <span class="doccomment">/// The id of the election (not user facing)</span>

@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/juniper-0.14.2/src/macros/scalar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scalar.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../juniper/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/git/checkouts/juniper-aa5e857cd28538c7/c2f0dd2/juniper/src/macros/scalar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>scalar.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../juniper/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -341,57 +341,382 @@
 <span id="341">341</span>
 <span id="342">342</span>
 <span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
+<span id="352">352</span>
+<span id="353">353</span>
+<span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
+<span id="473">473</span>
+<span id="474">474</span>
+<span id="475">475</span>
+<span id="476">476</span>
+<span id="477">477</span>
+<span id="478">478</span>
+<span id="479">479</span>
+<span id="480">480</span>
+<span id="481">481</span>
+<span id="482">482</span>
+<span id="483">483</span>
+<span id="484">484</span>
+<span id="485">485</span>
+<span id="486">486</span>
+<span id="487">487</span>
+<span id="488">488</span>
+<span id="489">489</span>
+<span id="490">490</span>
+<span id="491">491</span>
+<span id="492">492</span>
+<span id="493">493</span>
+<span id="494">494</span>
+<span id="495">495</span>
+<span id="496">496</span>
+<span id="497">497</span>
+<span id="498">498</span>
+<span id="499">499</span>
+<span id="500">500</span>
+<span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
+<span id="507">507</span>
+<span id="508">508</span>
+<span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
+<span id="583">583</span>
+<span id="584">584</span>
+<span id="585">585</span>
+<span id="586">586</span>
+<span id="587">587</span>
+<span id="588">588</span>
+<span id="589">589</span>
+<span id="590">590</span>
+<span id="591">591</span>
+<span id="592">592</span>
+<span id="593">593</span>
+<span id="594">594</span>
+<span id="595">595</span>
+<span id="596">596</span>
+<span id="597">597</span>
+<span id="598">598</span>
+<span id="599">599</span>
+<span id="600">600</span>
+<span id="601">601</span>
+<span id="602">602</span>
+<span id="603">603</span>
+<span id="604">604</span>
+<span id="605">605</span>
+<span id="606">606</span>
+<span id="607">607</span>
+<span id="608">608</span>
+<span id="609">609</span>
+<span id="610">610</span>
+<span id="611">611</span>
+<span id="612">612</span>
+<span id="613">613</span>
+<span id="614">614</span>
+<span id="615">615</span>
+<span id="616">616</span>
+<span id="617">617</span>
+<span id="618">618</span>
+<span id="619">619</span>
+<span id="620">620</span>
+<span id="621">621</span>
+<span id="622">622</span>
+<span id="623">623</span>
+<span id="624">624</span>
+<span id="625">625</span>
+<span id="626">626</span>
+<span id="627">627</span>
+<span id="628">628</span>
+<span id="629">629</span>
+<span id="630">630</span>
+<span id="631">631</span>
+<span id="632">632</span>
+<span id="633">633</span>
+<span id="634">634</span>
+<span id="635">635</span>
+<span id="636">636</span>
+<span id="637">637</span>
+<span id="638">638</span>
+<span id="639">639</span>
+<span id="640">640</span>
+<span id="641">641</span>
+<span id="642">642</span>
+<span id="643">643</span>
+<span id="644">644</span>
+<span id="645">645</span>
+<span id="646">646</span>
+<span id="647">647</span>
+<span id="648">648</span>
+<span id="649">649</span>
+<span id="650">650</span>
+<span id="651">651</span>
+<span id="652">652</span>
+<span id="653">653</span>
+<span id="654">654</span>
+<span id="655">655</span>
+<span id="656">656</span>
+<span id="657">657</span>
+<span id="658">658</span>
+<span id="659">659</span>
+<span id="660">660</span>
+<span id="661">661</span>
+<span id="662">662</span>
+<span id="663">663</span>
+<span id="664">664</span>
+<span id="665">665</span>
+<span id="666">666</span>
+<span id="667">667</span>
+<span id="668">668</span>
+<span id="669">669</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">/**
-Expose GraphQL scalars
-
-The GraphQL language defines a number of built-in scalars: strings, numbers, and
-booleans. This macro can be used either to define new types of scalars (e.g.
-timestamps), or expose other types as one of the built-in scalars (e.g. bigints
-as numbers or strings).
-
-Since the preferred transport protocol for GraphQL responses is JSON, most
-custom scalars will be transferred as strings. You therefore need to ensure that
-the client library you are sending data to can parse the custom value into a
-datatype appropriate for that platform.
-
-By default the trait is implemented in terms of the default scalar value
-representation provided by juniper. If that does not fit your needs it is
-possible to use the same syntax as on `graphql_object!` to specify a custom
-representation.
-
-```rust
-# extern crate juniper;
-# use juniper::{Value, FieldResult, ParseScalarValue, ParseScalarResult};
-struct UserID(String);
-
-juniper::graphql_scalar!(UserID {
-    description: &quot;An opaque identifier, represented as a string&quot;
-
-    resolve(&amp;self) -&gt; Value {
-        Value::string(&amp;self.0)
-    }
-
-    from_input_value(v: &amp;InputValue) -&gt; Option&lt;UserID&gt; {
-        v.as_string_value().map(|s| UserID(s.to_owned()))
-    }
-
-    from_str&lt;&#39;a&gt;(value: ScalarToken&lt;&#39;a&gt;) -&gt; ParseScalarResult&lt;&#39;a&gt; {
-        &lt;String as ParseScalarValue&gt;::from_str(value)
-    }
-});
-
-# fn main() { }
-```
-
-In addition to implementing `GraphQLType` for the type in question,
-`FromInputValue` and `ToInputValue` is also implemented. This makes the type
-usable as arguments and default values.
-
-*/</span>
+<span class="doccomment">/// Expose GraphQL scalars</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The GraphQL language defines a number of built-in scalars: strings, numbers, and</span>
+<span class="doccomment">/// booleans. This macro can be used either to define new types of scalars (e.g.</span>
+<span class="doccomment">/// timestamps), or expose other types as one of the built-in scalars (e.g. bigints</span>
+<span class="doccomment">/// as numbers or strings).</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Since the preferred transport protocol for GraphQL responses is JSON, most</span>
+<span class="doccomment">/// custom scalars will be transferred as strings. You therefore need to ensure that</span>
+<span class="doccomment">/// the client library you are sending data to can parse the custom value into a</span>
+<span class="doccomment">/// datatype appropriate for that platform.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// By default the trait is implemented in terms of the default scalar value</span>
+<span class="doccomment">/// representation provided by juniper. If that does not fit your needs it is</span>
+<span class="doccomment">/// possible to use the same syntax as on `graphql_object!` to specify a custom</span>
+<span class="doccomment">/// representation.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// # extern crate juniper;</span>
+<span class="doccomment">/// # use juniper::{Value, FieldResult, ParseScalarValue, ParseScalarResult};</span>
+<span class="doccomment">/// struct UserID(String);</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// juniper::graphql_scalar!(UserID {</span>
+<span class="doccomment">///     description: &quot;An opaque identifier, represented as a string&quot;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///     resolve(&amp;self) -&gt; Value {</span>
+<span class="doccomment">///         Value::string(&amp;self.0)</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///     from_input_value(v: &amp;InputValue) -&gt; Option&lt;UserID&gt; {</span>
+<span class="doccomment">///     v.as_string_value().map(|s| UserID(s.to_owned()))</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">///</span>
+<span class="doccomment">///     from_str&lt;&#39;a&gt;(value: ScalarToken&lt;&#39;a&gt;) -&gt; ParseScalarResult&lt;&#39;a&gt; {</span>
+<span class="doccomment">///         &lt;String as ParseScalarValue&gt;::from_str(value)</span>
+<span class="doccomment">///     }</span>
+<span class="doccomment">/// });</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # fn main() { }</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// In addition to implementing `GraphQLType` for the type in question,</span>
+<span class="doccomment">/// `FromInputValue` and `ToInputValue` is also implemented. This makes the type</span>
+<span class="doccomment">/// usable as arguments and default values.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async&quot;</span>))]</span>
 <span class="attribute">#[<span class="ident">macro_export</span>]</span>
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">graphql_scalar</span> {
     ( @<span class="ident">as_expr</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> };
+
     (
         @<span class="ident">generate</span>,
         <span class="ident">meta</span> <span class="op">=</span> {
@@ -431,7 +756,7 @@ usable as arguments and default values.
                     <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">TypeInfo</span>,
                     <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Registry</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span>
                 ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">meta</span>::<span class="ident">MetaType</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span>
-                <span class="kw">where</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;__b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;__b</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>): <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;__b</span><span class="op">&gt;</span>,
+                <span class="kw">where</span>
                     <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>): <span class="lifetime">&#39;r</span>
                 {
                     <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">build_scalar_type</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>(<span class="ident">info</span>);
@@ -448,10 +773,337 @@ usable as arguments and default values.
                     <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Executor</span><span class="op">&lt;</span>
                         <span class="self">Self</span>::<span class="ident">Context</span>,
                         <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)
-                    <span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Value</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span> {
-                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>
+                    <span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">ExecutionResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>)
                 }
             });
+
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_impl_trait</span><span class="op">!</span>(
+            <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span><span class="op">&gt;</span> <span class="ident">ToInputValue</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+                <span class="kw">fn</span> <span class="ident">to_input_value</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_self_var</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">InputValue</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>;
+                    <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">ToInputValue</span>::<span class="ident">to_input_value</span>(<span class="kw-2">&amp;</span><span class="ident">v</span>)
+                }
+            }
+        );
+
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_impl_trait</span><span class="op">!</span>(
+            <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span><span class="op">&gt;</span> <span class="ident">FromInputValue</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+                <span class="kw">fn</span> <span class="ident">from_input_value</span>(
+                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_arg</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">InputValue</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span>
+                ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_result</span> {
+                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>
+                }
+            }
+        );
+
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_impl_trait</span><span class="op">!</span>(
+            <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span><span class="op">&gt;</span> <span class="ident">ParseScalarValue</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+                <span class="kw">fn</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_lt</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_arg</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">parser</span>::<span class="ident">ScalarToken</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_lt</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_result</span> {
+                    <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>
+                }
+            }
+        );
+    };
+
+    <span class="comment">// No more items to parse</span>
+    (
+        @<span class="ident">parse_functions</span>,
+        <span class="ident">meta</span> <span class="op">=</span> {
+            <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ty</span>,
+            <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            $(<span class="ident">description</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">descr</span>:<span class="ident">tt</span>,)<span class="op">*</span>
+        },
+        <span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+        <span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+        <span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+        <span class="ident">rest</span> <span class="op">=</span>
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">graphql_scalar</span><span class="op">!</span>(
+            @<span class="ident">generate</span>,
+            <span class="ident">meta</span> <span class="op">=</span> {
+                <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
+                <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>)<span class="op">+</span>},
+                <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>},
+                $(<span class="ident">description</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">descr</span>,)<span class="op">*</span>
+            },
+            <span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>)<span class="op">+</span>},
+            <span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>)<span class="op">+</span>},
+            <span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>)<span class="op">+</span>},
+        );
+    };
+
+    (
+        @<span class="ident">parse_functions</span>,
+        <span class="ident">meta</span> <span class="op">=</span> {
+            <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ty</span>,
+            <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            $(<span class="ident">description</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">descr</span>:<span class="ident">tt</span>,)<span class="op">*</span>
+        },
+        $(<span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>:<span class="ident">tt</span>)<span class="op">+</span>})<span class="kw-2">*</span>,
+        $(<span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>:<span class="ident">tt</span>)<span class="op">+</span>})<span class="kw-2">*</span>,
+        <span class="ident">rest</span> <span class="op">=</span>
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;Missing resolve function&quot;</span>);
+    };
+
+    (
+        @<span class="ident">parse_functions</span>,
+        <span class="ident">meta</span> <span class="op">=</span> {
+            <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ty</span>,
+            <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            $(<span class="ident">description</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">descr</span>:<span class="ident">tt</span>,)<span class="op">*</span>
+        },
+        <span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+        $(<span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>:<span class="ident">tt</span>)<span class="op">+</span>})<span class="kw-2">*</span>,
+        <span class="ident">rest</span> <span class="op">=</span>
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;Missing from_input_value function&quot;</span>);
+    };
+
+    (
+        @<span class="ident">parse_functions</span>,
+        <span class="ident">meta</span> <span class="op">=</span> {
+            <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ty</span>,
+            <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            $(<span class="ident">description</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">descr</span>:<span class="ident">tt</span>,)<span class="op">*</span>
+        },
+        <span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+        <span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+        <span class="ident">rest</span> <span class="op">=</span>
+    ) <span class="op">=</span><span class="op">&gt;</span>{
+        <span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;Missing from_str function&quot;</span>);
+    };
+
+
+    <span class="comment">// resolve(&amp;self) -&gt; Value { ... }</span>
+    (
+        @<span class="ident">parse_functions</span>,
+        <span class="ident">meta</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>},
+        $(<span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        $(<span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        $(<span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        <span class="ident">rest</span> <span class="op">=</span> <span class="ident">resolve</span>(<span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">selfvar</span>:<span class="ident">ident</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">return_ty</span>:<span class="ident">ty</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">block</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span>
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">graphql_scalar</span><span class="op">!</span>(
+            @<span class="ident">parse_functions</span>,
+            <span class="ident">meta</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>)<span class="kw-2">*</span>},
+            <span class="ident">resolve</span> <span class="op">=</span> {
+                <span class="ident">self_var</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">selfvar</span>,
+                <span class="ident">body</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>,
+                <span class="ident">return_type</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">return_ty</span>,
+            },
+            $(<span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>)<span class="op">+</span>},)<span class="op">*</span>
+            $(<span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>)<span class="op">+</span>},)<span class="op">*</span>
+            <span class="ident">rest</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+        );
+    };
+
+    <span class="comment">// from_input_value(arg: &amp;InputValue) -&gt; ... { ... }</span>
+    (
+        @<span class="ident">parse_functions</span>,
+        <span class="ident">meta</span> <span class="op">=</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">tt</span>)<span class="op">*</span> },
+        $(<span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>:<span class="ident">tt</span>)<span class="op">+</span>})<span class="kw-2">*</span>,
+        $(<span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        $(<span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        <span class="ident">rest</span> <span class="op">=</span> <span class="ident">from_input_value</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">ident</span>: <span class="kw-2">&amp;</span><span class="ident">InputValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">ty</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">block</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span>
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">graphql_scalar</span><span class="op">!</span>(
+            @<span class="ident">parse_functions</span>,
+            <span class="ident">meta</span> <span class="op">=</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>)<span class="op">*</span> },
+            $(<span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>)<span class="op">+</span>},)<span class="op">*</span>
+            <span class="ident">from_input_value</span> <span class="op">=</span> {
+                <span class="ident">arg</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>,
+                <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>,
+                <span class="ident">body</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>,
+            },
+            $(<span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>)<span class="op">+</span>},)<span class="op">*</span>
+            <span class="ident">rest</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+        );
+    };
+
+    <span class="comment">// from_str(value: &amp;str) -&gt; Result&lt;S, ParseError&gt;</span>
+    (
+        @<span class="ident">parse_functions</span>,
+        <span class="ident">meta</span> <span class="op">=</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>:<span class="ident">tt</span>)<span class="op">*</span> },
+        $(<span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        $(<span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        $(<span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        <span class="ident">rest</span> <span class="op">=</span> <span class="ident">from_str</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_lt</span>: <span class="ident">tt</span><span class="op">&gt;</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">value_arg</span>:<span class="ident">ident</span>: <span class="ident">ScalarToken</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">ignored_lt2</span>: <span class="ident">tt</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>:<span class="ident">ty</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>:<span class="ident">block</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span>
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">graphql_scalar</span><span class="op">!</span>(
+            @<span class="ident">parse_functions</span>,
+            <span class="ident">meta</span> <span class="op">=</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">meta</span>)<span class="op">*</span> },
+            $(<span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>)<span class="op">+</span>},)<span class="op">*</span>
+            $(<span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>)<span class="op">+</span>},)<span class="op">*</span>
+            <span class="ident">from_str</span> <span class="op">=</span> {
+                <span class="ident">value_arg</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">value_arg</span>,
+                <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">result</span>,
+                <span class="ident">body</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">body</span>,
+                <span class="ident">lifetime</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_lt</span>,
+            },
+            <span class="ident">rest</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+        );
+    };
+
+    <span class="comment">// description: &lt;description&gt;</span>
+    (
+        @<span class="ident">parse_functions</span>,
+        <span class="ident">meta</span> <span class="op">=</span> {
+            <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ty</span>,
+            <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+        },
+        $(<span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        $(<span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        $(<span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>:<span class="ident">tt</span>)<span class="op">+</span>},)<span class="op">*</span>
+        <span class="ident">rest</span> <span class="op">=</span> <span class="ident">description</span>: <span class="macro-nonterminal">$</span><span class="macro-nonterminal">descr</span>:<span class="ident">tt</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span>
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">graphql_scalar</span><span class="op">!</span>(
+            @<span class="ident">parse_functions</span>,
+            <span class="ident">meta</span> <span class="op">=</span> {
+                <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
+                <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>)<span class="op">+</span>},
+                <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>},
+                <span class="ident">description</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">descr</span>,
+            },
+            $(<span class="ident">resolve</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>)<span class="op">+</span>},)<span class="op">*</span>
+            $(<span class="ident">from_input_value</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>)<span class="op">+</span>},)<span class="op">*</span>
+            $(<span class="ident">from_str</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>)<span class="op">+</span>},)<span class="op">*</span>
+            <span class="ident">rest</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+        );
+    };
+
+    (
+        @<span class="ident">parse</span>,
+        <span class="ident">meta</span> <span class="op">=</span> {
+            <span class="ident">lifetimes</span> <span class="op">=</span> [],
+            <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>: <span class="ident">ty</span>,
+            <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>},
+            <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>},
+        },
+        <span class="ident">rest</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="op">*</span>
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+         <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">graphql_scalar</span><span class="op">!</span>(
+            @<span class="ident">parse_functions</span>,
+            <span class="ident">meta</span> <span class="op">=</span> {
+                <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>,
+                <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>)<span class="kw-2">*</span>},
+                <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="kw-2">*</span>},
+            },
+            <span class="ident">rest</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+        );
+    };
+
+    (@$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">stuff</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro">compile_error</span><span class="macro">!</span>(<span class="string">&quot;Invalid syntax for `graphql_scalar!`&quot;</span>);
+    };
+
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_parse_object_header</span><span class="op">!</span>(
+            <span class="ident">callback</span> <span class="op">=</span> <span class="ident">graphql_scalar</span>,
+            <span class="ident">rest</span> <span class="op">=</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">rest</span>)<span class="op">*</span>
+        );
+    }
+}
+
+<span class="comment">// FIXME: prevent duplicating the whole macro for async.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">macro_export</span>]</span>
+<span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">graphql_scalar</span> {
+    ( @<span class="ident">as_expr</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> { <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span> };
+
+    (
+        @<span class="ident">generate</span>,
+        <span class="ident">meta</span> <span class="op">=</span> {
+            <span class="ident">name</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ty</span>,
+            <span class="ident">outname</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            <span class="ident">scalar</span> <span class="op">=</span> {$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>:<span class="ident">tt</span>)<span class="op">+</span>},
+            $(<span class="ident">description</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">descr</span>:<span class="ident">tt</span>,)<span class="op">*</span>
+        },
+        <span class="ident">resolve</span> <span class="op">=</span> {
+            <span class="ident">self_var</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_self_var</span>:<span class="ident">ident</span>,
+            <span class="ident">body</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>: <span class="ident">block</span>,
+            <span class="ident">return_type</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_retun_type</span>: <span class="ident">ty</span>,
+        },
+        <span class="ident">from_input_value</span> <span class="op">=</span> {
+            <span class="ident">arg</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_arg</span>: <span class="ident">ident</span>,
+            <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_result</span>: <span class="ident">ty</span>,
+            <span class="ident">body</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_input_value_body</span>: <span class="ident">block</span>,
+        },
+        <span class="ident">from_str</span> <span class="op">=</span> {
+            <span class="ident">value_arg</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_arg</span>: <span class="ident">ident</span>,
+            <span class="ident">result</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_result</span>: <span class="ident">ty</span>,
+            <span class="ident">body</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_body</span>: <span class="ident">block</span>,
+            <span class="ident">lifetime</span> <span class="op">=</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">from_str_lt</span>: <span class="ident">tt</span>,
+        },
+
+    ) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_impl_trait</span><span class="op">!</span>(
+            <span class="kw">impl</span> <span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span><span class="op">&gt;</span> <span class="ident">GraphQLType</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
+                <span class="kw">type</span> <span class="ident">Context</span> <span class="op">=</span> ();
+                <span class="kw">type</span> <span class="ident">TypeInfo</span> <span class="op">=</span> ();
+
+                <span class="kw">fn</span> <span class="ident">name</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">TypeInfo</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span> {
+                    <span class="prelude-val">Some</span>(<span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">graphql_scalar</span><span class="op">!</span>(@<span class="ident">as_expr</span> $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">outname</span>)<span class="op">+</span>))
+                }
+
+                <span class="kw">fn</span> <span class="ident">meta</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span><span class="op">&gt;</span>(
+                    <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>::<span class="ident">TypeInfo</span>,
+                    <span class="ident">registry</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Registry</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span>
+                ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">meta</span>::<span class="ident">MetaType</span><span class="op">&lt;</span><span class="lifetime">&#39;r</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span>
+                <span class="kw">where</span>
+                    <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>): <span class="lifetime">&#39;r</span>
+                {
+                    <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">registry</span>.<span class="ident">build_scalar_type</span>::<span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>(<span class="ident">info</span>);
+                    $(
+                        <span class="kw">let</span> <span class="ident">meta</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">description</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">descr</span>);
+                    )<span class="op">*</span>
+                    <span class="ident">meta</span>.<span class="ident">into_meta</span>()
+                }
+
+                <span class="kw">fn</span> <span class="ident">resolve</span>(
+                    <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_self_var</span>,
+                    <span class="kw">_</span>: <span class="kw-2">&amp;</span>(),
+                    <span class="kw">_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span>[<span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Selection</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span>]<span class="op">&gt;</span>,
+                    <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Executor</span><span class="op">&lt;</span>
+                        <span class="self">Self</span>::<span class="ident">Context</span>,
+                        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)
+                    <span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">ExecutionResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span> {
+                    <span class="prelude-val">Ok</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">resolve_body</span>)
+                }
+            }
+        );
+
+
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async&quot;</span>)]</span>
+        <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_impl_trait</span><span class="op">!</span>(
+            <span class="kw">impl</span> <span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span><span class="op">&gt;</span> <span class="ident">GraphQLTypeAsync</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>
+                <span class="kw">where</span> (
+                    <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>): <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+                    <span class="self">Self</span>: <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">GraphQLType</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+                    <span class="self">Self</span>::<span class="ident">Context</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+                    <span class="self">Self</span>::<span class="ident">TypeInfo</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span>,
+                )
+            {
+
+                <span class="kw">fn</span> <span class="ident">resolve_async</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+                    <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">self</span>,
+                    <span class="ident">info</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="self">Self</span>::<span class="ident">TypeInfo</span>,
+                    <span class="ident">selection_set</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Selection</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span>]<span class="op">&gt;</span>,
+                    <span class="ident">executor</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">Executor</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Context</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span>,
+                ) <span class="op">-</span><span class="op">&gt;</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">ExecutionResult</span><span class="op">&lt;</span><span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_insert_generic</span><span class="op">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span>)<span class="op">&gt;</span><span class="op">&gt;</span> {
+                    <span class="kw">use</span> <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">GraphQLType</span>;
+                    <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>;
+                    <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">resolve</span>(<span class="ident">info</span>, <span class="ident">selection_set</span>, <span class="ident">executor</span>);
+                    <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">future</span>::<span class="ident">ready</span>(<span class="ident">v</span>))
+                }
+            }
+        );
 
         <span class="macro-nonterminal">$</span><span class="kw">crate</span>::<span class="macro-nonterminal">__juniper_impl_trait</span><span class="op">!</span>(
             <span class="kw">impl</span><span class="op">&lt;</span>$(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">scalar</span>)<span class="op">+</span><span class="op">&gt;</span> <span class="ident">ToInputValue</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {

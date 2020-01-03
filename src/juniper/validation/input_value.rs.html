@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/juniper-0.14.2/src/validation/input_value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>input_value.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../juniper/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/git/checkouts/juniper-aa5e857cd28538c7/c2f0dd2/juniper/src/validation/input_value.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>input_value.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../juniper/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -351,21 +351,19 @@
 <span id="351">351</span>
 <span id="352">352</span>
 <span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashSet</span>, <span class="ident">fmt</span>};
 
 <span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">ast</span>::{<span class="ident">InputValue</span>, <span class="ident">Operation</span>, <span class="ident">VariableDefinitions</span>},
+    <span class="ident">ast</span>::{<span class="ident">Definition</span>, <span class="ident">Document</span>, <span class="ident">InputValue</span>, <span class="ident">VariableDefinitions</span>},
     <span class="ident">executor</span>::<span class="ident">Variables</span>,
-    <span class="ident">parser</span>::{<span class="ident">SourcePosition</span>, <span class="ident">Spanning</span>},
+    <span class="ident">parser</span>::<span class="ident">SourcePosition</span>,
     <span class="ident">schema</span>::{
         <span class="ident">meta</span>::{<span class="ident">EnumMeta</span>, <span class="ident">InputObjectMeta</span>, <span class="ident">MetaType</span>, <span class="ident">ScalarMeta</span>},
         <span class="ident">model</span>::{<span class="ident">SchemaType</span>, <span class="ident">TypeType</span>},
     },
     <span class="ident">validation</span>::<span class="ident">RuleError</span>,
-    <span class="ident">value</span>::{<span class="ident">ScalarRefValue</span>, <span class="ident">ScalarValue</span>},
+    <span class="ident">value</span>::<span class="ident">ScalarValue</span>,
 };
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -377,17 +375,20 @@
 
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_input_values</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(
     <span class="ident">values</span>: <span class="kw-2">&amp;</span><span class="ident">Variables</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
-    <span class="ident">operation</span>: <span class="kw-2">&amp;</span><span class="ident">Spanning</span><span class="op">&lt;</span><span class="ident">Operation</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">document</span>: <span class="kw-2">&amp;</span><span class="ident">Document</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
     <span class="ident">schema</span>: <span class="kw-2">&amp;</span><span class="ident">SchemaType</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errs</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">vars</span>) <span class="op">=</span> <span class="ident">operation</span>.<span class="ident">item</span>.<span class="ident">variable_definitions</span> {
-        <span class="ident">validate_var_defs</span>(<span class="ident">values</span>, <span class="kw-2">&amp;</span><span class="ident">vars</span>.<span class="ident">item</span>, <span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">errs</span>);
+    <span class="kw">for</span> <span class="ident">def</span> <span class="kw">in</span> <span class="ident">document</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Definition</span>::<span class="ident">Operation</span>(<span class="kw-2">ref</span> <span class="ident">op</span>) <span class="op">=</span> <span class="kw-2">*</span><span class="ident">def</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">vars</span>) <span class="op">=</span> <span class="ident">op</span>.<span class="ident">item</span>.<span class="ident">variable_definitions</span> {
+                <span class="ident">validate_var_defs</span>(<span class="ident">values</span>, <span class="kw-2">&amp;</span><span class="ident">vars</span>.<span class="ident">item</span>, <span class="ident">schema</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">errs</span>);
+            }
+        }
     }
 
     <span class="ident">errs</span>.<span class="ident">sort</span>();
@@ -401,7 +402,6 @@
     <span class="ident">errors</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleError</span><span class="op">&gt;</span>,
 ) <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
 {
     <span class="kw">for</span> <span class="kw-2">&amp;</span>(<span class="kw-2">ref</span> <span class="ident">name</span>, <span class="kw-2">ref</span> <span class="ident">def</span>) <span class="kw">in</span> <span class="ident">var_defs</span>.<span class="ident">iter</span>() {
         <span class="kw">let</span> <span class="ident">raw_type_name</span> <span class="op">=</span> <span class="ident">def</span>.<span class="ident">var_type</span>.<span class="ident">item</span>.<span class="ident">innermost_name</span>();
@@ -413,25 +413,22 @@
                     <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">RuleError</span>::<span class="ident">new</span>(
                         <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
                             <span class="string">r#&quot;Variable &quot;${}&quot; of required type &quot;{}&quot; was not provided.&quot;#</span>,
-                            <span class="ident">name</span>.<span class="ident">item</span>, <span class="ident">def</span>.<span class="ident">var_type</span>.<span class="ident">item</span>,
+                            <span class="ident">name</span>.<span class="ident">item</span>,
+                            <span class="ident">def</span>.<span class="ident">var_type</span>.<span class="ident">item</span>,
                         ),
                         <span class="kw-2">&amp;</span>[<span class="ident">name</span>.<span class="ident">start</span>],
                     ));
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span> <span class="ident">values</span>.<span class="ident">get</span>(<span class="ident">name</span>.<span class="ident">item</span>) {
-                    <span class="ident">errors</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unify_value</span>(
-                        <span class="ident">name</span>.<span class="ident">item</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">name</span>.<span class="ident">start</span>,
-                        <span class="ident">v</span>,
-                        <span class="kw-2">&amp;</span><span class="ident">ct</span>,
-                        <span class="ident">schema</span>,
-                        <span class="ident">Path</span>::<span class="ident">Root</span>,
-                    ));
+                    <span class="ident">errors</span>.<span class="ident">append</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">unify_value</span>(<span class="ident">name</span>.<span class="ident">item</span>, <span class="kw-2">&amp;</span><span class="ident">name</span>.<span class="ident">start</span>, <span class="ident">v</span>, <span class="kw-2">&amp;</span><span class="ident">ct</span>, <span class="ident">schema</span>, <span class="ident">Path</span>::<span class="ident">Root</span>));
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(
-                <span class="string">r#&quot;Variable &quot;${}&quot; has invalid input type &quot;{}&quot; after document validation.&quot;#</span>,
-                <span class="ident">name</span>.<span class="ident">item</span>, <span class="ident">def</span>.<span class="ident">var_type</span>.<span class="ident">item</span>,
-            ),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">RuleError</span>::<span class="ident">new</span>(
+                <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(
+                    <span class="string">r#&quot;Variable &quot;${}&quot; expected value of type &quot;{}&quot; which cannot be used as an input type.&quot;#</span>,
+                    <span class="ident">name</span>.<span class="ident">item</span>, <span class="ident">def</span>.<span class="ident">var_type</span>.<span class="ident">item</span>,
+                ),
+                <span class="kw-2">&amp;</span>[ <span class="ident">name</span>.<span class="ident">start</span> ],
+            )),
         }
     }
 }
@@ -446,7 +443,6 @@
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
 
@@ -577,12 +573,13 @@
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
+
     <span class="kw">match</span> <span class="kw-2">*</span><span class="ident">value</span> {
-        <span class="ident">InputValue</span>::<span class="ident">Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="kw">if</span> <span class="ident">scalar</span>.<span class="ident">is_type</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>() <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">S</span> <span class="kw">as</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>::<span class="ident">into</span>(<span class="ident">scalar</span>) {
+        <span class="comment">// TODO: avoid this bad duplicate as_str() call. (value system refactor)</span>
+        <span class="ident">InputValue</span>::<span class="ident">Scalar</span>(<span class="kw-2">ref</span> <span class="ident">scalar</span>) <span class="kw">if</span> <span class="ident">scalar</span>.<span class="ident">as_str</span>().<span class="ident">is_some</span>() <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">name</span>) <span class="op">=</span> <span class="ident">scalar</span>.<span class="ident">as_str</span>() {
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">meta</span>.<span class="ident">values</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">ev</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">ev</span>.<span class="ident">name</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">name</span>) {
                     <span class="ident">errors</span>.<span class="ident">push</span>(<span class="ident">unification_error</span>(
                         <span class="ident">var_name</span>,
@@ -623,7 +620,6 @@
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleError</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">ScalarValue</span>,
-    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">S</span>: <span class="ident">ScalarRefValue</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span>,
 {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">errors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RuleError</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
 
