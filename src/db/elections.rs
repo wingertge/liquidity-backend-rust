@@ -43,7 +43,9 @@ use crate::db::ESResultExt;
 ///     importance: None
 /// };
 ///
-/// let result = elections::create_election(election_input, "auth0|test", conn).await.unwrap().unwrap();
+/// let result = elections::create_election(election_input, "auth0|test", conn)
+///     .await.unwrap().unwrap();
+///
 /// assert_eq!(result.name, "test_name".to_string());
 /// # })
 /// ```
@@ -104,7 +106,8 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
 /// use backend_rust::db::elections;
 /// let id = Uuid::new_v4();
 ///
-/// let election = elections::find_election(&id, conn).await.unwrap();
+/// let election = elections::find_election(&id, conn)
+///     .await.unwrap();
 ///
 /// assert_eq!(election, None);
 /// # })
