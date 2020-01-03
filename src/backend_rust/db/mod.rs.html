@@ -40,6 +40,7 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
+<span id="43">43</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">eventstore</span>::<span class="ident">OperationError</span>;
 
@@ -61,8 +62,9 @@
     <span class="doccomment">/// # Example</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">/// use eventstore::OperationError;</span>
+    <span class="doccomment">/// # use eventstore::OperationError;</span>
     <span class="doccomment">/// use backend_rust::db::ESResultExt;</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// let some = Ok::&lt;_, OperationError&gt;(Some(&quot;test&quot;.to_string()));</span>
     <span class="doccomment">/// let none = Err::&lt;Option&lt;String&gt;, _&gt;(OperationError::StreamNotFound(&quot;asd&quot;.to_string()));</span>
     <span class="doccomment">/// let err = Err::&lt;Option&lt;String&gt;, _&gt;(OperationError::AccessDenied(&quot;asd&quot;.to_string()));</span>

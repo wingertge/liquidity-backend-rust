@@ -137,6 +137,9 @@
 <span id="137">137</span>
 <span id="138">138</span>
 <span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">failure</span>::<span class="ident">Error</span>;
 <span class="kw">use</span> <span class="ident">chrono</span>::<span class="ident">Utc</span>;
@@ -183,7 +186,9 @@
 <span class="doccomment">///     importance: None</span>
 <span class="doccomment">/// };</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let result = elections::create_election(election_input, &quot;auth0|test&quot;, conn).await.unwrap().unwrap();</span>
+<span class="doccomment">/// let result = elections::create_election(election_input, &quot;auth0|test&quot;, conn)</span>
+<span class="doccomment">///     .await.unwrap().unwrap();</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(result.name, &quot;test_name&quot;.to_string());</span>
 <span class="doccomment">/// # })</span>
 <span class="doccomment">/// ```</span>
@@ -244,7 +249,8 @@
 <span class="doccomment">/// use backend_rust::db::elections;</span>
 <span class="doccomment">/// let id = Uuid::new_v4();</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// let election = elections::find_election(&amp;id, conn).await.unwrap();</span>
+<span class="doccomment">/// let election = elections::find_election(&amp;id, conn)</span>
+<span class="doccomment">///     .await.unwrap();</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// assert_eq!(election, None);</span>
 <span class="doccomment">/// # })</span>
