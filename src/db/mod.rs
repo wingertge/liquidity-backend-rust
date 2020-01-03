@@ -18,8 +18,9 @@ impl <T> ESResultExt<T> for Result<Option<T>, OperationError> {
     /// # Example
     ///
     /// ```
-    /// use eventstore::OperationError;
+    /// # use eventstore::OperationError;
     /// use backend_rust::db::ESResultExt;
+    ///
     /// let some = Ok::<_, OperationError>(Some("test".to_string()));
     /// let none = Err::<Option<String>, _>(OperationError::StreamNotFound("asd".to_string()));
     /// let err = Err::<Option<String>, _>(OperationError::AccessDenied("asd".to_string()));
