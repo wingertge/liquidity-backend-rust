@@ -1,4 +1,3 @@
-extern crate failure;
 extern crate pretty_env_logger;
 extern crate juniper;
 extern crate warp;
@@ -12,11 +11,7 @@ use serde::{Serialize};
 use eventstore::{Connection, Credentials};
 use std::net::SocketAddr;
 use backend_rust::auth::JWTAuth;
-use warp::{
-    http::HeaderMap,
-    http::header::{ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_ALLOW_HEADERS},
-    Filter
-};
+use warp::{http::HeaderMap, http::header::{ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_ALLOW_HEADERS}, Filter};
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
@@ -118,6 +113,8 @@ async fn main() {
             .unify()
     };
 
+
+    let options = warp::options().map(warp::reply).with(warp::reply::with::headers(headers()));
     let graphql_filter = juniper_warp::make_graphql_filter_async(schema(), context.boxed());
     let headers = headers();
 
@@ -126,6 +123,7 @@ async fn main() {
             .and(warp::path::end())
             .and(juniper_warp::playground_filter("/graphql"))
             .or(warp::path("graphql").and(graphql_filter).with(warp::reply::with::headers(headers)))
+            .or(options)
             .with(log)
     ).run(addr)
 }

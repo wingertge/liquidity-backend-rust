@@ -6,6 +6,7 @@ pub struct Context {
     pub user: Option<User>
 }
 
+#[derive(Debug)]
 pub struct User {
     pub id: String,
     pub permissions: Vec<String>

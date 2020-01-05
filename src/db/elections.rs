@@ -1,4 +1,3 @@
-use failure::Error;
 use chrono::Utc;
 use uuid::Uuid;
 use crate::graphql::schema::{ElectionInput, Election, Importance::Regular};
@@ -7,6 +6,7 @@ use futures::{StreamExt, compat::{Stream01CompatExt, Future01CompatExt}};
 use std::sync::Arc;
 use super::models::CreateElectionEvent;
 use crate::db::ESResultExt;
+use std::error::Error;
 
 /// Create a new election in the database
 ///
@@ -49,7 +49,7 @@ use crate::db::ESResultExt;
 /// assert_eq!(result.name, "test_name".to_string());
 /// # })
 /// ```
-pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Arc<Connection>) -> Result<Option<Election>, Error> {
+pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Arc<Connection>) -> Result<Option<Election>, Box<dyn Error>> {
     let id = Uuid::new_v4();
     let stream_id = format!("election-{}", id);
 
@@ -112,7 +112,7 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
 /// assert_eq!(election, None);
 /// # })
 /// ```
-pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<Election>, Error> {
+pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<Election>, OperationError> {
     let stream = conn.read_stream(format!("election-{}", id))
         .forward()
         .iterate_over();
@@ -121,8 +121,7 @@ pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<El
         .compat()
         .fold(Ok(None), project_election)
         .await
-        .map_not_found()
-        .map_err(Into::into);
+        .map_not_found();
 
     result
 }

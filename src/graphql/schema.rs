@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
-use core::fmt;
-use failure::_core::fmt::{Formatter, Error};
-use failure::_core::str::FromStr;
 use serde::{Serialize, Deserialize};
+use std::{
+    fmt,
+    str::FromStr
+};
 
 #[derive(juniper::GraphQLInputObject)]
 /// A set of roles allowed to interact with this election.
@@ -47,7 +48,7 @@ pub enum Importance {
 }
 
 impl fmt::Display for Importance {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{:?}", self)
     }
 }

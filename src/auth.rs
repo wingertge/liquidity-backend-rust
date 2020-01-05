@@ -1,10 +1,14 @@
-use jwks_client::keyset::KeyStore;
-use jwks_client::jwt::Payload;
-use failure::Error;
-use crate::auth::JWTError::{InvalidJWTFormat, InvalidSignature};
-use crate::graphql::context::User;
+use jwks_client::{
+    keyset::KeyStore,
+    jwt::Payload
+};
+use std::{error::Error, fmt};
+use crate::{
+    auth::JWTError::{InvalidJWTFormat, InvalidSignature, InvalidMetadata},
+    graphql::context::User
+};
 use serde_json::Value;
-use serde::Serialize;
+use serde::{Serialize, export::Formatter, Serializer};
 
 /// Authentication validator
 ///
@@ -15,42 +19,73 @@ pub struct JWTAuth {
     audience: String
 }
 
-#[derive(Debug, Fail, Serialize)]
+#[derive(Debug)]
 #[allow(clippy::enum_variant_names)]
 pub enum JWTError {
-    #[fail(display = "JWT Token failed to validate")]
-    InvalidSignature,
-    #[fail(display = "Invalid request: {}", reason)]
-    InvalidRequestFormat {reason: String},
-    #[fail(display = "Invalid JWT format: {}", reason)]
-    InvalidJWTFormat {reason: String}
+    InvalidSignature(jwks_client::error::Error),
+    InvalidRequestFormat(String),
+    InvalidJWTFormat(String),
+    InvalidMetadata(String),
+    NotAToken
 }
 
-
-fn audience_valid(aud: &String, payload: &Payload) -> Result<bool, Error> {
-    let audiences = payload.get_array("aud");
-    match audiences {
-        Some(audiences) => {
-            let audiences: Result<Vec<String>, JWTError> = audiences.iter()
-                .map(|x| {
-                    let result = x.as_str()
-                        .ok_or(InvalidJWTFormat { reason: "Audiences array contains non-strings".to_string() })
-                        .map(|s| s.to_string());
-                    result
-                })
-                .collect();
-            Ok(audiences?.contains(aud))
-        },
-        None => {
-            let audience = payload.aud().ok_or(InvalidJWTFormat {reason: "Missing audience from JWT".to_string()})?;
-            Ok(audience.eq(aud))
+impl fmt::Display for JWTError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            JWTError::InvalidSignature(e) => write!(f, "Invalid JWT signature: {}", e.msg),
+            JWTError::InvalidRequestFormat(e) => write!(f, "Invalid request format: {}", e),
+            JWTError::InvalidJWTFormat(e) => write!(f, "Invalid JWT format: {}", e),
+            JWTError::InvalidMetadata(e) => write!(f, "Invalid JWT data: {}", e),
+            JWTError::NotAToken => write!(f, "Authorization header is not a JWT token")
         }
     }
 }
 
-fn parse_user(payload: &Payload) -> Result<User, Error> {
+impl Serialize for JWTError {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
+        S: Serializer {
+        serializer.serialize_str(format!("{}", self).as_str())
+    }
+}
+
+impl Error for JWTError {}
+
+fn audience_valid(aud: &String, payload: &Payload) -> Result<(), JWTError> {
+    let audiences = payload.get_array("aud");
+    let valid = match audiences {
+        Some(audiences) => {
+            let audiences: Result<Vec<String>, JWTError> = audiences.iter()
+                .map(|x| {
+                    let result = x.as_str()
+                        .ok_or(InvalidJWTFormat("Audiences array contains non-strings".to_string()))
+                        .map(|s| s.to_string());
+                    result
+                })
+                .collect();
+            audiences?.contains(aud)
+        },
+        None => {
+            let audience = payload.aud().ok_or(InvalidJWTFormat("Missing audience from JWT".to_string()))?;
+            audience.eq(aud)
+        }
+    };
+    match valid {
+        true => Ok(()),
+        false => Err(InvalidMetadata("Token wasn't issued for this service".to_string()))
+    }
+}
+
+fn issuer_valid(iss: &String, payload: &Payload) -> Result<(), JWTError> {
+    let issuer = payload.iss().ok_or(InvalidJWTFormat("Missing issuer from JWT".to_string()))?;
+    match issuer.eq(iss) {
+        true => Ok(()),
+        false => Err(InvalidMetadata("Token wasn't issued by a trusted party".to_string()))
+    }
+}
+
+fn parse_user(payload: &Payload) -> Result<User, JWTError> {
     let id = payload.sub()
-        .ok_or(InvalidJWTFormat {reason: "Missing subject from JWT".to_string()})?
+        .ok_or(InvalidJWTFormat("Missing subject from JWT".to_string()))?
         .to_string();
     let empty = Vec::<Value>::new();
     let permissions = payload
@@ -128,15 +163,12 @@ impl JWTAuth {
     ///
     /// assert!(invalid_token.is_err());
     /// ```
-    pub fn validate(&self, token: String) -> Result<User, Error> {
-        let decoded = self.jwks_store.verify(token.as_str()).map_err(|_| InvalidSignature)?;
-        let audience_valid = audience_valid(&self.audience, decoded.payload())?;
-        let issuer_valid = decoded.payload().iss().ok_or(InvalidJWTFormat {reason: "Missing issuer from JWT".to_string()})? == self.issuer;
-        let valid = audience_valid && issuer_valid;
+    pub fn validate(&self, token: String) -> Result<User, JWTError> {
+        let token = token.replace("Bearer ", "");
+        let decoded = self.jwks_store.verify(token.as_str()).map_err(InvalidSignature)?;
+        audience_valid(&self.audience, decoded.payload())?;
+        issuer_valid(&self.issuer, decoded.payload())?;
 
-        match valid {
-            true => parse_user(decoded.payload()),
-            false => Err(InvalidJWTFormat {reason: "Token wasn't issued for this service!".to_string()}.into())
-        }
+        parse_user(decoded.payload())
     }
 }
