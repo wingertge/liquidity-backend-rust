@@ -10,7 +10,7 @@ use backend_rust::graphql::{context::Context, resolvers::{Query, Mutation}};
 use serde::{Serialize};
 use eventstore::{Connection, Credentials};
 use std::net::SocketAddr;
-use backend_rust::auth::JWTAuth;
+use backend_rust::auth::{JWTAuth, JWTError};
 use warp::{http::HeaderMap, http::header::{ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_ALLOW_HEADERS}, Filter};
 
 const JWKS_URL: &str = "JWKS_URL";
@@ -90,24 +90,24 @@ async fn main() {
 
     let no_auth = {
         let db_conn = db_conn.clone();
-        warp::any().map(move || -> Context{
-            Context {
+        warp::any().map(move || -> Result<Context, JWTError> {
+            Ok(Context {
                 db: db_conn.clone(),
                 user: None
-            }
+            })
         })
     };
     let context = {
         let auth = auth.clone();
         let db_conn = db_conn.clone();
         warp::header::<String>("Authorization")
-            .map(move |jwt: String| -> Context {
+            .map(move |jwt: String| -> Result<Context, JWTError> {
                 let auth = auth.clone();
-                let user = auth.validate(jwt).unwrap();
-                Context {
+                let user = auth.validate(jwt)?;
+                Ok(Context {
                     db: db_conn.clone(),
                     user: Some(user)
-                }
+                })
             })
             .or(no_auth)
             .unify()

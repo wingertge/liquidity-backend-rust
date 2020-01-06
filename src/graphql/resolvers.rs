@@ -2,6 +2,7 @@ use super::{schema::{ElectionInput, Election}, context::Context, permissions};
 use juniper::FieldResult;
 use uuid::Uuid;
 use futures::executor::block_on;
+use crate::auth::JWTError;
 
 /// GraphQL Query type
 pub struct Query;
@@ -9,7 +10,7 @@ pub struct Query;
 pub struct Mutation;
 
 #[juniper::graphql_object(
-    Context = Context
+    Context = Result<Context, JWTError>
 )]
 impl Query {
     /// Fetch an election by id
@@ -38,18 +39,23 @@ impl Query {
     ///     }
     /// }
     /// ```
-    pub fn election(id: Uuid, context: &Context) -> FieldResult<Option<Election>> {
-        permissions::check("view:election", &context.user)?;
-        use crate::db::elections;
+    pub fn election(id: Uuid, context: &Result<Context, JWTError>) -> FieldResult<Option<Election>> {
+        match context {
+            Ok(context) => {
+                permissions::check("view:election", &context.user)?;
+                use crate::db::elections;
 
-        let db = context.db.clone();
-        let result = block_on(elections::find_election(&id, db)); //TODO: Don't block as soon as futures 0.3 support arrives for eventstore
-        result.map_err(Into::into)
+                let db = context.db.clone();
+                let result = block_on(elections::find_election(&id, db)); //TODO: Don't block as soon as futures 0.3 support arrives for eventstore
+                result.map_err(Into::into)
+            },
+            Err(e) => Err(e.into())
+        }
     }
 }
 
 #[juniper::graphql_object(
-    Context = Context
+    Context = Result<Context, JWTError>
 )]
 impl Mutation {
     /// Create a new election
@@ -80,16 +86,21 @@ impl Mutation {
     /// ```
     pub async fn create_election(
         input: ElectionInput,
-        context: &Context
+        context: &Result<Context, JWTError>
     ) -> FieldResult<Option<Election>> {
-        permissions::check("create:election", &context.user)?;
-        let db = context.db.clone();
-        match &context.user {
-            Some(user) => {
-                use crate::db::elections;
-                elections::create_election(input, &user.id, db).await.map_err(Into::into)
+        match context {
+            Ok(context) => {
+                permissions::check("create:election", &context.user)?;
+                let db = context.db.clone();
+                match &context.user {
+                    Some(user) => {
+                        use crate::db::elections;
+                        elections::create_election(input, &user.id, db).await.map_err(Into::into)
+                    },
+                    None => Err("Must be logged in".into())
+                }
             },
-            None => Err("Must be logged in".into())
+            Err(e) => Err(e.into())
         }
     }
 }
