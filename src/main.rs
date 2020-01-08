@@ -12,6 +12,9 @@ use eventstore::{Connection, Credentials};
 use std::net::SocketAddr;
 use backend_rust::auth::{JWTAuth, JWTError};
 use warp::{http::HeaderMap, http::header::{ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_ALLOW_HEADERS}, Filter};
+use tic::Sample;
+use backend_rust::metrics::{Metric, Metrics};
+use std::thread;
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
@@ -74,6 +77,7 @@ async fn main() {
 
     let config = Config::from_env();
     let addr: SocketAddr = ([127, 0, 0, 1], config.port).into();
+    let metrics_addr: SocketAddr = ([127, 0, 0, 1], 4001).into();
 
     let log = warp::log("warp_server");
 
@@ -88,26 +92,52 @@ async fn main() {
     let key_store = KeyStore::new_from(config.jwks_url.as_str()).expect("Failed to create JWKS key store");
     let auth = Arc::new(JWTAuth::new(key_store, config.issuer, config.audience));
 
+    // Metrics
+    let (mut receiver, metrics) = Metrics::new(metrics_addr);
+    thread::spawn(move || receiver.run());
+
     let no_auth = {
         let db_conn = db_conn.clone();
+        let metrics = metrics.clone();
+
         warp::any().map(move || -> Result<Context, JWTError> {
             Ok(Context {
                 db: db_conn.clone(),
-                user: None
+                user: None,
+                metrics: metrics.clone()
             })
         })
     };
     let context = {
         let auth = auth.clone();
         let db_conn = db_conn.clone();
+        let metrics = metrics.clone();
+
         warp::header::<String>("Authorization")
             .map(move |jwt: String| -> Result<Context, JWTError> {
                 let auth = auth.clone();
-                let user = auth.validate(jwt)?;
-                Ok(Context {
-                    db: db_conn.clone(),
-                    user: Some(user)
-                })
+                let metrics = metrics.clone();
+                let clocksource = metrics.clocksource();
+                let mut sender = metrics.sender();
+
+                let start = clocksource.counter();
+                let user = auth.validate(jwt);
+                let end = clocksource.counter();
+
+                sender.send(Sample::new(start, end, Metric::JWT)).unwrap();
+
+                match user {
+                    Ok(user) => Ok(Context {
+                        db: db_conn.clone(),
+                        user: Some(user),
+                        metrics
+                    }),
+                    Err(e) => {
+                        sender.send(Sample::new(start, end, Metric::Error)).unwrap();
+                        Err(e)
+                    }
+                }
+
             })
             .or(no_auth)
             .unify()

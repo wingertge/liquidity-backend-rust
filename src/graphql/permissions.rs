@@ -27,7 +27,7 @@ use juniper::FieldError;
 /// let invalid = permissions::check("create:election", &user);
 /// let not_logged_in = permissions::check("create:election", &None);
 ///
-/// assert_eq!(Ok(true), valid);
+/// assert_eq!(Ok(()), valid);
 /// assert_eq!(Err(FieldError::from("You don't have permission to view elections")), invalid);
 /// assert_eq!(Err(FieldError::from("Must be logged in to do that")), not_logged_in);
 /// ```

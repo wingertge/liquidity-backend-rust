@@ -13,11 +13,11 @@ scenarios:
       - post:
           url: "/graphql"
           headers:
-            authorization: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik16UTVORFpEUWpVeVFqWTNOME5HUlRZMVFqbEJOVUpETVRkR09UaEJNa0kzT0VVek9EZ3lSZyJ9.eyJpc3MiOiJodHRwczovL2xpcXVpZGl0eS1kZXYuZXUuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDVkZDUwNTI0YmRiNzdjMGYxN2ZjNzU0MyIsImF1ZCI6WyJodHRwOi8vbG9jYWxob3N0OjQwMDAvZ3JhcGhxbCIsImh0dHBzOi8vbGlxdWlkaXR5LWRldi5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNTc3NTQ3MDQwLCJleHAiOjE1Nzc2MzM0NDAsImF6cCI6IklvOGZFazFaRDJ1d2RheDRiV2E4Tmo1eFNWTWNoU0w1Iiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsInBlcm1pc3Npb25zIjpbImNyZWF0ZTplbGVjdGlvbiIsInVwZGF0ZTplbGVjdGlvbiIsInZpZXc6ZWxlY3Rpb24iLCJ2b3RlOmVsZWN0aW9uIl19.FLoKenZtHhIJfZoBWbxIo6OA1k8iyRUoHhefy15lOe-3Eue2DYNp4ly_LO3Xmj3kWn_YSc10Akqvk-CfYYmaPhrXf1fXnDpKx5r6kj1cpYx8-hV0C59E1trCuKgzDv9LeUyP8fvPtPBYei3JNbK1G3J9f-I1vezuISkjeruFKvyiaqVD-07dJZb0yt7Cl-20-2q9psNzpo1QGd0lp5CDGTOhMI6EsfSuR3rpwj1peiN4ojWdmrTsOIYRkXiOly-FjvlLaRV_mhdgMXDeVKevbPWzQOp2dOySC2tH30O_k6GOvVP7xOAMxv1K0Wfkf_fndLFRQQpgbKdNEykdNreiXA'
+            authorization: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik16UTVORFpEUWpVeVFqWTNOME5HUlRZMVFqbEJOVUpETVRkR09UaEJNa0kzT0VVek9EZ3lSZyJ9.eyJpc3MiOiJodHRwczovL2xpcXVpZGl0eS1kZXYuZXUuYXV0aDAuY29tLyIsInN1YiI6ImF1dGgwfDVkZDUwNTI0YmRiNzdjMGYxN2ZjNzU0MyIsImF1ZCI6WyJodHRwOi8vbG9jYWxob3N0OjQwMDAvZ3JhcGhxbCIsImh0dHBzOi8vbGlxdWlkaXR5LWRldi5ldS5hdXRoMC5jb20vdXNlcmluZm8iXSwiaWF0IjoxNTc4NDg2ODQzLCJleHAiOjE1Nzg1NzMyNDMsImF6cCI6IklvOGZFazFaRDJ1d2RheDRiV2E4Tmo1eFNWTWNoU0w1Iiwic2NvcGUiOiJvcGVuaWQgcHJvZmlsZSBlbWFpbCIsInBlcm1pc3Npb25zIjpbImNyZWF0ZTplbGVjdGlvbiIsInVwZGF0ZTplbGVjdGlvbiIsInZpZXc6ZWxlY3Rpb24iLCJ2b3RlOmVsZWN0aW9uIl19.Kh6y6wckcIwThYOtleh_2y0nA5RHHJMkj_rFs7CciE7fvbG5JQ9Rnj80ArD1Z9Vwa5RmUj4rxckBPlm6QskyR3dw4UibVn4vwM17mGpHWT3D-SgWG2wAETSC_EsKBI94Re1ONC5zcrWPW6hx_b9CqFRQC8GUJaypoHkbeSlboOM17gfdEJHRy-CkRy8Jf8tGslppLEjeA00jKqovGZbCS75M7-V1fTLy5eKUSJFCmajdzkIzDJDwZ_QeylVwrgDicWhcJyreHLdaNFn8BQWIoTG8EtoVsWFHiJI3PcLISuZ3azDmK7jf2v_obK0-6K5v_DAKX-aPDYkAJQatG5qs3A'
           json:
             query: |
               query {
-                nextElection: election(id: "f318c2fc-824f-46f0-8737-ac102f6a8297") {
+                nextElection: election(id: "51aaec46-531b-4d0e-9ee6-faae7599d0e1") {
                   id
                   custom_name: name
                   description

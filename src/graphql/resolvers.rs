@@ -3,6 +3,7 @@ use juniper::FieldResult;
 use uuid::Uuid;
 use futures::executor::block_on;
 use crate::auth::JWTError;
+use crate::metrics::{GQLMonitor, Metric};
 
 /// GraphQL Query type
 pub struct Query;
@@ -26,7 +27,7 @@ impl Query {
     ///
     /// # Returns
     ///
-    /// The election if it exists, an error if it doesn't
+    /// The election if it exists, None if it doesn't, Error if an issue has occurred
     ///
     /// # Example
     ///
@@ -48,17 +49,14 @@ impl Query {
         )
     )]
     pub fn election(id: Uuid, context: &Result<Context, JWTError>) -> FieldResult<Option<Election>> {
-        match context {
-            Ok(context) => {
-                permissions::check("view:election", &context.user)?;
-                use crate::db::elections;
+        context.monitor(Metric::Query, |context| {
+            permissions::check("view:election", &context.user)?;
+            use crate::db::elections;
 
-                let db = context.db.clone();
-                let result = block_on(elections::find_election(&id, db)); //TODO: Don't block as soon as futures 0.3 support arrives for eventstore
-                result.map_err(Into::into)
-            },
-            Err(e) => Err(e.into())
-        }
+            let db = context.db.clone();
+            let result = block_on(elections::find_election(&id, db)); //TODO: Don't block as soon as futures 0.3 support arrives for eventstore
+            result.map_err(Into::into)
+        })
     }
 }
 
@@ -104,19 +102,16 @@ impl Mutation {
         input: ElectionInput,
         context: &Result<Context, JWTError>
     ) -> FieldResult<Option<Election>> {
-        match context {
-            Ok(context) => {
-                permissions::check("create:election", &context.user)?;
-                let db = context.db.clone();
-                match &context.user {
-                    Some(user) => {
-                        use crate::db::elections;
-                        elections::create_election(input, &user.id, db).await.map_err(Into::into)
-                    },
-                    None => Err("Must be logged in".into())
-                }
-            },
-            Err(e) => Err(e.into())
-        }
+        context.monitor(Metric::Mutation, |context| {
+            permissions::check("create:election", &context.user)?;
+            let db = context.db.clone();
+            match &context.user {
+                Some(user) => {
+                    use crate::db::elections;
+                    block_on(elections::create_election(input, &user.id, db)).map_err(Into::into)
+                },
+                None => Err("Must be logged in".into())
+            }
+        })
     }
 }
