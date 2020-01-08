@@ -15,9 +15,9 @@ use std::error::Error;
 ///
 /// # Arguments
 ///
-/// `election` - The input object with the user input data for the new election
-/// `creator_id` - The id of the user calling the creation function
-/// `conn` - The database connection to execute the insert on
+/// * `election` - The input object with the user input data for the new election
+/// * `creator_id` - The id of the user calling the creation function
+/// * `conn` - The database connection to execute the insert on
 ///
 /// # Example
 ///
@@ -83,8 +83,8 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
 ///
 /// # Arguments
 ///
-/// `id` - The id of the election
-/// `conn` - The database connection
+/// * `id` - The id of the election
+/// * `conn` - The database connection
 ///
 /// # Returns
 ///
