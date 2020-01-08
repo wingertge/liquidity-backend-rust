@@ -7,8 +7,6 @@ use std::{
 };
 
 #[derive(juniper::GraphQLInputObject)]
-/// A set of roles allowed to interact with this election.
-/// Base permissions are always required in addition to these.
 pub struct PermissionSet {
     /// The roles allowed to view the election and its results. Defaults to all.
     pub view_roles: Option<Vec<String>>,
@@ -104,7 +102,8 @@ impl Default for Election {
 pub struct ElectionInput {
     /// The name of the election
     pub name: String,
-    /// The permissions object (see [PermissionSet](struct.PermissionSet.html))
+    /// A set of roles allowed to interact with this election.
+    /// Base permissions are always required in addition to these.
     pub permissions: Option<PermissionSet>,
     /// The description of the election
     pub description: Option<String>,

@@ -39,6 +39,14 @@ impl Query {
     ///     }
     /// }
     /// ```
+    #[graphql(
+        description="Fetch an election by id",
+        arguments(
+            id(
+                description = "The id of the election"
+            )
+        )
+    )]
     pub fn election(id: Uuid, context: &Result<Context, JWTError>) -> FieldResult<Option<Election>> {
         match context {
             Ok(context) => {
@@ -84,6 +92,14 @@ impl Mutation {
     //      }
     //  }
     /// ```
+    #[graphql(
+        description="Create a new election",
+        arguments(
+            input(
+                description = "The input data for the new election"
+            )
+        )
+    )]
     pub async fn create_election(
         input: ElectionInput,
         context: &Result<Context, JWTError>
