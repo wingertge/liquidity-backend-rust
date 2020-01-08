@@ -31,11 +31,11 @@ use juniper::FieldError;
 /// assert_eq!(Err(FieldError::from("You don't have permission to view elections")), invalid);
 /// assert_eq!(Err(FieldError::from("Must be logged in to do that")), not_logged_in);
 /// ```
-pub fn check<'a>(key: &str, user: &Option<User>) -> Result<bool, FieldError> {
-    if !user.as_ref()
-        .ok_or("Must be logged in to do that")?
-        .permissions.contains(&key.to_string()) {
-        return Err("You don't have permission to view elections".into())
+pub fn check<'a>(key: &str, user: &Option<User>) -> Result<(), FieldError> {
+    let has_permission = || -> Option<bool> { Some(user.as_ref()?.permissions.contains(&key.to_string())) };
+    match has_permission() {
+        None => Err("Must be logged in to do that".into()),
+        Some(false) => Err("You don't have permission to view elections".into()),
+        Some(true) => Ok(())
     }
-    Ok(true)
 }
