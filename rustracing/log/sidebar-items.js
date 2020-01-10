@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Log","Span log."],["LogBuilder","Span log builder."],["LogField","Span log field."],["StdErrorLogFieldsBuilder","A specialized span log builder for [the standard error log fields]."],["StdLogFieldsBuilder","A specialized span log builder for [the standard log fields]."]]});

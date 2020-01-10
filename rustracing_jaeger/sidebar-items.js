@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["ErrorKind","The list of the possible error kinds"]],"mod":[["reporter","Reporter to the [jaeger agent]"],["span","Span."]],"struct":[["Error","This crate specific error type."],["Tracer","Tracer."]],"type":[["Result","This crate specific `Result` type."]]});

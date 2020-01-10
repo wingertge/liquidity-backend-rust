@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Data","Data."],["DataKind","Available data kinds."],["DataRef","The reference to a `Data`."],["Elements","A sequence of the values of a data kind."]],"mod":[["iterators","Iterators."]],"struct":[["Field","A struct field."],["List","List."],["Map","Map."],["Set","Set."],["Struct","Structure."]]});

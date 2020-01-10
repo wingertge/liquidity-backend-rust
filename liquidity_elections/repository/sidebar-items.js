@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["create_election","Create a new election in the database"],["find_election","Find an election by its id"]]});

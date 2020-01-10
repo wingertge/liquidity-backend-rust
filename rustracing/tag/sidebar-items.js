@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["TagValue","Span tag value."]],"struct":[["StdTag","[Standard span tags][tags]. [tags]: https://github.com/opentracing/specification/blob/master/semantic_conventions.md#span-tags-table"],["Tag","Span tag."]]});

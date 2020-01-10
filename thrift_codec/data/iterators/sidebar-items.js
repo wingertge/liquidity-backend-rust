@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["ElementIter","An iterator which traverse the elements of a `Elements`."],["MapIter","An iterator which traverse the entries of a `Map`."]]});

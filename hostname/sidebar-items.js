@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["get","Return the system hostname."],["get_hostname","Get hostname."],["set","Set the system hostname."]]});

@@ -1,0 +1,97 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/opentelemetry-0.1.5/src/exporter/trace/mod.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>mod.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../opentelemetry/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
+<span id="2"> 2</span>
+<span id="3"> 3</span>
+<span id="4"> 4</span>
+<span id="5"> 5</span>
+<span id="6"> 6</span>
+<span id="7"> 7</span>
+<span id="8"> 8</span>
+<span id="9"> 9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="doccomment">//! Trace exporters</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">api</span>;
+
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">jaeger</span>;
+
+<span class="doccomment">/// `SpanExporter` defines the interface that protocol-specific exporters must</span>
+<span class="doccomment">/// implement so that they can be plugged into OpenTelemetry SDK and support</span>
+<span class="doccomment">/// sending of telemetry data.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// The goals of the interface are:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// - Minimize burden of implementation for protocol-dependent telemetry</span>
+<span class="doccomment">///  exporters. The protocol exporter is expected to be primarily a simple</span>
+<span class="doccomment">/// telemetry data encoder and transmitter.</span>
+<span class="doccomment">/// - Allow implementing helpers as composable components that use the same</span>
+<span class="doccomment">/// chainable Exporter interface. SDK authors are encouraged to implement common</span>
+<span class="doccomment">/// functionality such as queuing, batching, tagging, etc. as helpers. This</span>
+<span class="doccomment">/// functionality will be applicable regardless of what protocol exporter is used.</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">SpanExporter</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span> {
+    <span class="doccomment">/// The type of `Span` that is exported</span>
+    <span class="kw">type</span> <span class="ident">Span</span>: <span class="ident">api</span>::<span class="ident">Span</span>;
+    <span class="doccomment">/// Exports a batch of telemetry data. Protocol exporters that will implement</span>
+    <span class="doccomment">/// this function are typically expected to serialize and transmit the data</span>
+    <span class="doccomment">/// to the destination.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function will never be called concurrently for the same exporter</span>
+    <span class="doccomment">/// instance. It can be called again only after the current call returns.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This function must not block indefinitely, there must be a reasonable</span>
+    <span class="doccomment">/// upper limit after which the call must time out with an error result.</span>
+    <span class="kw">fn</span> <span class="ident">export</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">batch</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Span</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), ()<span class="op">&gt;</span>;
+
+    <span class="doccomment">/// Shuts down the exporter. Called when SDK is shut down. This is an</span>
+    <span class="doccomment">/// opportunity for exporter to do any cleanup required.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// `shutdown` should be called only once for each Exporter instance. After</span>
+    <span class="doccomment">/// the call to `shutdown`, subsequent calls to `SpanExport` are not allowed</span>
+    <span class="doccomment">/// and should return an error.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Shutdown should not block indefinitely (e.g. if it attempts to flush the</span>
+    <span class="doccomment">/// data and the destination is unavailable). SDK authors can</span>
+    <span class="doccomment">/// decide if they want to make the shutdown timeout to be configurable.</span>
+    <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">&amp;</span><span class="self">self</span>);
+
+    <span class="doccomment">/// Allows exporter to be downcast</span>
+    <span class="kw">fn</span> <span class="ident">as_any</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw">dyn</span> <span class="ident">std</span>::<span class="ident">any</span>::<span class="ident">Any</span>;
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../";window.currentCrate = "opentelemetry";</script><script src="../../../../aliases.js"></script><script src="../../../../main.js"></script><script src="../../../../source-script.js"></script><script src="../../../../source-files.js"></script><script defer src="../../../../search-index.js"></script></body></html>

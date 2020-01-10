@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Importance","The importance of an election. Affects sorting and filtering."]],"struct":[["Election","An election"],["ElectionInput","Input to create a new election"],["PermissionSet",""]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["MessageKind","The kind of a message."]],"struct":[["Message","RPC message."]]});

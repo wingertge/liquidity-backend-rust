@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["BinaryFormat","Used to serialize and deserialize `SpanContext`s to and from  a binary representation."],["Carrier","Carriers provide an interface for adding and removing fields from an underlying struct like `HashMap`."],["HttpTextFormat","is used to inject and extract a value as text into carriers that travel in-band across process boundaries."]]});

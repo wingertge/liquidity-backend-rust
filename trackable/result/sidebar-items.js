@@ -1,0 +1,1 @@
+initSidebarItems({"type":[["MainResult","A variant of [`Result`] for main functions that return a trackable error on failure."],["TestResult","A variant of [`Result`] for unit tests that return a trackable error on failure."],["TopLevelResult","A variant of [`Result`] for top-level functions that return a trackable error on failure."]]});

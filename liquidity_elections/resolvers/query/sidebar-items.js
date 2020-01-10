@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["election","Fetch an election by id"]]});

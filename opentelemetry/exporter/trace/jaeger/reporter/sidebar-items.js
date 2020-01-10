@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["JaegerBinaryReporter","Reporter for the agent which accepts jaeger.thrift over binary thrift protocol."],["JaegerCompactReporter","Reporter for the agent which accepts jaeger.thrift over compact thrift protocol."]]});
