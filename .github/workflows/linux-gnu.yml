@@ -1,5 +1,4 @@
 name: 'Linux (GNU)'
-description: 'Build and test for the linux-gnu target'
 
 on:
   push:
