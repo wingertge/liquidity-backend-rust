@@ -1,5 +1,5 @@
 
-ARG BINARY_NAME_DEFAULT=backend
+ARG BINARY_NAME_DEFAULT=liquidity_server
 ARG MY_GREAT_CONFIG_DEFAULT="someconfig-default-value"
 
 FROM clux/muslrust:stable as builder
@@ -32,4 +32,4 @@ COPY --from=builder /build-out/$BINARY_NAME /
 # Start with an execution list (there is no sh in a scratch image)
 # No shell => no variable expansion, |, <, >, etc
 # Hard coded start command
-CMD ["backend"]
+CMD ["/liquidity_server"]

@@ -1,8 +1,6 @@
-use eventstore::OperationError;
-
-/// Contains Repository functions for elections
-pub mod elections;
-mod models;
+pub use eventstore::OperationError;
+use crate::Connection;
+use std::{sync::Arc, fmt};
 
 pub trait ESResultExt<T> {
     fn map_not_found(self) -> Result<Option<T>, OperationError>;
@@ -18,8 +16,7 @@ impl <T> ESResultExt<T> for Result<Option<T>, OperationError> {
     /// # Example
     ///
     /// ```
-    /// # use eventstore::OperationError;
-    /// use backend_rust::db::ESResultExt;
+    /// use liquidity::db::{ESResultExt, OperationError};
     ///
     /// let some = Ok::<_, OperationError>(Some("test".to_string()));
     /// let none = Err::<Option<String>, _>(OperationError::StreamNotFound("asd".to_string()));
@@ -39,5 +36,13 @@ impl <T> ESResultExt<T> for Result<Option<T>, OperationError> {
                 }
             }
         }
+    }
+}
+
+/// This is stupid and only for tracing
+pub struct StupidConnectionWrapper(pub Arc<Connection>);
+impl fmt::Debug for StupidConnectionWrapper {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "eventstore connection")
     }
 }

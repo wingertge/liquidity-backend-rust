@@ -1,12 +1,8 @@
 use chrono::{DateTime, Utc};
-use uuid::Uuid;
 use serde::{Serialize, Deserialize};
-use std::{
-    fmt,
-    str::FromStr
-};
+use liquidity::Uuid;
 
-#[derive(juniper::GraphQLInputObject)]
+#[derive(juniper::GraphQLInputObject, Debug)]
 pub struct PermissionSet {
     /// The roles allowed to view the election and its results. Defaults to all.
     pub view_roles: Option<Vec<String>>,
@@ -31,37 +27,12 @@ impl Default for PermissionSet {
     }
 }
 
-#[derive(juniper::GraphQLObject)]
-/// The user object. Currently not used
-pub struct User {
-    pub username: String
-}
-
 #[derive(juniper::GraphQLEnum, Debug, Serialize, Deserialize, Clone, PartialEq)]
 /// The importance of an election. Affects sorting and filtering.
 pub enum Importance {
     Important,
     Regular,
     Minor
-}
-
-impl fmt::Display for Importance {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
-}
-
-impl FromStr for Importance {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        match s {
-            "Important" => Ok(Importance::Important),
-            "Regular" => Ok(Importance::Regular),
-            "Minor" => Ok(Importance::Minor),
-            _ => Err(())
-        }
-    }
 }
 
 #[derive(juniper::GraphQLObject, Clone, PartialEq, Debug)]
@@ -83,21 +54,7 @@ pub struct Election {
     pub importance: Importance
 }
 
-impl Default for Election {
-    fn default() -> Self {
-        Election {
-            id: Uuid::new_v4(),
-            name: "".to_string(),
-            description: "".to_string(),
-            choices: vec![],
-            start_date: Utc::now(),
-            end_date: Utc::now(),
-            importance: Importance::Regular
-        }
-    }
-}
-
-#[derive(juniper::GraphQLInputObject)]
+#[derive(juniper::GraphQLInputObject, Debug)]
 /// Input to create a new election
 pub struct ElectionInput {
     /// The name of the election

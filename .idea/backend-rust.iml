@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../backend-rust/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/../backend-rust/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/../backend-rust/benches" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_server/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_server/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_server/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_server/benches" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_api/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_api/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_api/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_api/benches" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_elections/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_elections/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_elections/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_elections/benches" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity/benches" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/liquidity/target" />
+      <excludeFolder url="file://$MODULE_DIR$/liquidity_api/target" />
+      <excludeFolder url="file://$MODULE_DIR$/liquidity_elections/target" />
+      <excludeFolder url="file://$MODULE_DIR$/liquidity_server/target" />
+      <excludeFolder url="file://$MODULE_DIR$/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

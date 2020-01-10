@@ -3,12 +3,8 @@ use jwks_client::{
     jwt::Payload
 };
 use std::{error::Error, fmt};
-use crate::{
-    auth::JWTError::{InvalidJWTFormat, InvalidSignature, InvalidMetadata},
-    graphql::context::User
-};
-use serde_json::Value;
-use serde::{Serialize, export::Formatter, Serializer};
+use crate::auth::JWTError::{InvalidJWTFormat, InvalidSignature, InvalidMetadata};
+use liquidity::context::User;
 
 /// Authentication validator
 ///
@@ -23,28 +19,19 @@ pub struct JWTAuth {
 #[allow(clippy::enum_variant_names)]
 pub enum JWTError {
     InvalidSignature(jwks_client::error::Error),
-    InvalidRequestFormat(String),
     InvalidJWTFormat(String),
     InvalidMetadata(String),
     NotAToken
 }
 
 impl fmt::Display for JWTError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             JWTError::InvalidSignature(e) => write!(f, "Invalid JWT signature: {}", e.msg),
-            JWTError::InvalidRequestFormat(e) => write!(f, "Invalid request format: {}", e),
             JWTError::InvalidJWTFormat(e) => write!(f, "Invalid JWT format: {}", e),
             JWTError::InvalidMetadata(e) => write!(f, "Invalid JWT data: {}", e),
             JWTError::NotAToken => write!(f, "Authorization header is not a JWT token")
         }
-    }
-}
-
-impl Serialize for JWTError {
-    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error> where
-        S: Serializer {
-        serializer.serialize_str(format!("{}", self).as_str())
     }
 }
 
@@ -87,7 +74,7 @@ fn parse_user(payload: &Payload) -> Result<User, JWTError> {
     let id = payload.sub()
         .ok_or(InvalidJWTFormat("Missing subject from JWT".to_string()))?
         .to_string();
-    let empty = Vec::<Value>::new();
+    let empty = Vec::new();
     let permissions = payload
         .get_array("permissions")
         .unwrap_or_else(|| &empty)
@@ -163,12 +150,26 @@ impl JWTAuth {
     ///
     /// assert!(invalid_token.is_err());
     /// ```
+    #[instrument]
     pub fn validate(&self, token: String) -> Result<User, JWTError> {
+        if !token.starts_with("Bearer ") { return Err(JWTError::NotAToken) }
         let token = token.replace("Bearer ", "");
-        let decoded = self.jwks_store.verify(token.as_str()).map_err(InvalidSignature)?;
+        let decoded = {
+            let span = trace_span!("verify_token");
+            let _enter = span.enter();
+            let res = self.jwks_store.verify(token.as_str()).map_err(InvalidSignature);
+            if let Err(e) = &res { error!("{:?}", e) }
+            res
+        }?;
         audience_valid(&self.audience, decoded.payload())?;
         issuer_valid(&self.issuer, decoded.payload())?;
 
         parse_user(decoded.payload())
+    }
+}
+
+impl fmt::Debug for JWTAuth {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "aud: {}, iss: {}", self.audience, self.issuer)
     }
 }

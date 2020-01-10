@@ -1,30 +1,28 @@
-extern crate pretty_env_logger;
+#[macro_use] extern crate tracing;
 extern crate juniper;
 extern crate warp;
 extern crate juniper_warp;
+extern crate tracing_subscriber;
 
-use std::sync::Arc;
+mod query;
+mod mutation;
+mod auth;
+
+use std::{sync::Arc, net::SocketAddr};
 use juniper::RootNode;
 use jwks_client::keyset::KeyStore;
-use backend_rust::graphql::{context::Context, resolvers::{Query, Mutation}};
-use serde::{Serialize};
-use eventstore::{Connection, Credentials};
-use std::net::SocketAddr;
-use backend_rust::auth::{JWTAuth, JWTError};
-use warp::{http::HeaderMap, http::header::{ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_ALLOW_HEADERS}, Filter};
-use tic::Sample;
-use backend_rust::metrics::{Metric, Metrics};
-use std::thread;
+use crate::{auth::{JWTAuth, JWTError}, query::Query, mutation::Mutation};
+use warp::{
+    Filter,
+    http::header::{ACCESS_CONTROL_ALLOW_HEADERS, ACCESS_CONTROL_ALLOW_ORIGIN},
+    http::HeaderMap
+};
+use liquidity::{Context, Connection, Credentials};
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
 const ENDPOINT_URL: &str = "ENDPOINT_URL";
 const GRAPHQL_PLAYGROUND: &str = "GRAPHQL_PLAYGROUND";
-
-#[derive(Serialize)]
-struct JsonError {
-    error: String
-}
 
 struct Config {
     pub port: u16,
@@ -64,24 +62,46 @@ impl Config {
     }
 }
 
+fn init_tracing() {
+    use opentelemetry::{api::Provider, sdk};
+    use tracing_opentelemetry::OpentelemetryLayer;
+    use tracing_subscriber::{Layer, Registry};
+
+    // Create tracer
+    let tracer = sdk::Provider::default()
+        .get_tracer("liquidity_backend");
+
+    // Create tracing layer
+    let layer = OpentelemetryLayer::with_tracer(tracer);
+    let subscriber = layer.with_subscriber(Registry::default());
+
+    tracing::subscriber::set_global_default(subscriber).expect("Failed to set tracing subscriber");
+}
+
 type Schema = RootNode<'static, Query, Mutation>;
 
 fn schema() -> Schema {
     Schema::new(Query, Mutation)
 }
+fn headers() -> HeaderMap {
+    let mut headers = HeaderMap::new();
+    headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, "*".parse().unwrap());
+    headers.insert(ACCESS_CONTROL_ALLOW_HEADERS, "*".parse().unwrap());
+    headers
+}
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
     dotenv::dotenv().ok();
-    pretty_env_logger::init();
+    init_tracing();
 
     let config = Config::from_env();
     let addr: SocketAddr = ([127, 0, 0, 1], config.port).into();
-    let metrics_addr: SocketAddr = ([127, 0, 0, 1], 4001).into();
 
     let log = warp::log("warp_server");
 
-    log::info!("Listening on {}", addr.to_string());
+    info!("Listening on {}", addr.to_string());
 
     let db_conn = Arc::new(
         Connection::builder()
@@ -89,78 +109,45 @@ async fn main() {
             .single_node_connection(config.database_url)
     );
 
-    let key_store = KeyStore::new_from(config.jwks_url.as_str()).expect("Failed to create JWKS key store");
+    let key_store = KeyStore::new_from(config.jwks_url.as_str()).await.expect("Failed to create JWKS key store");
     let auth = Arc::new(JWTAuth::new(key_store, config.issuer, config.audience));
-
-    // Metrics
-    let (mut receiver, metrics) = Metrics::new(metrics_addr);
-    thread::spawn(move || receiver.run());
 
     let no_auth = {
         let db_conn = db_conn.clone();
-        let metrics = metrics.clone();
-
         warp::any().map(move || -> Result<Context, JWTError> {
             Ok(Context {
                 db: db_conn.clone(),
                 user: None,
-                metrics: metrics.clone()
             })
         })
     };
     let context = {
         let auth = auth.clone();
         let db_conn = db_conn.clone();
-        let metrics = metrics.clone();
 
         warp::header::<String>("Authorization")
             .map(move |jwt: String| -> Result<Context, JWTError> {
                 let auth = auth.clone();
-                let metrics = metrics.clone();
-                let clocksource = metrics.clocksource();
-                let mut sender = metrics.sender();
+                let user = auth.validate(jwt)?;
 
-                let start = clocksource.counter();
-                let user = auth.validate(jwt);
-                let end = clocksource.counter();
-
-                sender.send(Sample::new(start, end, Metric::JWT)).unwrap();
-
-                match user {
-                    Ok(user) => Ok(Context {
-                        db: db_conn.clone(),
-                        user: Some(user),
-                        metrics
-                    }),
-                    Err(e) => {
-                        sender.send(Sample::new(start, end, Metric::Error)).unwrap();
-                        Err(e)
-                    }
-                }
-
+                Ok(Context {
+                    db: db_conn.clone(),
+                    user: Some(user)
+                })
             })
             .or(no_auth)
             .unify()
     };
 
-
     let options = warp::options().map(warp::reply).with(warp::reply::with::headers(headers()));
-    let graphql_filter = juniper_warp::make_graphql_filter_async(schema(), context.boxed());
-    let headers = headers();
+    let graphql_filter = juniper_warp::make_graphql_filter(schema(), context.boxed());
 
     warp::serve(
         warp::get2()
             .and(warp::path::end())
             .and(juniper_warp::playground_filter("/graphql"))
-            .or(warp::path("graphql").and(graphql_filter).with(warp::reply::with::headers(headers)))
+            .or(warp::path("graphql").and(graphql_filter).with(warp::reply::with::headers(headers())))
             .or(options)
             .with(log)
     ).run(addr)
-}
-
-fn headers() -> HeaderMap {
-    let mut headers = HeaderMap::new();
-    headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, "*".parse().unwrap());
-    headers.insert(ACCESS_CONTROL_ALLOW_HEADERS, "*".parse().unwrap());
-    headers
 }

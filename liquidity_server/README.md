@@ -1,0 +1,1 @@
+![](https://github.com/wingertge/liquidity-backend-rust/workflows/Linux%20%28GNU%29/badge.svg)

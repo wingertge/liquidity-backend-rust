@@ -1,7 +1,7 @@
-use uuid::Uuid;
 use chrono::{DateTime, Utc};
-use crate::graphql::schema::{Importance, Election};
+use crate::schema::{Importance, Election};
 use serde::{Serialize, Deserialize};
+use liquidity::Uuid;
 
 #[derive(Clone, Serialize, Deserialize)]
 pub struct CreateElectionEvent {
