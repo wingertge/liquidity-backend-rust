@@ -1,12 +1,13 @@
 use chrono::Utc;
-use crate::schema::{ElectionInput, Election, Importance::Regular};
+use crate::schema::{Election, Importance::Regular, ElectionInput};
 use eventstore::{EventData, Connection, ResolvedEvent, OperationError};
 use futures::{StreamExt, compat::{Stream01CompatExt, Future01CompatExt}};
 use std::sync::Arc;
 use super::models::CreateElectionEvent;
-use liquidity::{db::{ESResultExt, StupidConnectionWrapper}, Uuid};
-use std::error::Error;
+use liquidity::{db::{ESResultExt, StupidConnectionWrapper}, Uuid, Merge};
 use tracing_futures::Instrument;
+use crate::models::{UpdateElectionEvent, ElectionEventType};
+use liquidity::db::DatabaseError;
 
 /// Create a new election in the database
 ///
@@ -34,7 +35,7 @@ use tracing_futures::Instrument;
 /// use liquidity_elections::repository;
 ///
 /// let election_input = ElectionInput {
-///     name: "test_name".to_string(),
+///     name: Some("test_name".to_string()),
 ///     description: Some("This is a test description".to_string()),
 ///     choices: Some(vec!["test1".to_string(), "test2".to_string()]),
 ///     permissions: None,
@@ -44,14 +45,14 @@ use tracing_futures::Instrument;
 /// };
 ///
 /// let result = repository::create_election(election_input, "auth0|test", conn)
-///     .await.unwrap().unwrap();
+///     .await.unwrap();
 ///
 /// assert_eq!(result.name, "test_name".to_string());
 /// # })
 /// ```
-pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Arc<Connection>) -> Result<Option<Election>, Box<dyn Error>> {
+pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Arc<Connection>) -> Result<Election, DatabaseError> {
     #[instrument]
-    async fn create_election(election: ElectionInput, creator_id: &str, conn_wrapper: StupidConnectionWrapper) -> Result<Option<Election>, Box<dyn Error>> {
+    async fn create_election(election: ElectionInput, creator_id: &str, conn_wrapper: StupidConnectionWrapper) -> Result<Election, DatabaseError> {
         let conn = conn_wrapper.0;
         let id = Uuid::new_v4();
         let stream_id = format!("election-{}", id);
@@ -59,7 +60,7 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
         let event_data = CreateElectionEvent {
             id,
             created_by_id: creator_id.to_string(),
-            name: election.name,
+            name: election.name.unwrap(),
             description: election.description.unwrap_or("".to_string()),
             start_date: election.start_date.unwrap_or_else(|| Utc::now()),
             end_date: election.end_date.unwrap_or_else(|| Utc::now()),
@@ -69,7 +70,7 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
 
         let event_payload = serde_json::to_value(event_data.clone())?;
 
-        let event = EventData::json("election-create", event_payload)?;
+        let event = EventData::json(ElectionEventType::Create, event_payload)?;
 
         let result = conn
             .write_events(stream_id)
@@ -84,7 +85,7 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
             Err(e) => error!("{:?}", e)
         };
 
-        result.map(|_| Some(event_data.into())).map_err(Into::into)
+        result.map(|_| event_data.into()).map_err(Into::into)
     }
 
     create_election(election, creator_id, StupidConnectionWrapper(conn)).await
@@ -122,9 +123,9 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
 /// assert_eq!(election, None);
 /// # })
 /// ```
-pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<Election>, OperationError> {
+pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<Election>, DatabaseError> {
     #[instrument]
-    async fn find(id: &Uuid, conn_wrapper: StupidConnectionWrapper) -> Result<Option<Election>, OperationError> {
+    async fn find(id: &Uuid, conn_wrapper: StupidConnectionWrapper) -> Result<Option<Election>, DatabaseError> {
         let conn = conn_wrapper.0;
         let stream_id = format!("election-{}", id);
 
@@ -141,9 +142,11 @@ pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<El
                 .await;
 
             result
-        }.instrument(trace_span!("fold_election"));
+        }.instrument(trace_span!("fold_election"))
+            .await
+            .map_not_found()?;
 
-        result.await.map_not_found()
+        Ok(result)
     }
 
     find(id, StupidConnectionWrapper(conn)).await

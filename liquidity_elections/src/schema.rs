@@ -58,7 +58,7 @@ pub struct Election {
 /// Input to create a new election
 pub struct ElectionInput {
     /// The name of the election
-    pub name: String,
+    pub name: Option<String>,
     /// A set of roles allowed to interact with this election.
     /// Base permissions are always required in addition to these.
     pub permissions: Option<PermissionSet>,

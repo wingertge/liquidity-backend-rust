@@ -1,6 +1,7 @@
 pub use eventstore::OperationError;
 use crate::Connection;
 use std::{sync::Arc, fmt};
+use std::error::Error;
 
 pub trait ESResultExt<T> {
     fn map_not_found(self) -> Result<Option<T>, OperationError>;
@@ -44,5 +45,46 @@ pub struct StupidConnectionWrapper(pub Arc<Connection>);
 impl fmt::Debug for StupidConnectionWrapper {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "eventstore connection")
+    }
+}
+
+#[derive(Debug)]
+pub enum DatabaseError {
+    ConnectionFailed,
+    DatabaseError(OperationError),
+    AccessDenied(String),
+    SerializationError(serde_json::Error),
+    NotFound
+}
+
+impl fmt::Display for DatabaseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            DatabaseError::ConnectionFailed => write!(f, "database disconnected"),
+            DatabaseError::DatabaseError(e) => write!(f, "{:?}", e),
+            DatabaseError::AccessDenied(s) => write!(f, "Access Denied: {}", s),
+            DatabaseError::SerializationError(e) => write!(f, "{:?}", e),
+            DatabaseError::NotFound => write!(f, "object doesn't exist")
+        }
+    }
+}
+
+impl Error for DatabaseError {}
+
+impl From<OperationError> for DatabaseError {
+    fn from(e: OperationError) -> Self {
+        match e.clone() {
+            OperationError::AccessDenied(s) => DatabaseError::AccessDenied(s),
+            OperationError::AuthenticationRequired => DatabaseError::AccessDenied("Not authenticated".to_string()),
+            OperationError::StreamDeleted(_) | OperationError::StreamNotFound(_) => DatabaseError::NotFound,
+            OperationError::Aborted | OperationError::ConnectionHasDropped => DatabaseError::ConnectionFailed,
+            _ => DatabaseError::DatabaseError(e)
+        }
+    }
+}
+
+impl From<serde_json::Error> for DatabaseError {
+    fn from(e: serde_json::Error) -> Self {
+        DatabaseError::SerializationError(e)
     }
 }

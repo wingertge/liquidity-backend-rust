@@ -4,7 +4,7 @@ use serde::{Serialize, Deserialize};
 use liquidity::Uuid;
 
 #[derive(Clone, Serialize, Deserialize)]
-pub struct CreateElectionEvent {
+pub(crate) struct CreateElectionEvent {
     pub id: Uuid,
     pub name: String,
     pub description: String,

@@ -45,8 +45,8 @@ pub mod query {
 
 pub mod mutation {
     use futures::executor::block_on;
-    use liquidity::{Context, permissions, Error};
-    use crate::schema::{ElectionInput, Election};
+    use liquidity::{Context, permissions, Error, Uuid};
+    use crate::schema::{Election, ElectionInput};
 
     /// Create a new election
     ///
@@ -77,17 +77,17 @@ pub mod mutation {
     pub async fn create_election(
         input: ElectionInput,
         context: &Context
-    ) -> Result<Option<Election>, Error> {
+    ) -> Result<Election, Error> {
         let span = trace_span!("create_election", "input: {:?}, context: {:?}", input, context);
         let _enter = span.enter();
         permissions::check("create:election", &context.user)?;
+        if input.name.is_none() { return Err("Name cannot be null".into()) }
+
         let db = context.db.clone();
-        match &context.user {
-            Some(user) => {
-                use crate::repository::create_election;
-                block_on(create_election(input, &user.id, db)).map_err(Into::into)
-            },
-            None => Err("Must be logged in".into())
-        }
+        let user = context.user.as_ref().unwrap();
+
+        use crate::repository::create_election;
+        let result = create_election(input, &user.id, db).await?;
+        Ok(result)
     }
 }

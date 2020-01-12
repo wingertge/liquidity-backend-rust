@@ -17,7 +17,7 @@ impl Mutation {
             )
         )
     )]
-    pub async fn create_election(input: ElectionInput, context: &Result<Context, JWTError>) -> FieldResult<Option<Election>> {
+    pub async fn create_election(input: ElectionInput, context: &Result<Context, JWTError>) -> FieldResult<Election> {
         let context = context.as_ref()?;
 
         elections::mutation::create_election(input, context).await.map_err(Into::into)
