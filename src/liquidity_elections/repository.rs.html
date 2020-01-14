@@ -243,10 +243,6 @@
 <span id="243">243</span>
 <span id="244">244</span>
 <span id="245">245</span>
-<span id="246">246</span>
-<span id="247">247</span>
-<span id="248">248</span>
-<span id="249">249</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">chrono</span>::<span class="ident">Utc</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">schema</span>::{<span class="ident">Election</span>, <span class="ident">Importance</span>::<span class="ident">Regular</span>, <span class="ident">ElectionInput</span>};
@@ -308,11 +304,11 @@
             <span class="ident">id</span>,
             <span class="ident">created_by_id</span>: <span class="ident">creator_id</span>.<span class="ident">to_string</span>(),
             <span class="ident">name</span>: <span class="ident">election</span>.<span class="ident">name</span>.<span class="ident">unwrap</span>(),
-            <span class="ident">description</span>: <span class="ident">election</span>.<span class="ident">description</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()),
-            <span class="ident">start_date</span>: <span class="ident">election</span>.<span class="ident">start_date</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Utc</span>::<span class="ident">now</span>()),
-            <span class="ident">end_date</span>: <span class="ident">election</span>.<span class="ident">end_date</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Utc</span>::<span class="ident">now</span>()),
+            <span class="ident">description</span>: <span class="ident">election</span>.<span class="ident">description</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="string">&quot;&quot;</span>.<span class="ident">to_string</span>()),
+            <span class="ident">start_date</span>: <span class="ident">election</span>.<span class="ident">start_date</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">Utc</span>::<span class="ident">now</span>),
+            <span class="ident">end_date</span>: <span class="ident">election</span>.<span class="ident">end_date</span>.<span class="ident">unwrap_or_else</span>(<span class="ident">Utc</span>::<span class="ident">now</span>),
             <span class="ident">importance</span>: <span class="ident">election</span>.<span class="ident">importance</span>.<span class="ident">unwrap_or</span>(<span class="ident">Regular</span>),
-            <span class="ident">choices</span>: <span class="ident">election</span>.<span class="ident">choices</span>.<span class="ident">unwrap_or</span>(<span class="macro">vec</span><span class="macro">!</span>[])
+            <span class="ident">choices</span>: <span class="ident">election</span>.<span class="ident">choices</span>.<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">vec</span><span class="macro">!</span>[])
         };
 
         <span class="kw">let</span> <span class="ident">event_payload</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_value</span>(<span class="ident">event_data</span>.<span class="ident">clone</span>())<span class="question-mark">?</span>;
@@ -465,14 +461,10 @@
                 .<span class="ident">iterate_over</span>()
         });
 
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="kw">async</span> {
-            <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">stream</span>
-                .<span class="ident">compat</span>()
-                .<span class="ident">fold</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="ident">project_election</span>)
-                .<span class="kw">await</span>;
-
-            <span class="ident">result</span>
-        }.<span class="ident">instrument</span>(<span class="macro">trace_span</span><span class="macro">!</span>(<span class="string">&quot;fold_election&quot;</span>))
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">stream</span>
+            .<span class="ident">compat</span>()
+            .<span class="ident">fold</span>(<span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>), <span class="ident">project_election</span>)
+            .<span class="ident">instrument</span>(<span class="macro">trace_span</span><span class="macro">!</span>(<span class="string">&quot;fold_election&quot;</span>))
             .<span class="kw">await</span>
             .<span class="ident">map_not_found</span>()<span class="question-mark">?</span>;
 

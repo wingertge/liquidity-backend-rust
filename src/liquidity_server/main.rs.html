@@ -150,7 +150,6 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
-<span id="153">153</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">tracing</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">juniper</span>;
@@ -201,7 +200,7 @@
             .<span class="ident">expect</span>(<span class="string">&quot;DATABASE_URL must be a valid socket address&quot;</span>);
         <span class="kw">let</span> <span class="ident">database_login</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;DATABASE_LOGIN&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;DATABASE_LOGIN must be set&quot;</span>);
         <span class="kw">let</span> <span class="ident">database_password</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;DATABASE_PASSWORD&quot;</span>).<span class="ident">expect</span>(<span class="string">&quot;DATABASE_PASSWORD must be set&quot;</span>);
-        <span class="kw">let</span> <span class="ident">playground_enabled</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">GRAPHQL_PLAYGROUND</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;false&quot;</span>.<span class="ident">to_string</span>()).<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
+        <span class="kw">let</span> <span class="ident">playground_enabled</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">GRAPHQL_PLAYGROUND</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;false&quot;</span>.<span class="ident">to_string</span>()).<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>();
         <span class="kw">let</span> <span class="ident">jwks_url</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">JWKS_URL</span>).<span class="ident">expect</span>(<span class="string">&quot;JWKS_URL must be set&quot;</span>);
         <span class="kw">let</span> <span class="ident">issuer</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">JWT_ISSUER</span>).<span class="ident">expect</span>(<span class="string">&quot;JWT_ISSUER must be set&quot;</span>);
         <span class="kw">let</span> <span class="ident">audience</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">ENDPOINT_URL</span>).<span class="ident">expect</span>(<span class="string">&quot;ENDPOINT_URL must be set&quot;</span>);
@@ -276,7 +275,6 @@
         })
     };
     <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">auth</span> <span class="op">=</span> <span class="ident">auth</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">db_conn</span> <span class="op">=</span> <span class="ident">db_conn</span>.<span class="ident">clone</span>();
 
         <span class="ident">warp</span>::<span class="ident">header</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(<span class="string">&quot;Authorization&quot;</span>)
