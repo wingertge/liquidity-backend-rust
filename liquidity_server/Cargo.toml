@@ -19,7 +19,7 @@ liquidity = {path = "../liquidity"}
 liquidity_api = {path = "../liquidity_api"}
 
 warp = "0.1.20"
-jwks-client = { git = "https://github.com/wingertge/jwks-client.git", branch = "futures-0.3" }
+jwks-client = "0.2"
 
 juniper = { git = "https://github.com/graphql-rust/juniper", branch = "async-await", features = ["async"] }
 juniper_warp = { git = "https://github.com/graphql-rust/juniper", branch = "async-await", features = ["async"] }
