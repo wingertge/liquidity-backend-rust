@@ -153,11 +153,14 @@ pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<El
 async fn project_election(acc: Result<Option<Election>, OperationError>, item: Result<ResolvedEvent, OperationError>) -> Result<Option<Election>, OperationError> {
     let acc = acc?;
     let event = item?.event.unwrap();
-    match event.event_type.as_str() {
-        "election-create" => {
+    match event.event_type.to_owned().into() {
+        ElectionEventType::Create => {
             let payload = event.as_json::<CreateElectionEvent>().unwrap();
             Ok(Some(payload.into()))
         },
-        _ => Ok(acc)
+        ElectionEventType::Update => {
+            let payload = event.as_json::<UpdateElectionEvent>().unwrap();
+            Ok(acc.map(|acc| acc.merge_with(payload)))
+        }
     }
 }

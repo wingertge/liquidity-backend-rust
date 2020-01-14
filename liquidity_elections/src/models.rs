@@ -1,7 +1,31 @@
 use chrono::{DateTime, Utc};
 use crate::schema::{Importance, Election};
 use serde::{Serialize, Deserialize};
-use liquidity::Uuid;
+use liquidity::{Uuid, Merge};
+
+pub(crate) enum ElectionEventType {
+    Create,
+    Update
+}
+
+impl AsRef<str> for ElectionEventType {
+    fn as_ref(&self) -> &str {
+        match self {
+            ElectionEventType::Create => "election-create",
+            ElectionEventType::Update => "election-update"
+        }
+    }
+}
+
+impl From<String> for ElectionEventType {
+    fn from(s: String) -> Self {
+        match s.as_str() {
+            "election-create" => ElectionEventType::Create,
+            "election-update" => ElectionEventType::Update,
+            _ => ElectionEventType::Create
+        }
+    }
+}
 
 #[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct CreateElectionEvent {
