@@ -10,7 +10,7 @@ pub enum PermissionError {
 
 impl fmt::Display for PermissionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "PermissionError: {}", self.description())
+        write!(f, "PermissionError: {:?}", self)
     }
 }
 
