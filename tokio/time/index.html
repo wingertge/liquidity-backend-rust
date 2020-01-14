@@ -69,12 +69,15 @@ external entities like the file system or other processes.</p>
 </td></tr><tr class='module-item'><td><a class="struct" href="struct.Interval.html" title='tokio::time::Interval struct'>Interval</a></td><td class='docblock-short'><p>Stream returned by <a href="interval"><code>interval</code></a> and <a href="interval_at"><code>interval_at</code></a>.</p>
 </td></tr><tr class='module-item'><td><a class="struct" href="struct.Timeout.html" title='tokio::time::Timeout struct'>Timeout</a></td><td class='docblock-short'><p>Future returned by <a href="timeout"><code>timeout</code></a> and <a href="timeout_at"><code>timeout_at</code></a>.</p>
 </td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
-<table><tr class='module-item'><td><a class="fn" href="fn.delay_for.html" title='tokio::time::delay_for fn'>delay_for</a></td><td class='docblock-short'><p>Wait until <code>duration</code> has elapsed.</p>
+<table><tr class='module-item'><td><a class="fn" href="fn.advance.html" title='tokio::time::advance fn'>advance</a></td><td class='docblock-short'><p>Advance time</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.delay_for.html" title='tokio::time::delay_for fn'>delay_for</a></td><td class='docblock-short'><p>Wait until <code>duration</code> has elapsed.</p>
 </td></tr><tr class='module-item'><td><a class="fn" href="fn.delay_until.html" title='tokio::time::delay_until fn'>delay_until</a></td><td class='docblock-short'><p>Wait until <code>deadline</code> is reached.</p>
 </td></tr><tr class='module-item'><td><a class="fn" href="fn.interval.html" title='tokio::time::interval fn'>interval</a></td><td class='docblock-short'><p>Creates new <code>Interval</code> that yields with interval of <code>duration</code>. The first
 tick completes immediately.</p>
 </td></tr><tr class='module-item'><td><a class="fn" href="fn.interval_at.html" title='tokio::time::interval_at fn'>interval_at</a></td><td class='docblock-short'><p>Creates new <code>Interval</code> that yields with interval of <code>period</code> with the
 first tick completing at <code>at</code>.</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.pause.html" title='tokio::time::pause fn'>pause</a></td><td class='docblock-short'><p>Pause time</p>
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.resume.html" title='tokio::time::resume fn'>resume</a></td><td class='docblock-short'><p>Resume time</p>
 </td></tr><tr class='module-item'><td><a class="fn" href="fn.timeout.html" title='tokio::time::timeout fn'>timeout</a></td><td class='docblock-short'><p>Require a <code>Future</code> to complete before the specified duration has elapsed.</p>
 </td></tr><tr class='module-item'><td><a class="fn" href="fn.timeout_at.html" title='tokio::time::timeout_at fn'>timeout_at</a></td><td class='docblock-short'><p>Require a <code>Future</code> to complete before the specified instant in time.</p>
 </td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "tokio";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

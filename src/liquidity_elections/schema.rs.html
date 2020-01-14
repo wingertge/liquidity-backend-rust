@@ -73,12 +73,26 @@
 <span id="73">73</span>
 <span id="74">74</span>
 <span id="75">75</span>
+<span id="76">76</span>
+<span id="77">77</span>
+<span id="78">78</span>
+<span id="79">79</span>
+<span id="80">80</span>
+<span id="81">81</span>
+<span id="82">82</span>
+<span id="83">83</span>
+<span id="84">84</span>
+<span id="85">85</span>
+<span id="86">86</span>
+<span id="87">87</span>
+<span id="88">88</span>
+<span id="89">89</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">Serialize</span>, <span class="ident">Deserialize</span>};
 <span class="kw">use</span> <span class="ident">liquidity</span>::<span class="ident">Uuid</span>;
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLInputObject</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLInputObject</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PermissionSet</span> {
     <span class="doccomment">/// The roles allowed to view the election and its results. Defaults to all.</span>
     <span class="kw">pub</span> <span class="ident">view_roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -130,11 +144,11 @@
     <span class="kw">pub</span> <span class="ident">importance</span>: <span class="ident">Importance</span>
 }
 
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLInputObject</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">juniper</span>::<span class="ident">GraphQLInputObject</span>, <span class="ident">Debug</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="doccomment">/// Input to create a new election</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ElectionInput</span> {
     <span class="doccomment">/// The name of the election</span>
-    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A set of roles allowed to interact with this election.</span>
     <span class="doccomment">/// Base permissions are always required in addition to these.</span>
     <span class="kw">pub</span> <span class="ident">permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PermissionSet</span><span class="op">&gt;</span>,
@@ -149,5 +163,18 @@
     <span class="doccomment">/// The importance of the election</span>
     <span class="kw">pub</span> <span class="ident">importance</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Importance</span><span class="op">&gt;</span>
 }
-</pre></div>
+
+<span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">ElectionInput</span> {
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="ident">ElectionInput</span> {
+            <span class="ident">name</span>: <span class="prelude-val">None</span>,
+            <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
+            <span class="ident">description</span>: <span class="prelude-val">None</span>,
+            <span class="ident">choices</span>: <span class="prelude-val">None</span>,
+            <span class="ident">start_date</span>: <span class="prelude-val">None</span>,
+            <span class="ident">end_date</span>: <span class="prelude-val">None</span>,
+            <span class="ident">importance</span>: <span class="prelude-val">None</span>
+        }
+    }
+}</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "liquidity_elections";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>

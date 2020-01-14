@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["create_election","Create a new election"]]});
+initSidebarItems({"fn":[["create_election","Create a new election"],["edit_election","Edit an election"]]});

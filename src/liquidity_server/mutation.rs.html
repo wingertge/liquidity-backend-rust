@@ -23,8 +23,25 @@
 <span id="23">23</span>
 <span id="24">24</span>
 <span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">liquidity</span>::<span class="ident">Context</span>;
+<span class="kw">use</span> <span class="ident">liquidity</span>::{<span class="ident">Context</span>, <span class="ident">Uuid</span>};
 <span class="kw">use</span> <span class="ident">liquidity_api</span>::<span class="ident">elections</span>::{<span class="ident">schema</span>::{<span class="ident">Election</span>, <span class="ident">ElectionInput</span>}, <span class="self">self</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">auth</span>::<span class="ident">JWTError</span>;
 <span class="kw">use</span> <span class="ident">juniper</span>::<span class="ident">FieldResult</span>;
@@ -43,10 +60,27 @@
             )
         )
     )]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_election</span>(<span class="ident">input</span>: <span class="ident">ElectionInput</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">JWTError</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldResult</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_election</span>(<span class="ident">input</span>: <span class="ident">ElectionInput</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">JWTError</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldResult</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
 
         <span class="ident">elections</span>::<span class="ident">mutation</span>::<span class="ident">create_election</span>(<span class="ident">input</span>, <span class="ident">context</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Into</span>::<span class="ident">into</span>)
+    }
+
+    <span class="attribute">#[<span class="ident">graphql</span>(
+        <span class="ident">description</span><span class="op">=</span><span class="string">&quot;Edit an election&quot;</span>,
+        <span class="ident">arguments</span>(
+            <span class="ident">id</span>(
+                <span class="ident">description</span> <span class="op">=</span> <span class="string">&quot;The id of the election&quot;</span>
+            ),
+            <span class="ident">input</span>(
+                <span class="ident">description</span> <span class="op">=</span> <span class="string">&quot;The fields to update&quot;</span>
+            )
+        )
+    )]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edit_election</span>(<span class="ident">id</span>: <span class="ident">Uuid</span>, <span class="ident">input</span>: <span class="ident">ElectionInput</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">JWTError</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldResult</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span> {
+        <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">elections</span>::<span class="ident">mutation</span>::<span class="ident">edit_election</span>(<span class="ident">id</span>, <span class="ident">input</span>, <span class="ident">context</span>)<span class="question-mark">?</span>;
+        <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
     }
 }</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "liquidity_server";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
