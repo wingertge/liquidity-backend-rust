@@ -1,4 +1,4 @@
-use liquidity::Context;
+use liquidity::{Context, Uuid};
 use liquidity_api::elections::{schema::{Election, ElectionInput}, self};
 use crate::auth::JWTError;
 use juniper::FieldResult;
@@ -21,5 +21,22 @@ impl Mutation {
         let context = context.as_ref()?;
 
         elections::mutation::create_election(input, context).await.map_err(Into::into)
+    }
+
+    #[graphql(
+        description="Edit an election",
+        arguments(
+            id(
+                description = "The id of the election"
+            ),
+            input(
+                description = "The fields to update"
+            )
+        )
+    )]
+    pub fn edit_election(id: Uuid, input: ElectionInput, context: &Result<Context, JWTError>) -> FieldResult<Election> {
+        let context = context.as_ref()?;
+        let result = elections::mutation::edit_election(id, input, context)?;
+        Ok(result)
     }
 }

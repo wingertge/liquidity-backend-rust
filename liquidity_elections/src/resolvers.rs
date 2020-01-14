@@ -90,4 +90,45 @@ pub mod mutation {
         let result = create_election(input, &user.id, db).await?;
         Ok(result)
     }
+
+    /// Edit an election
+    ///
+    /// # Arguments
+    ///
+    /// `id` - The id of the election to be edited
+    /// `input` - The fields to edit
+    /// `context` - The request context, passed automatically
+    ///
+    /// # Permissions Required
+    ///
+    /// `update:election`
+    ///
+    /// # Returns
+    ///
+    /// The edited election or an error if the update failed
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// mutation {
+    ///     editElection(id: "54c8ed41-b4f4-4f1c-8903-f9bbbe2d992d", input: {description: "new description"}) {
+    ///        id
+    ///        name
+    ///        description
+    ///     }
+    /// }
+    /// ```
+    #[instrument]
+    pub fn edit_election(
+        id: Uuid,
+        input: ElectionInput,
+        context: &Context
+    ) -> Result<Election, Error> {
+        permissions::check("update:election", &context.user)?;
+        let db = context.db.clone();
+
+        use crate::repository::update_election;
+        let result = block_on(update_election(&id, input, db))?;
+        Ok(result)
+    }
 }
