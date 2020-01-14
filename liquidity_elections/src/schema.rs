@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use serde::{Serialize, Deserialize};
 use liquidity::Uuid;
 
-#[derive(juniper::GraphQLInputObject, Debug)]
+#[derive(juniper::GraphQLInputObject, Debug, PartialEq)]
 pub struct PermissionSet {
     /// The roles allowed to view the election and its results. Defaults to all.
     pub view_roles: Option<Vec<String>>,
@@ -54,7 +54,7 @@ pub struct Election {
     pub importance: Importance
 }
 
-#[derive(juniper::GraphQLInputObject, Debug)]
+#[derive(juniper::GraphQLInputObject, Debug, PartialEq)]
 /// Input to create a new election
 pub struct ElectionInput {
     /// The name of the election
@@ -72,4 +72,18 @@ pub struct ElectionInput {
     pub end_date: Option<DateTime<Utc>>,
     /// The importance of the election
     pub importance: Option<Importance>
+}
+
+impl Default for ElectionInput {
+    fn default() -> Self {
+        ElectionInput {
+            name: None,
+            permissions: None,
+            description: None,
+            choices: None,
+            start_date: None,
+            end_date: None,
+            importance: None
+        }
+    }
 }

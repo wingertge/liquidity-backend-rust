@@ -38,10 +38,7 @@ use liquidity::db::DatabaseError;
 ///     name: Some("test_name".to_string()),
 ///     description: Some("This is a test description".to_string()),
 ///     choices: Some(vec!["test1".to_string(), "test2".to_string()]),
-///     permissions: None,
-///     start_date: None,
-///     end_date: None,
-///     importance: None
+///     ..ElectionInput::default()
 /// };
 ///
 /// let result = repository::create_election(election_input, "auth0|test", conn)
