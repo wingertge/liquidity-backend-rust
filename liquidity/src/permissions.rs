@@ -53,7 +53,7 @@ impl Error for PermissionError {
 /// assert_eq!(Err(PermissionError::NotAllowed), invalid);
 /// assert_eq!(Err(PermissionError::NotLoggedIn), not_logged_in);
 /// ```
-pub fn check<'a>(key: &str, user: &Option<User>) -> Result<(), PermissionError> {
+pub fn check(key: &str, user: &Option<User>) -> Result<(), PermissionError> {
     let has_permission = || -> Option<bool> { Some(user.as_ref()?.permissions.contains(&key.to_string())) };
     match has_permission() {
         None => Err(PermissionError::NotLoggedIn),

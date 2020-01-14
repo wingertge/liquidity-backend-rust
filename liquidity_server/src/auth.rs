@@ -37,42 +37,41 @@ impl fmt::Display for JWTError {
 
 impl Error for JWTError {}
 
-fn audience_valid(aud: &String, payload: &Payload) -> Result<(), JWTError> {
+fn audience_valid(aud: String, payload: &Payload) -> Result<(), JWTError> {
     let audiences = payload.get_array("aud");
     let valid = match audiences {
         Some(audiences) => {
             let audiences: Result<Vec<String>, JWTError> = audiences.iter()
                 .map(|x| {
-                    let result = x.as_str()
-                        .ok_or(InvalidJWTFormat("Audiences array contains non-strings".to_string()))
-                        .map(|s| s.to_string());
-                    result
+                    x.as_str()
+                        .ok_or_else(|| InvalidJWTFormat("Audiences array contains non-strings".to_string()))
+                        .map(|s| s.to_string())
                 })
                 .collect();
-            audiences?.contains(aud)
+            audiences?.contains(&aud)
         },
         None => {
-            let audience = payload.aud().ok_or(InvalidJWTFormat("Missing audience from JWT".to_string()))?;
-            audience.eq(aud)
+            let audience = payload.aud().ok_or_else(|| InvalidJWTFormat("Missing audience from JWT".to_string()))?;
+            audience.eq(&aud)
         }
     };
-    match valid {
-        true => Ok(()),
-        false => Err(InvalidMetadata("Token wasn't issued for this service".to_string()))
+    if valid { Ok(()) }
+    else {
+        Err(InvalidMetadata("Token wasn't issued for this service".to_string()))
     }
 }
 
-fn issuer_valid(iss: &String, payload: &Payload) -> Result<(), JWTError> {
-    let issuer = payload.iss().ok_or(InvalidJWTFormat("Missing issuer from JWT".to_string()))?;
-    match issuer.eq(iss) {
-        true => Ok(()),
-        false => Err(InvalidMetadata("Token wasn't issued by a trusted party".to_string()))
+fn issuer_valid(iss: String, payload: &Payload) -> Result<(), JWTError> {
+    let issuer = payload.iss().ok_or_else(|| InvalidJWTFormat("Missing issuer from JWT".to_string()))?;
+    if issuer.eq(&iss) { Ok(()) }
+    else {
+        Err(InvalidMetadata("Token wasn't issued by a trusted party".to_string()))
     }
 }
 
 fn parse_user(payload: &Payload) -> Result<User, JWTError> {
     let id = payload.sub()
-        .ok_or(InvalidJWTFormat("Missing subject from JWT".to_string()))?
+        .ok_or_else(|| InvalidJWTFormat("Missing subject from JWT".to_string()))?
         .to_string();
     let empty = Vec::new();
     let permissions = payload
@@ -161,8 +160,8 @@ impl JWTAuth {
             if let Err(e) = &res { error!("{:?}", e) }
             res
         }?;
-        audience_valid(&self.audience, decoded.payload())?;
-        issuer_valid(&self.issuer, decoded.payload())?;
+        audience_valid(self.audience.to_owned(), decoded.payload())?;
+        issuer_valid(self.issuer.to_owned(), decoded.payload())?;
 
         parse_user(decoded.payload())
     }

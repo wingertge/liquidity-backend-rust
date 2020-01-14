@@ -58,11 +58,11 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
             id,
             created_by_id: creator_id.to_string(),
             name: election.name.unwrap(),
-            description: election.description.unwrap_or("".to_string()),
-            start_date: election.start_date.unwrap_or_else(|| Utc::now()),
-            end_date: election.end_date.unwrap_or_else(|| Utc::now()),
+            description: election.description.unwrap_or_else(|| "".to_string()),
+            start_date: election.start_date.unwrap_or_else(Utc::now),
+            end_date: election.end_date.unwrap_or_else(Utc::now),
             importance: election.importance.unwrap_or(Regular),
-            choices: election.choices.unwrap_or(vec![])
+            choices: election.choices.unwrap_or_else(|| vec![])
         };
 
         let event_payload = serde_json::to_value(event_data.clone())?;
@@ -215,14 +215,10 @@ pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<El
                 .iterate_over()
         });
 
-        let result = async {
-            let result = stream
-                .compat()
-                .fold(Ok(None), project_election)
-                .await;
-
-            result
-        }.instrument(trace_span!("fold_election"))
+        let result = stream
+            .compat()
+            .fold(Ok(None), project_election)
+            .instrument(trace_span!("fold_election"))
             .await
             .map_not_found()?;
 

@@ -47,7 +47,7 @@ impl Config {
             .expect("DATABASE_URL must be a valid socket address");
         let database_login = std::env::var("DATABASE_LOGIN").expect("DATABASE_LOGIN must be set");
         let database_password = std::env::var("DATABASE_PASSWORD").expect("DATABASE_PASSWORD must be set");
-        let playground_enabled = std::env::var(GRAPHQL_PLAYGROUND).unwrap_or("false".to_string()).parse::<bool>().unwrap();
+        let playground_enabled = std::env::var(GRAPHQL_PLAYGROUND).unwrap_or_else(|_| "false".to_string()).parse::<bool>().unwrap();
         let jwks_url = std::env::var(JWKS_URL).expect("JWKS_URL must be set");
         let issuer = std::env::var(JWT_ISSUER).expect("JWT_ISSUER must be set");
         let audience = std::env::var(ENDPOINT_URL).expect("ENDPOINT_URL must be set");
@@ -122,7 +122,6 @@ async fn main() {
         })
     };
     let context = {
-        let auth = auth.clone();
         let db_conn = db_conn.clone();
 
         warp::header::<String>("Authorization")
