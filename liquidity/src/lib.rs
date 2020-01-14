@@ -10,3 +10,7 @@ pub mod permissions;
 pub use context::Context;
 
 pub type Error = Box<dyn ErrTrait>;
+
+pub trait Merge<T> {
+    fn merge_with(self, new: T) -> Self;
+}

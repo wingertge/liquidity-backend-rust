@@ -28,3 +28,39 @@ impl From<CreateElectionEvent> for Election {
         }
     }
 }
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct UpdateElectionEvent {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub name: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub description: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub start_date: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub end_date: Option<DateTime<Utc>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub importance: Option<Importance>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(default)]
+    pub choices: Option<Vec<String>>
+}
+
+impl Merge<UpdateElectionEvent> for Election {
+    fn merge_with(self, new: UpdateElectionEvent) -> Self {
+        Election {
+            id: self.id,
+            name: new.name.unwrap_or(self.name),
+            description: new.description.unwrap_or(self.description),
+            choices: new.choices.unwrap_or(self.choices),
+            start_date: new.start_date.unwrap_or(self.start_date),
+            end_date: new.end_date.unwrap_or(self.end_date),
+            importance: new.importance.unwrap_or(self.importance)
+        }
+    }
+}
