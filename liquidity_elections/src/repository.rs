@@ -88,6 +88,89 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
     create_election(election, creator_id, StupidConnectionWrapper(conn)).await
 }
 
+/// Update an election in the database
+///
+/// This update an election in the database given an election input and the ID of the election.
+/// This will error if the stream doesn't exist or the update fails because of connection errors.
+///
+/// # Arguments
+///
+/// * `id` - The id of the election to be updated
+/// * `election` - The input object with the fields to update
+/// * `conn` - The database connection to execute the update on
+///
+/// # Example
+///
+/// ```
+/// # use liquidity_elections::schema::Election;
+/// use liquidity::Uuid;
+/// futures::executor::block_on(async {
+/// # use liquidity_elections::schema::ElectionInput;
+/// # use liquidity::{Connection, Credentials};
+/// # use std::sync::Arc;
+/// # let conn = Arc::new(
+/// #     Connection::builder()
+/// #         .with_default_user(Credentials::new("admin", "changeit"))
+/// #         .single_node_connection(([127, 0, 0, 1], 1113).into())
+/// # );
+///
+/// use liquidity_elections::repository;
+///
+/// let election_input = ElectionInput {
+///     description: Some("This is a new test description".to_string()),
+///     ..ElectionInput::default()
+/// };
+///
+/// let id = Uuid::new_v4();
+/// let result = repository::update_election(&id, election_input, conn).await;
+///
+/// assert!(result.is_err())
+/// # })
+/// ```
+pub async fn update_election(id: &Uuid, input: ElectionInput, conn: Arc<Connection>) -> Result<Election, DatabaseError> {
+    #[instrument]
+    async fn update_election(id: &Uuid, input: ElectionInput, conn_wrapper: StupidConnectionWrapper) -> Result<Election, DatabaseError> {
+        let conn = conn_wrapper.0;
+        let stream_id = format!("election-{}", id);
+
+        let original = find_election(id, conn.clone()).await?
+            .ok_or(DatabaseError::NotFound)?;
+
+        if input.eq(&ElectionInput::default()) { return Ok(original) }
+
+        let event_data = UpdateElectionEvent {
+            name: input.name,
+            description: input.description,
+            choices: input.choices,
+            start_date: input.start_date,
+            end_date: input.end_date,
+            importance: input.importance
+        };
+
+        let event_payload = serde_json::to_value(event_data.clone())?;
+        let event = EventData::json(ElectionEventType::Update, event_payload)?;
+
+        let result = conn
+            .write_events(stream_id)
+            .push_event(event)
+            .execute()
+            .compat()
+            .instrument(trace_span!("store_event"))
+            .await;
+
+        match &result {
+            Ok(event_data) => debug!("{:?}", event_data),
+            Err(e) => error!("{:?}", e)
+        };
+
+        result?;
+
+        Ok(original.merge_with(event_data))
+    }
+
+    update_election(id, input, StupidConnectionWrapper(conn)).await
+}
+
 /// Find an election by its id
 ///
 /// # Arguments
