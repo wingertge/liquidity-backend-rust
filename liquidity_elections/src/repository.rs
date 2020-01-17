@@ -4,7 +4,7 @@ use eventstore::{EventData, Connection, ResolvedEvent, OperationError};
 use futures::{StreamExt, compat::{Stream01CompatExt, Future01CompatExt}};
 use std::sync::Arc;
 use super::models::CreateElectionEvent;
-use liquidity::{db::{ESResultExt, StupidConnectionWrapper}, Uuid, Merge};
+use liquidity::{db::ESResultExt, Uuid, Merge};
 use tracing_futures::Instrument;
 use crate::models::{UpdateElectionEvent, ElectionEventType};
 use liquidity::db::DatabaseError;
@@ -47,45 +47,40 @@ use liquidity::db::DatabaseError;
 /// assert_eq!(result.name, "test_name".to_string());
 /// # })
 /// ```
+#[instrument(skip(conn))]
 pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Arc<Connection>) -> Result<Election, DatabaseError> {
-    #[instrument]
-    async fn create_election(election: ElectionInput, creator_id: &str, conn_wrapper: StupidConnectionWrapper) -> Result<Election, DatabaseError> {
-        let conn = conn_wrapper.0;
-        let id = Uuid::new_v4();
-        let stream_id = format!("election-{}", id);
+    let id = Uuid::new_v4();
+    let stream_id = format!("election-{}", id);
 
-        let event_data = CreateElectionEvent {
-            id,
-            created_by_id: creator_id.to_string(),
-            name: election.name.unwrap(),
-            description: election.description.unwrap_or_else(|| "".to_string()),
-            start_date: election.start_date.unwrap_or_else(Utc::now),
-            end_date: election.end_date.unwrap_or_else(Utc::now),
-            importance: election.importance.unwrap_or(Regular),
-            choices: election.choices.unwrap_or_else(|| vec![])
-        };
+    let event_data = CreateElectionEvent {
+        id,
+        created_by_id: creator_id.to_string(),
+        name: election.name.unwrap(),
+        description: election.description.unwrap_or_else(|| "".to_string()),
+        start_date: election.start_date.unwrap_or_else(Utc::now),
+        end_date: election.end_date.unwrap_or_else(Utc::now),
+        importance: election.importance.unwrap_or(Regular),
+        choices: election.choices.unwrap_or_else(|| vec![])
+    };
 
-        let event_payload = serde_json::to_value(event_data.clone())?;
+    let event_payload = serde_json::to_value(event_data.clone())?;
 
-        let event = EventData::json(ElectionEventType::Create, event_payload)?;
+    let event = EventData::json(ElectionEventType::Create, event_payload)?;
 
-        let result = conn
-            .write_events(stream_id)
-            .push_event(event)
-            .execute()
-            .compat()
-            .instrument(trace_span!("store_event"))
-            .await;
+    let result = conn
+        .write_events(stream_id)
+        .push_event(event)
+        .execute()
+        .compat()
+        .instrument(trace_span!("store_event"))
+        .await;
 
-        match &result {
-            Ok(event_data) => debug!("{:?}", event_data),
-            Err(e) => error!("{:?}", e)
-        };
+    match &result {
+        Ok(event_data) => debug!("{:?}", event_data),
+        Err(e) => error!("{:?}", e)
+    };
 
-        result.map(|_| event_data.into()).map_err(Into::into)
-    }
-
-    create_election(election, creator_id, StupidConnectionWrapper(conn)).await
+    result.map(|_| event_data.into()).map_err(Into::into)
 }
 
 /// Update an election in the database
@@ -127,48 +122,43 @@ pub async fn create_election(election: ElectionInput, creator_id: &str, conn: Ar
 /// assert!(result.is_err())
 /// # })
 /// ```
+#[instrument(skip(conn))]
 pub async fn update_election(id: &Uuid, input: ElectionInput, conn: Arc<Connection>) -> Result<Election, DatabaseError> {
-    #[instrument]
-    async fn update_election(id: &Uuid, input: ElectionInput, conn_wrapper: StupidConnectionWrapper) -> Result<Election, DatabaseError> {
-        let conn = conn_wrapper.0;
-        let stream_id = format!("election-{}", id);
+    let stream_id = format!("election-{}", id);
 
-        let original = find_election(id, conn.clone()).await?
-            .ok_or(DatabaseError::NotFound)?;
+    let original = find_election(id, conn.clone()).await?
+        .ok_or(DatabaseError::NotFound)?;
 
-        if input.eq(&ElectionInput::default()) { return Ok(original) }
+    if input.eq(&ElectionInput::default()) { return Ok(original) }
 
-        let event_data = UpdateElectionEvent {
-            name: input.name,
-            description: input.description,
-            choices: input.choices,
-            start_date: input.start_date,
-            end_date: input.end_date,
-            importance: input.importance
-        };
+    let event_data = UpdateElectionEvent {
+        name: input.name,
+        description: input.description,
+        choices: input.choices,
+        start_date: input.start_date,
+        end_date: input.end_date,
+        importance: input.importance
+    };
 
-        let event_payload = serde_json::to_value(event_data.clone())?;
-        let event = EventData::json(ElectionEventType::Update, event_payload)?;
+    let event_payload = serde_json::to_value(event_data.clone())?;
+    let event = EventData::json(ElectionEventType::Update, event_payload)?;
 
-        let result = conn
-            .write_events(stream_id)
-            .push_event(event)
-            .execute()
-            .compat()
-            .instrument(trace_span!("store_event"))
-            .await;
+    let result = conn
+        .write_events(stream_id)
+        .push_event(event)
+        .execute()
+        .compat()
+        .instrument(trace_span!("store_event"))
+        .await;
 
-        match &result {
-            Ok(event_data) => debug!("{:?}", event_data),
-            Err(e) => error!("{:?}", e)
-        };
+    match &result {
+        Ok(event_data) => debug!("{:?}", event_data),
+        Err(e) => error!("{:?}", e)
+    };
 
-        result?;
+    result?;
 
-        Ok(original.merge_with(event_data))
-    }
-
-    update_election(id, input, StupidConnectionWrapper(conn)).await
+    Ok(original.merge_with(event_data))
 }
 
 /// Find an election by its id
@@ -203,29 +193,24 @@ pub async fn update_election(id: &Uuid, input: ElectionInput, conn: Arc<Connecti
 /// assert_eq!(election, None);
 /// # })
 /// ```
+#[instrument(skip(conn))]
 pub async fn find_election(id: &Uuid, conn: Arc<Connection>) -> Result<Option<Election>, DatabaseError> {
-    #[instrument]
-    async fn find(id: &Uuid, conn_wrapper: StupidConnectionWrapper) -> Result<Option<Election>, DatabaseError> {
-        let conn = conn_wrapper.0;
-        let stream_id = format!("election-{}", id);
+    let stream_id = format!("election-{}", id);
 
-        let stream = trace_span!("open_stream", "id: {}", stream_id).in_scope(|| {
-            conn.read_stream(stream_id)
-                .forward()
-                .iterate_over()
-        });
+    let stream = trace_span!("open_stream", "id: {}", stream_id).in_scope(|| {
+        conn.read_stream(stream_id)
+            .forward()
+            .iterate_over()
+    });
 
-        let result = stream
-            .compat()
-            .fold(Ok(None), project_election)
-            .instrument(trace_span!("fold_election"))
-            .await
-            .map_not_found()?;
+    let result = stream
+        .compat()
+        .fold(Ok(None), project_election)
+        .instrument(trace_span!("fold_election"))
+        .await
+        .map_not_found()?;
 
-        Ok(result)
-    }
-
-    find(id, StupidConnectionWrapper(conn)).await
+    Ok(result)
 }
 
 #[instrument]

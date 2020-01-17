@@ -1,6 +1,5 @@
 pub use eventstore::OperationError;
-use crate::Connection;
-use std::{sync::Arc, fmt};
+use std::fmt;
 use std::error::Error;
 
 pub trait ESResultExt<T> {
@@ -37,14 +36,6 @@ impl <T> ESResultExt<T> for Result<Option<T>, OperationError> {
                 }
             }
         }
-    }
-}
-
-/// This is stupid and only for tracing
-pub struct StupidConnectionWrapper(pub Arc<Connection>);
-impl fmt::Debug for StupidConnectionWrapper {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "eventstore connection")
     }
 }
 
