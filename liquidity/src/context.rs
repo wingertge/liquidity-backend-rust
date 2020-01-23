@@ -1,19 +1,13 @@
-use crate::Connection;
-use std::{fmt, sync::Arc};
+use crate::db::DbConnection;
+use std::fmt;
 
-pub struct Context {
-    pub db: Arc<Connection>,
-    pub user: Option<User>
-}
-
-impl fmt::Debug for Context {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "user: {:?}", self.user)
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct User {
     pub id: String,
     pub permissions: Vec<String>
+}
+
+pub trait Context<DB: DbConnection> : fmt::Debug {
+    fn db(&self) -> DB;
+    fn user(&self) -> &Option<User>;
 }
