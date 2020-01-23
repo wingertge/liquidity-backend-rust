@@ -215,21 +215,155 @@ impl ElectionRepository {
                     cache.insert(id.to_owned(), election.clone(), self.time_to_live);
                 }
 
-    Ok(result)
+                Ok(result)
+            }
+        }
+    }
 }
 
-#[instrument]
-async fn project_election(acc: Result<Option<Election>, OperationError>, item: Result<ResolvedEvent, OperationError>) -> Result<Option<Election>, OperationError> {
-    let acc = acc?;
-    let event = item?.event.unwrap();
-    match event.event_type.to_owned().into() {
-        ElectionEventType::Create => {
-            let payload = event.as_json::<CreateElectionEvent>().unwrap();
-            Ok(Some(payload.into()))
-        },
-        ElectionEventType::Update => {
-            let payload = event.as_json::<UpdateElectionEvent>().unwrap();
-            Ok(acc.map(|acc| acc.merge_with(payload)))
+#[cfg(test)]
+mod test {
+    use std::sync::Arc;
+    use tokio_test::block_on;
+    use crate::schema::{ElectionInput, Importance, Election};
+    use liquidity::db::EventType;
+    use crate::models::{UpdateElectionEvent, CreateElectionEvent};
+    use crate::repository::ElectionRepository;
+    use std::time::Duration;
+    use liquidity_test_utils::connection::MockConnection;
+    use serde_json::Value;
+
+    fn conn() -> MockConnection {
+        MockConnection::new()
+    }
+
+    fn repository() -> Arc<ElectionRepository> {
+        Arc::new(ElectionRepository::new(10, Duration::from_secs(600)))
+    }
+
+    fn test_election_input() -> ElectionInput {
+        ElectionInput {
+            name: Some("test_name".to_string()),
+            description: Some("test_description".to_string()),
+            choices: Some(vec!["test1".to_string(), "test2".to_string()]),
+            ..ElectionInput::default()
         }
+    }
+
+    fn test_update_input() -> ElectionInput {
+        ElectionInput {
+            description: Some("test_description_2".to_string()),
+            ..ElectionInput::default()
+        }
+    }
+
+    #[test]
+    fn create_works() {
+        block_on(async {
+            let conn = conn();
+            let repository = repository();
+
+            let election = repository.create_election(test_election_input(), "test_creator_id", conn.clone())
+                .await
+                .expect("Creating the election shouldn't fail");
+
+            assert_eq!(election.name, "test_name".to_string());
+            assert_eq!(election.description, "test_description".to_string());
+            assert_eq!(election.choices, vec!["test1".to_string(), "test2".to_string()]);
+            assert_eq!(election.importance, Importance::Regular);
+
+            let sent = conn.data.lock().unwrap();
+            let stream_id = format!("election-{}", election.id);
+            let (event_type, value): (EventType, Value) = sent[&stream_id][0].clone();
+            let payload: CreateElectionEvent = serde_json::from_value(value).expect("The event payload should have the right type");
+
+            assert_eq!(event_type, EventType::Create);
+            assert_eq!(payload.id, election.id);
+            assert_eq!(payload.description, "test_description");
+            assert_eq!(payload.choices, vec!["test1".to_string(), "test2".to_string()])
+        })
+    }
+
+    #[test]
+    fn update_works() {
+        block_on(async {
+            let conn = conn();
+            let repository = repository();
+
+            let election = repository.create_election(test_election_input(), "test_creator_id", conn.clone())
+                .await
+                .expect("Creating the election shouldn't fail");
+
+            let updated = repository.update_election(&election.id, test_update_input(), conn.clone())
+                .await
+                .expect("Updating the election shouldn't fail");
+
+            assert_eq!(election.name, updated.name);
+            assert_eq!(election.importance, updated.importance);
+            assert_eq!(updated.description, "test_description_2".to_string());
+            assert_ne!(election.description, updated.description);
+
+            let stream_id = format!("election-{}", election.id);
+            let events = conn.data.lock().unwrap()
+                .get(&stream_id)
+                .expect("Stream should've been created")
+                .clone();
+
+            let create_event = events[0].clone();
+            let create_payload = serde_json::from_value::<CreateElectionEvent>(create_event.1)
+                .expect("Create event should be of the right type");
+            let update_event = events[1].clone();
+            let update_payload = serde_json::from_value::<UpdateElectionEvent>(update_event.1)
+                .expect("Update event should be of the right type");
+
+            assert_eq!(create_event.0, EventType::Create);
+            assert_eq!(create_payload.name, "test_name".to_string());
+            assert_eq!(update_payload.name, None);
+            assert_eq!(update_payload.description, Some("test_description_2".to_string()));
+        })
+    }
+
+    #[test]
+    fn find_works() {
+        block_on(async {
+            let conn = conn();
+            let repository = repository();
+
+            let election = repository.create_election(test_election_input(), "test_creator_id", conn.clone())
+                .await
+                .expect("Creating the election shouldn't fail");
+
+            let read = repository.find_election(&election.id, conn.clone())
+                .await
+                .expect("Finding the election shouldn't fail")
+                .expect("The returned election shouldn't be none");
+
+            assert_eq!(read.name, "test_name".to_string());
+            assert_eq!(read.description, "test_description".to_string());
+
+            let cache_entry: Election = repository.cache.lock().await.get(&election.id).cloned()
+                .expect("Election should exist in the cache");
+
+            assert_eq!(cache_entry.name, election.name);
+            assert_eq!(cache_entry.description, election.description);
+
+            let updated = repository.update_election(&election.id, test_update_input(), conn.clone())
+                .await
+                .expect("Updating the election shouldn't fail");
+
+            let read = repository.find_election(&election.id, conn.clone())
+                .await
+                .expect("Finding the election shouldn't fail")
+                .expect("The returned election shouldn't be none");
+
+            assert_eq!(read.name, election.name);
+            assert_eq!(read.description, updated.description);
+
+            let cache_entry: Election = repository.cache.lock().await.get(&election.id).cloned()
+                .expect("Election should exist in the cache");
+
+            assert_eq!(cache_entry.description, updated.description);
+            assert_eq!(cache_entry.name, election.name);
+        })
     }
 }

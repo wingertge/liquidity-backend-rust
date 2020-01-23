@@ -7,15 +7,17 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-futures = {version = "0.3", features = ["compat"]}
+futures = {version = "0.3", features = ["compat", "std", "alloc"]}
 liquidity = { path = "../liquidity" }
-eventstore = "0.5"
+eventstore = { git = "https://github.com/YoEight/eventstore-rs.git", branch = "new-futures" }
 tracing = "0.1"
 tracing-futures = "0.2"
 chrono = {version = "0.4", features = ["serde"]}
 serde = "1"
 serde_json = "1"
 juniper = { git = "https://github.com/graphql-rust/juniper", branch = "async-await", features = ["async"] }
+ttl_cache = "0.5"
 
 [dev-dependencies]
 tokio-test = "0.2.0"
+liquidity_test_utils = { path = "../liquidity_test_utils" }
