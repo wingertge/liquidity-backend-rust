@@ -154,8 +154,6 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
-<span id="157">157</span>
-<span id="158">158</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">tracing</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">juniper</span>;
@@ -290,14 +288,12 @@
         })
     };
     <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">base_ctx</span>.<span class="ident">clone</span>();
-
         <span class="ident">warp</span>::<span class="ident">header</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(<span class="string">&quot;Authorization&quot;</span>)
             .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">jwt</span>: <span class="ident">String</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">APIContext</span>, <span class="ident">JWTError</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">auth</span> <span class="op">=</span> <span class="ident">auth</span>.<span class="ident">clone</span>();
                 <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">auth</span>.<span class="ident">validate</span>(<span class="ident">jwt</span>)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">ctx</span>.<span class="ident">clone_with_user</span>(<span class="ident">user</span>))
+                <span class="prelude-val">Ok</span>(<span class="ident">base_ctx</span>.<span class="ident">clone_with_user</span>(<span class="ident">user</span>))
             })
             .<span class="ident">or</span>(<span class="ident">no_auth</span>)
             .<span class="ident">unify</span>()

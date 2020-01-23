@@ -420,7 +420,7 @@
     <span class="doccomment">/// # use liquidity_elections::{repository::ElectionRepository, schema::ElectionInput};</span>
     <span class="doccomment">/// # use liquidity_test_utils::connection::MockConnection;</span>
     <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// # let conn = MockConnection::new();</span>
+    <span class="doccomment">/// # let conn = MockConnection::default();</span>
     <span class="doccomment">/// # let repository = ElectionRepository::new(0, Duration::from_secs(0));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let election_input = ElectionInput {</span>
@@ -489,7 +489,7 @@
     <span class="doccomment">/// # use liquidity_elections::{repository::ElectionRepository, schema::ElectionInput};</span>
     <span class="doccomment">/// # use liquidity_test_utils::connection::MockConnection;</span>
     <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// # let conn = MockConnection::new();</span>
+    <span class="doccomment">/// # let conn = MockConnection::default();</span>
     <span class="doccomment">/// # let repository = ElectionRepository::new(0, Duration::from_secs(0));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let election_input = ElectionInput {</span>
@@ -557,7 +557,7 @@
     <span class="doccomment">/// # use liquidity_elections::repository::ElectionRepository;</span>
     <span class="doccomment">/// # use liquidity_test_utils::connection::MockConnection;</span>
     <span class="doccomment">/// # use std::time::Duration;</span>
-    <span class="doccomment">/// # let conn = MockConnection::new();</span>
+    <span class="doccomment">/// # let conn = MockConnection::default();</span>
     <span class="doccomment">/// # let repository = ElectionRepository::new(0, Duration::from_secs(0));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let id = Uuid::new_v4();</span>
@@ -604,7 +604,7 @@
     <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
 
     <span class="kw">fn</span> <span class="ident">conn</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MockConnection</span> {
-        <span class="ident">MockConnection</span>::<span class="ident">new</span>()
+        <span class="ident">MockConnection</span>::<span class="ident">default</span>()
     }
 
     <span class="kw">fn</span> <span class="ident">repository</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ElectionRepository</span><span class="op">&gt;</span> {
