@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/eventstore-0.5.1/src/internal/driver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>driver.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../eventstore/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/git/checkouts/eventstore-rs-069cd2ba88f329d6/b261f6b/src/internal/driver.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>driver.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../eventstore/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -544,21 +544,27 @@
 <span id="544">544</span>
 <span id="545">545</span>
 <span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">core</span>::<span class="ident">option</span>::<span class="prelude-ty">Option</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="ident">Error</span>, <span class="ident">ErrorKind</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::{<span class="ident">Duration</span>, <span class="ident">Instant</span>};
 
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>::<span class="ident">Sender</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Sink</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">spawn</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">timer</span>::<span class="ident">Interval</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::<span class="ident">Sender</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sink</span>::<span class="ident">SinkExt</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">StreamExt</span>;
 <span class="kw">use</span> <span class="ident">uuid</span>::<span class="ident">Uuid</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">command</span>::<span class="ident">Cmd</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">connection</span>::<span class="ident">Connection</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">messaging</span>::<span class="ident">Msg</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">operations</span>::<span class="ident">OperationWrapper</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">messaging</span>::{<span class="ident">Msg</span>, <span class="ident">Mailbox</span>, <span class="ident">Lifetime</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">package</span>::<span class="ident">Pkg</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">registry</span>::<span class="ident">Registry</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">types</span>::{<span class="ident">Credentials</span>, <span class="ident">Endpoint</span>, <span class="ident">Settings</span>};
@@ -600,7 +606,7 @@
         <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">HeartbeatStatus</span>::<span class="ident">Init</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">manage_heartbeat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Heartbeat</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">manage_heartbeat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">conn</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Connection</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Heartbeat</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">HeartbeatStatus</span>::<span class="ident">Init</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">HeartbeatStatus</span>::<span class="ident">Delay</span>(<span class="self">self</span>.<span class="ident">pkg_num</span>, <span class="ident">Instant</span>::<span class="ident">now</span>());
@@ -614,7 +620,7 @@
                 } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">start</span>.<span class="ident">elapsed</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">heartbeat_delay</span> {
                     <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">HeartbeatStatus</span>::<span class="ident">Timeout</span>(<span class="self">self</span>.<span class="ident">pkg_num</span>, <span class="ident">Instant</span>::<span class="ident">now</span>());
 
-                    <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">Pkg</span>::<span class="ident">heartbeat_request</span>());
+                    <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">Pkg</span>::<span class="ident">heartbeat_request</span>()).<span class="kw">await</span>;
                 }
 
                 <span class="ident">Heartbeat</span>::<span class="ident">Valid</span>
@@ -727,7 +733,7 @@
             <span class="ident">setts</span>.<span class="ident">connection_name</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">as_str</span>().<span class="ident">into</span>());
 
         <span class="ident">Driver</span> {
-            <span class="ident">registry</span>: <span class="ident">Registry</span>::<span class="ident">new</span>(),
+            <span class="ident">registry</span>: <span class="ident">Registry</span>::<span class="ident">new</span>(<span class="ident">setts</span>.<span class="ident">operation_timeout</span>, <span class="ident">setts</span>.<span class="ident">operation_retry</span>),
             <span class="ident">candidate</span>: <span class="prelude-val">None</span>,
             <span class="ident">tracker</span>: <span class="ident">HealthTracker</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">setts</span>),
             <span class="ident">attempt_opt</span>: <span class="prelude-val">None</span>,
@@ -747,36 +753,34 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="self">self</span>.<span class="ident">attempt_opt</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Attempt</span>::<span class="ident">new</span>());
         <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Connecting</span>;
         <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">Reconnecting</span>;
 
         <span class="kw">let</span> <span class="ident">tick_period</span> <span class="op">=</span> <span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">200</span>);
-        <span class="kw">let</span> <span class="ident">tick</span> <span class="op">=</span> <span class="ident">Interval</span>::<span class="ident">new</span>(<span class="ident">Instant</span>::<span class="ident">now</span>(), <span class="ident">tick_period</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ());
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tick</span> <span class="op">=</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">interval</span>(<span class="ident">tick_period</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sender</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">clone</span>();
 
-        <span class="kw">let</span> <span class="ident">tick</span> <span class="op">=</span> <span class="ident">tick</span>.<span class="ident">fold</span>(<span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">clone</span>(), <span class="op">|</span><span class="ident">sender</span>, <span class="kw">_</span><span class="op">|</span> {
-            <span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Tick</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+        <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+            <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw">_</span>) <span class="op">=</span> <span class="ident">tick</span>.<span class="ident">next</span>().<span class="kw">await</span> {
+                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Tick</span>).<span class="kw">await</span>;
+            }
         });
 
-        <span class="ident">spawn</span>(<span class="ident">tick</span>.<span class="ident">then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(())));
-
-        <span class="self">self</span>.<span class="ident">discover</span>();
+        <span class="self">self</span>.<span class="ident">discover</span>().<span class="kw">await</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">discover</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">discover</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Connecting</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">Reconnecting</span> {
             <span class="kw">let</span> <span class="ident">failed_endpoint</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">last_endpoint</span>.<span class="ident">take</span>();
-            <span class="kw">let</span> <span class="ident">start_discovery</span> <span class="op">=</span> <span class="self">self</span>
-                .<span class="ident">discovery</span>
-                .<span class="ident">clone</span>()
+
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">discovery</span>
                 .<span class="ident">send</span>(<span class="ident">failed_endpoint</span>)
-                .<span class="ident">then</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="prelude-val">Ok</span>(()));
+                .<span class="kw">await</span>;
 
             <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">EndpointDiscovery</span>;
             <span class="self">self</span>.<span class="ident">tracker</span>.<span class="ident">reset</span>();
-
-            <span class="ident">spawn</span>(<span class="ident">start_discovery</span>);
         }
     }
 
@@ -788,20 +792,20 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">authenticate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">creds</span>: <span class="ident">Credentials</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">authenticate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">creds</span>: <span class="ident">Credentials</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Connecting</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">Establishing</span> {
             <span class="kw">let</span> <span class="ident">pkg</span> <span class="op">=</span> <span class="ident">Pkg</span>::<span class="ident">authenticate</span>(<span class="ident">creds</span>);
 
             <span class="self">self</span>.<span class="ident">init_req_opt</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">InitReq</span>::<span class="ident">new</span>(<span class="ident">pkg</span>.<span class="ident">correlation</span>));
             <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">Authentication</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span>.<span class="ident">as_ref</span>() {
-                <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">pkg</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span>.<span class="ident">as_mut</span>() {
+                <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">pkg</span>).<span class="kw">await</span>;
             }
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">identify_client</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">identify_client</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Connecting</span>
             <span class="kw-2">&amp;</span><span class="op">&amp;</span> (<span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">Authentication</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">Establishing</span>)
         {
@@ -810,13 +814,13 @@
             <span class="self">self</span>.<span class="ident">init_req_opt</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">InitReq</span>::<span class="ident">new</span>(<span class="ident">pkg</span>.<span class="ident">correlation</span>));
             <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">Identification</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span>.<span class="ident">as_ref</span>() {
-                <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">pkg</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span>.<span class="ident">as_mut</span>() {
+                <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">pkg</span>).<span class="kw">await</span>;
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">on_established</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">Uuid</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_established</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id</span>: <span class="ident">Uuid</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Connecting</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">Establishing</span> {
             <span class="kw">let</span> <span class="ident">same_connection</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">candidate</span> {
                 <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">conn</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">conn</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">id</span>,
@@ -832,8 +836,8 @@
                 <span class="self">self</span>.<span class="ident">tracker</span>.<span class="ident">reset</span>();
 
                 <span class="kw">match</span> <span class="self">self</span>.<span class="ident">default_user</span>.<span class="ident">clone</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">creds</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">authenticate</span>(<span class="ident">creds</span>),
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">identify_client</span>(),
+                    <span class="prelude-val">Some</span>(<span class="ident">creds</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">authenticate</span>(<span class="ident">creds</span>).<span class="kw">await</span>,
+                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">identify_client</span>().<span class="kw">await</span>,
                 }
             }
         }
@@ -883,7 +887,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">on_package_arrived</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pkg</span>: <span class="ident">Pkg</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_package_arrived</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pkg</span>: <span class="ident">Pkg</span>) {
         <span class="self">self</span>.<span class="ident">tracker</span>.<span class="ident">incr_pkg_num</span>();
 
         <span class="kw">if</span> <span class="ident">pkg</span>.<span class="ident">cmd</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Cmd</span>::<span class="ident">HeartbeatRequest</span> {
@@ -891,8 +895,8 @@
 
             <span class="ident">resp</span>.<span class="ident">cmd</span> <span class="op">=</span> <span class="ident">Cmd</span>::<span class="ident">HeartbeatResponse</span>;
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
-                <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">resp</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
+                <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">resp</span>).<span class="kw">await</span>;
             } <span class="kw">else</span> {
                 <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;We received an heartbeat request when having no active connection on our side!&quot;</span>);
             }
@@ -904,7 +908,7 @@
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">req</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">init_req_opt</span>.<span class="ident">take</span>() {
                 <span class="kw">if</span> <span class="ident">req</span>.<span class="ident">correlation</span> <span class="op">=</span><span class="op">=</span> <span class="ident">pkg</span>.<span class="ident">correlation</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
                         <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Connection identified: {} on {}.&quot;</span>, <span class="ident">conn</span>.<span class="ident">id</span>, <span class="ident">conn</span>.<span class="ident">desc</span>);
 
                         <span class="comment">// HACK: It can happen the user submitted operations before the connection was</span>
@@ -912,7 +916,11 @@
                         <span class="comment">// ms. This could lead the first operation to take time before gettings.</span>
                         <span class="comment">// FIXME: We might consider doing that hack only if it&#39;s the first time</span>
                         <span class="comment">// we connect with the server.</span>
-                        <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">check_and_retry</span>(<span class="ident">conn</span>);
+                        <span class="kw">let</span> <span class="ident">pkgs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">check_and_retry</span>().<span class="kw">await</span>;
+
+                        <span class="kw">if</span> <span class="op">!</span><span class="ident">pkgs</span>.<span class="ident">is_empty</span>() {
+                            <span class="ident">conn</span>.<span class="ident">enqueue_all</span>(<span class="ident">pkgs</span>).<span class="kw">await</span>;
+                        }
                     }
 
                     <span class="self">self</span>.<span class="ident">attempt_opt</span> <span class="op">=</span> <span class="prelude-val">None</span>;
@@ -930,13 +938,13 @@
                         <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Not authenticated.&quot;</span>);
                     }
 
-                    <span class="self">self</span>.<span class="ident">identify_client</span>();
+                    <span class="self">self</span>.<span class="ident">identify_client</span>().<span class="kw">await</span>;
                 }
             }
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Connected</span> {
             <span class="comment">// It will be always &#39;Some&#39; when receiving a package.</span>
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span>.<span class="ident">take</span>() {
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_endpoint</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">handle</span>(<span class="ident">pkg</span>, <span class="kw-2">&amp;</span><span class="ident">conn</span>) {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">new_endpoint</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">handle</span>(<span class="ident">pkg</span>).<span class="kw">await</span> {
                     <span class="comment">// We have been notified to connect to an other eventstore node.</span>
                     <span class="comment">// This only happens if the user uses a cluster-mode connection.</span>
                     <span class="macro">info</span><span class="macro">!</span>(
@@ -956,17 +964,22 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">on_new_op</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">operation</span>: <span class="ident">OperationWrapper</span>) {
-        <span class="kw">let</span> <span class="ident">conn_opt</span> <span class="op">=</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_transmit</span>(
+        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="ident">mailbox</span>: <span class="ident">Mailbox</span>,
+        <span class="ident">pkg</span>: <span class="ident">Lifetime</span><span class="op">&lt;</span><span class="ident">Pkg</span><span class="op">&gt;</span>,
+    )
+    {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
             <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">is_connected</span>() {
-                <span class="comment">// Will be always &#39;Some&#39; when connected.</span>
-                <span class="self">self</span>.<span class="ident">candidate</span>.<span class="ident">as_ref</span>()
+                <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">pkg</span>.<span class="ident">clone</span>().<span class="ident">inner</span>()).<span class="kw">await</span>;
+                <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">register</span>(<span class="ident">mailbox</span>, <span class="ident">pkg</span>);
             } <span class="kw">else</span> {
-                <span class="prelude-val">None</span>
+                <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">postpone</span>(<span class="ident">mailbox</span>, <span class="ident">pkg</span>);
             }
-        };
-
-        <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">register</span>(<span class="ident">operation</span>, <span class="ident">conn_opt</span>);
+        } <span class="kw">else</span> {
+            <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">postpone</span>(<span class="ident">mailbox</span>, <span class="ident">pkg</span>);
+        }
     }
 
     <span class="kw">fn</span> <span class="ident">has_init_req_timeout</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
@@ -1004,9 +1017,9 @@
         <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Closed</span>;
     }
 
-    <span class="kw">fn</span> <span class="ident">manage_heartbeat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">let</span> <span class="ident">has_timeout</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tracker</span>.<span class="ident">manage_heartbeat</span>(<span class="ident">conn</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">manage_heartbeat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="ident">has_timeout</span> <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
+            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">tracker</span>.<span class="ident">manage_heartbeat</span>(<span class="ident">conn</span>).<span class="kw">await</span> {
                 <span class="ident">Heartbeat</span>::<span class="ident">Valid</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
                 <span class="ident">Heartbeat</span>::<span class="ident">Failure</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
             }
@@ -1021,7 +1034,7 @@
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">on_tick</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Report</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_tick</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Report</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Init</span> <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Closed</span> {
             <span class="kw">return</span> <span class="ident">Report</span>::<span class="ident">Continue</span>;
         }
@@ -1032,7 +1045,7 @@
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">attempt_cnt</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">start_new_attempt</span>() {
                         <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Starting new connection attempt ({}).&quot;</span>, <span class="ident">attempt_cnt</span>);
 
-                        <span class="self">self</span>.<span class="ident">discover</span>();
+                        <span class="self">self</span>.<span class="ident">discover</span>().<span class="kw">await</span>;
                     } <span class="kw">else</span> {
                         <span class="macro">error</span><span class="macro">!</span>(<span class="string">&quot;Maximum reconnection attempt count reached!&quot;</span>);
                         <span class="kw">return</span> <span class="ident">Report</span>::<span class="ident">Quit</span>;
@@ -1042,45 +1055,48 @@
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_init_req_timeout</span>() {
                     <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;Authentication has timeout.&quot;</span>);
 
-                    <span class="self">self</span>.<span class="ident">identify_client</span>();
+                    <span class="self">self</span>.<span class="ident">identify_client</span>().<span class="kw">await</span>;
                 }
 
-                <span class="self">self</span>.<span class="ident">manage_heartbeat</span>();
+                <span class="self">self</span>.<span class="ident">manage_heartbeat</span>().<span class="kw">await</span>;
             } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">phase</span> <span class="op">=</span><span class="op">=</span> <span class="ident">Phase</span>::<span class="ident">Identification</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_init_req_timeout</span>() {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span>.<span class="ident">take</span>() {
                         <span class="self">self</span>.<span class="ident">tcp_connection_close</span>(<span class="kw-2">&amp;</span><span class="ident">conn</span>.<span class="ident">id</span>, <span class="kw-2">&amp;</span><span class="ident">identification_timeout_error</span>());
                     }
                 } <span class="kw">else</span> {
-                    <span class="self">self</span>.<span class="ident">manage_heartbeat</span>();
+                    <span class="self">self</span>.<span class="ident">manage_heartbeat</span>().<span class="kw">await</span>;
                 }
             }
         } <span class="kw">else</span> {
             <span class="comment">// Connected state</span>
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">last_operation_check</span>.<span class="ident">elapsed</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">operation_check_period</span> {
-                    <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">check_and_retry</span>(<span class="ident">conn</span>);
-
+                    <span class="kw">let</span> <span class="ident">pkgs</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">check_and_retry</span>().<span class="kw">await</span>;
                     <span class="self">self</span>.<span class="ident">last_operation_check</span> <span class="op">=</span> <span class="ident">Instant</span>::<span class="ident">now</span>();
+
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">pkgs</span>.<span class="ident">is_empty</span>() {
+                        <span class="ident">conn</span>.<span class="ident">enqueue_all</span>(<span class="ident">pkgs</span>).<span class="kw">await</span>;
+                    }
                 }
             }
 
-            <span class="self">self</span>.<span class="ident">manage_heartbeat</span>();
+            <span class="self">self</span>.<span class="ident">manage_heartbeat</span>().<span class="kw">await</span>;
         }
 
         <span class="ident">Report</span>::<span class="ident">Continue</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">on_send_pkg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pkg</span>: <span class="ident">Pkg</span>) {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_send_pkg</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">pkg</span>: <span class="ident">Pkg</span>) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionState</span>::<span class="ident">Connected</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
-                <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">pkg</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">conn</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">candidate</span> {
+                <span class="ident">conn</span>.<span class="ident">enqueue</span>(<span class="ident">pkg</span>).<span class="kw">await</span>;
             }
         }
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">abort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">abort</span>();
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">abort</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">registry</span>.<span class="ident">abort</span>().<span class="kw">await</span>;
     }
 }
 

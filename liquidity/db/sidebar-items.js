@@ -1,1 +1,1 @@
-initSidebarItems({"enum":[["DatabaseError",""],["OperationError",""]],"struct":[["StupidConnectionWrapper","This is stupid and only for tracing"]],"trait":[["ESResultExt",""]]});
+initSidebarItems({"enum":[["DatabaseError",""],["EventType",""],["OperationError",""]],"trait":[["DbConnection",""],["ESResultExt",""]]});

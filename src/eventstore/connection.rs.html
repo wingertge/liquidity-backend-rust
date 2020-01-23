@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/eventstore-0.5.1/src/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../eventstore/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/git/checkouts/eventstore-rs-069cd2ba88f329d6/b261f6b/src/connection.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>connection.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../eventstore/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -445,59 +445,20 @@
 <span id="445">445</span>
 <span id="446">446</span>
 <span id="447">447</span>
-<span id="448">448</span>
-<span id="449">449</span>
-<span id="450">450</span>
-<span id="451">451</span>
-<span id="452">452</span>
-<span id="453">453</span>
-<span id="454">454</span>
-<span id="455">455</span>
-<span id="456">456</span>
-<span id="457">457</span>
-<span id="458">458</span>
-<span id="459">459</span>
-<span id="460">460</span>
-<span id="461">461</span>
-<span id="462">462</span>
-<span id="463">463</span>
-<span id="464">464</span>
-<span id="465">465</span>
-<span id="466">466</span>
-<span id="467">467</span>
-<span id="468">468</span>
-<span id="469">469</span>
-<span id="470">470</span>
-<span id="471">471</span>
-<span id="472">472</span>
-<span id="473">473</span>
-<span id="474">474</span>
-<span id="475">475</span>
-<span id="476">476</span>
-<span id="477">477</span>
-<span id="478">478</span>
-<span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">net</span>::<span class="ident">SocketAddr</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>::{<span class="ident">channel</span>, <span class="ident">Receiver</span>, <span class="ident">Sender</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Sink</span>, <span class="ident">Stream</span>};
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">runtime</span>::{<span class="ident">Runtime</span>, <span class="ident">Shutdown</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="ident">channel</span>, <span class="ident">Receiver</span>, <span class="ident">Sender</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sink</span>::<span class="ident">SinkExt</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">StreamExt</span>;
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">runtime</span>::<span class="ident">Runtime</span>;
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">discovery</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">commands</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">driver</span>::{<span class="ident">Driver</span>, <span class="ident">Report</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">messaging</span>::<span class="ident">Msg</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">operations</span>::<span class="ident">OperationError</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">types</span>::{<span class="self">self</span>, <span class="ident">GossipSeedClusterSettings</span>, <span class="ident">Settings</span>, <span class="ident">StreamMetadata</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">messaging</span>::{<span class="ident">Msg</span>, <span class="ident">OpMsg</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">types</span>::{<span class="self">self</span>, <span class="ident">GossipSeedClusterSettings</span>, <span class="ident">Settings</span>, <span class="ident">StreamMetadata</span>, <span class="ident">OperationError</span>};
 
 <span class="doccomment">/// Represents a connection to a single node. `Client` maintains a full duplex</span>
 <span class="doccomment">/// connection to the EventStore server. An EventStore connection operates</span>
@@ -512,7 +473,6 @@
 <span class="doccomment">/// performance out of the connection, it is generally recommended to use it</span>
 <span class="doccomment">/// in this way.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Connection</span> {
-    <span class="ident">shutdown</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Shutdown</span><span class="op">&gt;</span>,
     <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>,
     <span class="ident">settings</span>: <span class="ident">Settings</span>,
 }
@@ -579,49 +539,29 @@
 
     <span class="doccomment">/// Creates a connection to a single EventStore node. The connection will</span>
     <span class="doccomment">/// start right away.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single_node_connection</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
-        <span class="self">self</span>.<span class="ident">start_common_with_runtime</span>(<span class="ident">DiscoveryProcess</span>::<span class="ident">Static</span>(<span class="ident">addr</span>), <span class="prelude-val">None</span>)
-    }
-
-    <span class="doccomment">/// Creates a connection to a single EventStore node. The connection will</span>
-    <span class="doccomment">/// start right away.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single_node_connection_with_runtime</span>(
-        <span class="self">self</span>,
-        <span class="ident">addr</span>: <span class="ident">SocketAddr</span>,
-        <span class="ident">runtime</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Runtime</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
-        <span class="self">self</span>.<span class="ident">start_common_with_runtime</span>(<span class="ident">DiscoveryProcess</span>::<span class="ident">Static</span>(<span class="ident">addr</span>), <span class="prelude-val">Some</span>(<span class="ident">runtime</span>))
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">single_node_connection</span>(<span class="self">self</span>, <span class="ident">addr</span>: <span class="ident">SocketAddr</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
+        <span class="self">self</span>.<span class="ident">start_common_with_runtime</span>(<span class="ident">DiscoveryProcess</span>::<span class="ident">Static</span>(<span class="ident">addr</span>))
+            .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a connection to a cluster of EventStore nodes. The connection will</span>
     <span class="doccomment">/// start right away. Those `GossipSeed` should be the external HTTP endpoint</span>
     <span class="doccomment">/// of a node. The standard external HTTP endpoint is running on `2113`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cluster_nodes_through_gossip_connection</span>(
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">cluster_nodes_through_gossip_connection</span>(
         <span class="self">self</span>,
         <span class="ident">setts</span>: <span class="ident">GossipSeedClusterSettings</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
-        <span class="self">self</span>.<span class="ident">start_common_with_runtime</span>(<span class="ident">DiscoveryProcess</span>::<span class="ident">ClusterThroughGossip</span>(<span class="ident">setts</span>), <span class="prelude-val">None</span>)
+        <span class="self">self</span>.<span class="ident">start_common_with_runtime</span>(<span class="ident">DiscoveryProcess</span>::<span class="ident">ClusterThroughGossip</span>(<span class="ident">setts</span>))
+            .<span class="kw">await</span>
     }
 
-    <span class="doccomment">/// Creates a connection to a cluster of EventStore nodes. The connection will</span>
-    <span class="doccomment">/// start right away. Those `GossipSeed` should be the external HTTP endpoint</span>
-    <span class="doccomment">/// of a node. The standard external HTTP endpoint is running on `2113`.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">cluster_nodes_through_gossip_connection_with_runtime</span>(
-        <span class="self">self</span>,
-        <span class="ident">setts</span>: <span class="ident">GossipSeedClusterSettings</span>,
-        <span class="ident">runtime</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Runtime</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
-        <span class="self">self</span>.<span class="ident">start_common_with_runtime</span>(<span class="ident">DiscoveryProcess</span>::<span class="ident">ClusterThroughGossip</span>(<span class="ident">setts</span>), <span class="prelude-val">Some</span>(<span class="ident">runtime</span>))
-    }
-
-    <span class="kw">fn</span> <span class="ident">start_common_with_runtime</span>(
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start_common_with_runtime</span>(
         <span class="self">self</span>,
         <span class="ident">discovery</span>: <span class="ident">DiscoveryProcess</span>,
-        <span class="ident">runtime_opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Runtime</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
-        <span class="kw">let</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Connection</span>::<span class="ident">with_runtime</span>(<span class="self">self</span>.<span class="ident">settings</span>, <span class="ident">discovery</span>, <span class="ident">runtime_opt</span>);
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Connection</span>::<span class="ident">make</span>(<span class="self">self</span>.<span class="ident">settings</span>, <span class="ident">discovery</span>);
 
-        <span class="ident">client</span>.<span class="ident">start</span>();
+        <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span>;
 
         <span class="ident">client</span>
     }
@@ -629,80 +569,79 @@
 
 <span class="kw">const</span> <span class="ident">DEFAULT_BOX_SIZE</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">500</span>;
 
-<span class="kw">fn</span> <span class="ident">connection_state_machine</span>(
-    <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>,
-    <span class="ident">recv</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>,
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">connection_state_machine</span>(
+    <span class="kw-2">mut</span> <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>,
+    <span class="kw-2">mut</span> <span class="ident">recv</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>,
     <span class="kw-2">mut</span> <span class="ident">driver</span>: <span class="ident">Driver</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (), <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span> {
+)
+{
     <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
     <span class="kw">enum</span> <span class="ident">State</span> {
         <span class="ident">Live</span>,
         <span class="ident">Clearing</span>,
     }
 
-    <span class="kw">fn</span> <span class="ident">start_closing</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>, <span class="ident">driver</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Driver</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">State</span>, <span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">closing</span>(<span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>, <span class="ident">driver</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Driver</span>)
+    {
         <span class="ident">driver</span>.<span class="ident">close_connection</span>();
-
-        <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">clone</span>().<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Marker</span>).<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ()).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ());
-
-        <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">action</span>);
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Marker</span>).<span class="kw">await</span>;
 
         <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Closing the connection...&quot;</span>);
         <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Start clearing uncomplete operations...&quot;</span>);
-
-        <span class="prelude-val">Ok</span>(<span class="ident">State</span>::<span class="ident">Clearing</span>)
     }
 
-    <span class="ident">recv</span>.<span class="ident">fold</span>(<span class="ident">State</span>::<span class="ident">Live</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">acc</span>, <span class="ident">msg</span><span class="op">|</span> {
-        <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Bus loop received state {:?}: {:?}&quot;</span>, <span class="ident">acc</span>, <span class="ident">msg</span>);
+    <span class="comment">// Live state</span>
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="ident">recv</span>.<span class="ident">next</span>().<span class="kw">await</span> {
+        <span class="kw">match</span> <span class="ident">msg</span> {
+            <span class="ident">Msg</span>::<span class="ident">Start</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">start</span>().<span class="kw">await</span>,
+            <span class="ident">Msg</span>::<span class="ident">Establish</span>(<span class="ident">endpoint</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_establish</span>(<span class="ident">endpoint</span>),
+            <span class="ident">Msg</span>::<span class="ident">Established</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_established</span>(<span class="ident">id</span>).<span class="kw">await</span>,
+            <span class="ident">Msg</span>::<span class="ident">ConnectionClosed</span>(<span class="ident">conn_id</span>, <span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">driver</span>.<span class="ident">on_connection_closed</span>(<span class="ident">conn_id</span>, <span class="kw-2">&amp;</span><span class="ident">error</span>)
+            }
+            <span class="ident">Msg</span>::<span class="ident">Arrived</span>(<span class="ident">pkg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_package_arrived</span>(<span class="ident">pkg</span>).<span class="kw">await</span>,
+            <span class="ident">Msg</span>::<span class="ident">Transmit</span>(<span class="ident">pkg</span>, <span class="ident">mailbox</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_transmit</span>(<span class="ident">mailbox</span>, <span class="ident">pkg</span>).<span class="kw">await</span>,
+            <span class="ident">Msg</span>::<span class="ident">Send</span>(<span class="ident">pkg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_send_pkg</span>(<span class="ident">pkg</span>).<span class="kw">await</span>,
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">State</span>::<span class="ident">Live</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">acc</span> {
-            <span class="kw">match</span> <span class="ident">msg</span> {
-                <span class="ident">Msg</span>::<span class="ident">Start</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">start</span>(),
-                <span class="ident">Msg</span>::<span class="ident">Establish</span>(<span class="ident">endpoint</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_establish</span>(<span class="ident">endpoint</span>),
-                <span class="ident">Msg</span>::<span class="ident">Established</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_established</span>(<span class="ident">id</span>),
-                <span class="ident">Msg</span>::<span class="ident">ConnectionClosed</span>(<span class="ident">conn_id</span>, <span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="ident">driver</span>.<span class="ident">on_connection_closed</span>(<span class="ident">conn_id</span>, <span class="kw-2">&amp;</span><span class="ident">error</span>)
-                }
-                <span class="ident">Msg</span>::<span class="ident">Arrived</span>(<span class="ident">pkg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_package_arrived</span>(<span class="ident">pkg</span>),
-                <span class="ident">Msg</span>::<span class="ident">NewOp</span>(<span class="ident">op</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_new_op</span>(<span class="ident">op</span>),
-                <span class="ident">Msg</span>::<span class="ident">Send</span>(<span class="ident">pkg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_send_pkg</span>(<span class="ident">pkg</span>),
-
-                <span class="ident">Msg</span>::<span class="ident">Tick</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Report</span>::<span class="ident">Quit</span> <span class="op">=</span> <span class="ident">driver</span>.<span class="ident">on_tick</span>() {
-                        <span class="kw">return</span> <span class="ident">start_closing</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">driver</span>);
-                    }
-                }
-
-                <span class="comment">// It&#39;s impossible to receive `Msg::Marker` at `State::Live` state.</span>
-                <span class="comment">// However we can hit two birds with one stone with pattern-matching</span>
-                <span class="comment">// coverage checker.</span>
-                <span class="ident">Msg</span>::<span class="ident">Shutdown</span> <span class="op">|</span> <span class="ident">Msg</span>::<span class="ident">Marker</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;User-shutdown request received.&quot;</span>);
-
-                    <span class="kw">return</span> <span class="ident">start_closing</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">driver</span>);
+            <span class="ident">Msg</span>::<span class="ident">Tick</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Report</span>::<span class="ident">Quit</span> <span class="op">=</span> <span class="ident">driver</span>.<span class="ident">on_tick</span>().<span class="kw">await</span> {
+                    <span class="ident">closing</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">driver</span>).<span class="kw">await</span>;
+                    <span class="kw">break</span>;
                 }
             }
-        } <span class="kw">else</span> {
-            <span class="kw">match</span> <span class="ident">msg</span> {
-                <span class="ident">Msg</span>::<span class="ident">NewOp</span>(<span class="kw-2">mut</span> <span class="ident">op</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">op</span>.<span class="ident">failed</span>(<span class="ident">OperationError</span>::<span class="ident">Aborted</span>),
-                <span class="ident">Msg</span>::<span class="ident">Arrived</span>(<span class="ident">pkg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_package_arrived</span>(<span class="ident">pkg</span>),
-                <span class="ident">Msg</span>::<span class="ident">Marker</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="comment">// We&#39;ve reached the end of our checkpoint, we can properly</span>
-                    <span class="comment">// aborts uncompleted operations.</span>
-                    <span class="ident">driver</span>.<span class="ident">abort</span>();
-                    <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Connection closed properly.&quot;</span>);
 
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(());
-                }
-
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="comment">// It&#39;s impossible to receive `Msg::Marker` at `State::Live` state.</span>
+            <span class="comment">// However we can hit two birds with one stone with pattern-matching</span>
+            <span class="comment">// coverage checker.</span>
+            <span class="ident">Msg</span>::<span class="ident">Shutdown</span> <span class="op">|</span> <span class="ident">Msg</span>::<span class="ident">Marker</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;User-shutdown request received.&quot;</span>);
+                <span class="ident">closing</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">driver</span>).<span class="kw">await</span>;
+                <span class="kw">break</span>;
             }
         }
+    }
 
-        <span class="prelude-val">Ok</span>(<span class="ident">acc</span>)
-    })
-    .<span class="ident">map</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
+    <span class="comment">// Closing state</span>
+    <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="ident">recv</span>.<span class="ident">next</span>().<span class="kw">await</span> {
+        <span class="kw">match</span> <span class="ident">msg</span> {
+            <span class="ident">Msg</span>::<span class="ident">Transmit</span>(<span class="kw">_</span>, <span class="kw-2">mut</span> <span class="ident">mailbox</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">mailbox</span>.<span class="ident">send</span>(<span class="ident">OpMsg</span>::<span class="ident">Failed</span>(<span class="ident">OperationError</span>::<span class="ident">Aborted</span>))
+                    .<span class="kw">await</span>;
+            }
+
+            <span class="ident">Msg</span>::<span class="ident">Arrived</span>(<span class="ident">pkg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">driver</span>.<span class="ident">on_package_arrived</span>(<span class="ident">pkg</span>).<span class="kw">await</span>,
+            <span class="ident">Msg</span>::<span class="ident">Marker</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="comment">// We&#39;ve reached the end of our checkpoint, we can properly</span>
+                <span class="comment">// aborts uncompleted operations.</span>
+                <span class="ident">driver</span>.<span class="ident">abort</span>().<span class="kw">await</span>;
+                <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;Connection closed properly.&quot;</span>);
+
+                <span class="kw">break</span>;
+            }
+
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+        }
+    }
 }
 
 <span class="kw">enum</span> <span class="ident">DiscoveryProcess</span> {
@@ -718,39 +657,24 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">with_runtime</span>(
+    <span class="kw">fn</span> <span class="ident">make</span>(
         <span class="ident">settings</span>: <span class="ident">Settings</span>,
         <span class="ident">discovery</span>: <span class="ident">DiscoveryProcess</span>,
-        <span class="ident">runtime_opt</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Runtime</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Connection</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">runtime</span>) <span class="op">=</span> <span class="ident">runtime_opt</span> {
-            <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="ident">settings</span>, <span class="ident">discovery</span>, <span class="ident">runtime</span>);
+        <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="ident">settings</span>, <span class="ident">discovery</span>);
 
-            <span class="ident">Connection</span> {
-                <span class="ident">shutdown</span>: <span class="prelude-val">None</span>,
-                <span class="ident">sender</span>,
-                <span class="ident">settings</span>,
-            }
-        } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runtime</span> <span class="op">=</span> <span class="ident">Runtime</span>::<span class="ident">new</span>().<span class="ident">unwrap</span>();
-            <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">initialize</span>(<span class="kw-2">&amp;</span><span class="ident">settings</span>, <span class="ident">discovery</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">runtime</span>);
-            <span class="kw">let</span> <span class="ident">shutdown</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">shutdown_on_idle</span>();
-
-            <span class="ident">Connection</span> {
-                <span class="ident">shutdown</span>: <span class="prelude-val">Some</span>(<span class="ident">shutdown</span>),
-                <span class="ident">sender</span>,
-                <span class="ident">settings</span>,
-            }
+        <span class="ident">Connection</span> {
+            <span class="ident">sender</span>,
+            <span class="ident">settings</span>,
         }
     }
 
     <span class="kw">fn</span> <span class="ident">initialize</span>(
         <span class="ident">settings</span>: <span class="kw-2">&amp;</span><span class="ident">Settings</span>,
         <span class="ident">discovery</span>: <span class="ident">DiscoveryProcess</span>,
-        <span class="ident">runtime</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Runtime</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">sender</span>, <span class="ident">recv</span>) <span class="op">=</span> <span class="ident">channel</span>(<span class="ident">DEFAULT_BOX_SIZE</span>);
-        <span class="kw">let</span> (<span class="ident">start_discovery</span>, <span class="ident">run_discovery</span>) <span class="op">=</span> <span class="ident">channel</span>(<span class="ident">DEFAULT_BOX_SIZE</span>);
+        <span class="kw">let</span> (<span class="ident">start_discovery</span>, <span class="ident">run_discovery</span>) <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::<span class="ident">channel</span>(<span class="ident">DEFAULT_BOX_SIZE</span>);
         <span class="kw">let</span> <span class="ident">cloned_sender</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">clone</span>();
         <span class="kw">let</span> <span class="ident">driver</span> <span class="op">=</span> <span class="ident">Driver</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="ident">settings</span>, <span class="ident">start_discovery</span>, <span class="ident">sender</span>.<span class="ident">clone</span>());
 
@@ -759,23 +683,22 @@
                 <span class="kw">let</span> <span class="ident">endpoint</span> <span class="op">=</span> <span class="ident">types</span>::<span class="ident">Endpoint</span>::<span class="ident">from_addr</span>(<span class="ident">addr</span>);
                 <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="ident">discovery</span>::<span class="ident">constant</span>::<span class="ident">discover</span>(<span class="ident">run_discovery</span>, <span class="ident">sender</span>.<span class="ident">clone</span>(), <span class="ident">endpoint</span>);
 
-                <span class="ident">runtime</span>.<span class="ident">spawn</span>(<span class="ident">action</span>);
+                <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">action</span>);
             }
 
             <span class="ident">DiscoveryProcess</span>::<span class="ident">ClusterThroughGossip</span>(<span class="ident">setts</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="ident">discovery</span>::<span class="ident">cluster</span>::<span class="ident">discover</span>(<span class="ident">run_discovery</span>, <span class="ident">sender</span>.<span class="ident">clone</span>(), <span class="ident">setts</span>);
 
-                <span class="ident">runtime</span>.<span class="ident">spawn</span>(<span class="ident">action</span>);
+                <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">action</span>);
             }
         };
 
-        <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="ident">connection_state_machine</span>(<span class="ident">cloned_sender</span>, <span class="ident">recv</span>, <span class="ident">driver</span>);
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">runtime</span>.<span class="ident">spawn</span>(<span class="ident">action</span>);
+        <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">connection_state_machine</span>(<span class="ident">cloned_sender</span>, <span class="ident">recv</span>, <span class="ident">driver</span>));
         <span class="ident">sender</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">clone</span>().<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Start</span>).<span class="ident">wait</span>().<span class="ident">unwrap</span>();
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Start</span>).<span class="kw">await</span>;
     }
 
     <span class="doccomment">/// Sends events to a given stream.</span>
@@ -966,9 +889,8 @@
     <span class="doccomment">/// everything properly when returning.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `shutdown` blocks the current thread.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="self">self</span>) {
-        <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Shutdown</span>).<span class="ident">wait</span>().<span class="ident">unwrap</span>();
-        <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">wait</span>().<span class="ident">unwrap</span>();
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">shutdown</span>(<span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Shutdown</span>).<span class="kw">await</span>;
     }
 }
 </pre></div>

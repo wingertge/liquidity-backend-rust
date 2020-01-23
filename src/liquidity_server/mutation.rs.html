@@ -40,16 +40,18 @@
 <span id="40">40</span>
 <span id="41">41</span>
 <span id="42">42</span>
+<span id="43">43</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">liquidity</span>::{<span class="ident">Context</span>, <span class="ident">Uuid</span>};
-<span class="kw">use</span> <span class="ident">liquidity_api</span>::<span class="ident">elections</span>::{<span class="ident">schema</span>::{<span class="ident">Election</span>, <span class="ident">ElectionInput</span>}, <span class="self">self</span>};
+<span class="kw">use</span> <span class="ident">liquidity</span>::<span class="ident">Uuid</span>;
+<span class="kw">use</span> <span class="ident">liquidity_api</span>::<span class="ident">elections</span>::<span class="ident">schema</span>::{<span class="ident">Election</span>, <span class="ident">ElectionInput</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">auth</span>::<span class="ident">JWTError</span>;
 <span class="kw">use</span> <span class="ident">juniper</span>::<span class="ident">FieldResult</span>;
+<span class="kw">use</span> <span class="ident">liquidity_api</span>::<span class="ident">APIContext</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Mutation</span>;
 
 <span class="attribute">#[<span class="ident">juniper</span>::<span class="ident">graphql_object</span>(
-    <span class="ident">Context</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">JWTError</span><span class="op">&gt;</span>
+    <span class="ident">Context</span> <span class="op">=</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">APIContext</span>, <span class="ident">JWTError</span><span class="op">&gt;</span>
 )]</span>
 <span class="kw">impl</span> <span class="ident">Mutation</span> {
     <span class="attribute">#[<span class="ident">graphql</span>(
@@ -60,10 +62,10 @@
             )
         )
     )]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_election</span>(<span class="ident">input</span>: <span class="ident">ElectionInput</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">JWTError</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldResult</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_election</span>(<span class="ident">input</span>: <span class="ident">ElectionInput</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">APIContext</span>, <span class="ident">JWTError</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldResult</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
 
-        <span class="ident">elections</span>::<span class="ident">mutation</span>::<span class="ident">create_election</span>(<span class="ident">input</span>, <span class="ident">context</span>).<span class="kw">await</span>.<span class="ident">map_err</span>(<span class="ident">Into</span>::<span class="ident">into</span>)
+        <span class="prelude-val">Ok</span>(<span class="ident">context</span>.<span class="ident">elections</span>().<span class="ident">create_election</span>(<span class="ident">input</span>, <span class="ident">context</span>).<span class="kw">await</span><span class="question-mark">?</span>)
     }
 
     <span class="attribute">#[<span class="ident">graphql</span>(
@@ -77,9 +79,9 @@
             )
         )
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edit_election</span>(<span class="ident">id</span>: <span class="ident">Uuid</span>, <span class="ident">input</span>: <span class="ident">ElectionInput</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">JWTError</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldResult</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_election</span>(<span class="ident">id</span>: <span class="ident">Uuid</span>, <span class="ident">input</span>: <span class="ident">ElectionInput</span>, <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">APIContext</span>, <span class="ident">JWTError</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FieldResult</span><span class="op">&lt;</span><span class="ident">Election</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">as_ref</span>()<span class="question-mark">?</span>;
-        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">elections</span>::<span class="ident">mutation</span>::<span class="ident">edit_election</span>(<span class="ident">id</span>, <span class="ident">input</span>, <span class="ident">context</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">elections</span>().<span class="ident">edit_election</span>(<span class="ident">id</span>, <span class="ident">input</span>, <span class="ident">context</span>).<span class="kw">await</span><span class="question-mark">?</span>;
         <span class="prelude-val">Ok</span>(<span class="ident">result</span>)
     }
 }</pre></div>

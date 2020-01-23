@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Context",""],["User",""]]});
+initSidebarItems({"struct":[["User",""]],"trait":[["Context",""]]});

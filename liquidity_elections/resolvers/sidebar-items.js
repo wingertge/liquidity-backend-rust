@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["mutation",""],["query",""]]});
+initSidebarItems({"struct":[["ElectionResolvers",""]]});

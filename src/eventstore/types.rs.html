@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/eventstore-0.5.1/src/types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>types.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../eventstore/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/git/checkouts/eventstore-rs-069cd2ba88f329d6/b261f6b/src/types.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>types.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../eventstore/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1640,6 +1640,39 @@
 <span id="1640">1640</span>
 <span id="1641">1641</span>
 <span id="1642">1642</span>
+<span id="1643">1643</span>
+<span id="1644">1644</span>
+<span id="1645">1645</span>
+<span id="1646">1646</span>
+<span id="1647">1647</span>
+<span id="1648">1648</span>
+<span id="1649">1649</span>
+<span id="1650">1650</span>
+<span id="1651">1651</span>
+<span id="1652">1652</span>
+<span id="1653">1653</span>
+<span id="1654">1654</span>
+<span id="1655">1655</span>
+<span id="1656">1656</span>
+<span id="1657">1657</span>
+<span id="1658">1658</span>
+<span id="1659">1659</span>
+<span id="1660">1660</span>
+<span id="1661">1661</span>
+<span id="1662">1662</span>
+<span id="1663">1663</span>
+<span id="1664">1664</span>
+<span id="1665">1665</span>
+<span id="1666">1666</span>
+<span id="1667">1667</span>
+<span id="1668">1668</span>
+<span id="1669">1669</span>
+<span id="1670">1670</span>
+<span id="1671">1671</span>
+<span id="1672">1672</span>
+<span id="1673">1673</span>
+<span id="1674">1674</span>
+<span id="1675">1675</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Common types used across the library.</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
@@ -1650,10 +1683,10 @@
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
 <span class="kw">use</span> <span class="ident">bytes</span>::{<span class="ident">Buf</span>, <span class="ident">BufMut</span>, <span class="ident">Bytes</span>, <span class="ident">BytesMut</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">iter_ok</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::<span class="ident">mpsc</span>::{<span class="ident">Receiver</span>, <span class="ident">Sender</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sync</span>::<span class="ident">oneshot</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">Future</span>, <span class="ident">Sink</span>, <span class="ident">Stream</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">stream</span>::{<span class="ident">iter</span>, <span class="ident">StreamExt</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">sink</span>::<span class="ident">SinkExt</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="ident">Receiver</span>, <span class="ident">Sender</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">oneshot</span>;
 <span class="kw">use</span> <span class="ident">protobuf</span>::<span class="ident">Chars</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Deserialize</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">ser</span>::<span class="ident">Serialize</span>;
@@ -1664,6 +1697,60 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">messages</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">messaging</span>::<span class="ident">Msg</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">package</span>::<span class="ident">Pkg</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OperationError</span> {
+    <span class="ident">WrongExpectedVersion</span>(<span class="ident">String</span>, <span class="ident">ExpectedVersion</span>),
+    <span class="ident">StreamDeleted</span>(<span class="ident">String</span>),
+    <span class="ident">InvalidTransaction</span>,
+    <span class="ident">AccessDenied</span>(<span class="ident">String</span>),
+    <span class="ident">ProtobufDecodingError</span>(<span class="ident">String</span>),
+    <span class="ident">ServerError</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
+    <span class="ident">InvalidOperation</span>(<span class="ident">String</span>),
+    <span class="ident">StreamNotFound</span>(<span class="ident">String</span>),
+    <span class="ident">AuthenticationRequired</span>,
+    <span class="ident">Aborted</span>,
+    <span class="ident">WrongClientImpl</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Cmd</span><span class="op">&gt;</span>),
+    <span class="ident">ConnectionHasDropped</span>,
+    <span class="ident">NotImplemented</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">OperationError</span> {
+    <span class="kw">fn</span> <span class="ident">wrong_client_impl</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OperationError</span> {
+        <span class="ident">OperationError</span>::<span class="ident">WrongClientImpl</span>(<span class="prelude-val">None</span>)
+    }
+
+    <span class="kw">fn</span> <span class="ident">wrong_client_impl_on_cmd</span>(<span class="ident">cmd</span>: <span class="ident">Cmd</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OperationError</span> {
+        <span class="ident">OperationError</span>::<span class="ident">WrongClientImpl</span>(<span class="prelude-val">Some</span>(<span class="ident">cmd</span>))
+    }
+}
+
+<span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">for</span> <span class="ident">OperationError</span> {}
+
+<span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span> <span class="kw">for</span> <span class="ident">OperationError</span> {
+    <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Formatter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
+        <span class="kw">use</span> <span class="ident">OperationError</span>::<span class="kw-2">*</span>;
+
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">WrongExpectedVersion</span>(<span class="ident">stream</span>, <span class="ident">exp</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;expected version {:?} for stream {}&quot;</span>, <span class="ident">exp</span>, <span class="ident">stream</span>)
+            }
+            <span class="ident">StreamDeleted</span>(<span class="ident">stream</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;stream {} deleted&quot;</span>, <span class="ident">stream</span>),
+            <span class="ident">InvalidTransaction</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid transaction&quot;</span>),
+            <span class="ident">AccessDenied</span>(<span class="ident">info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;access denied: {}&quot;</span>, <span class="ident">info</span>),
+            <span class="ident">ProtobufDecodingError</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;protobuf decoding error: {}&quot;</span>, <span class="ident">error</span>),
+            <span class="ident">ServerError</span>(<span class="ident">error</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;server error: {:?}&quot;</span>, <span class="ident">error</span>),
+            <span class="ident">InvalidOperation</span>(<span class="ident">info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;invalid operation: {}&quot;</span>, <span class="ident">info</span>),
+            <span class="ident">StreamNotFound</span>(<span class="ident">stream</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;stream {} not found&quot;</span>, <span class="ident">stream</span>),
+            <span class="ident">AuthenticationRequired</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;authentication required&quot;</span>),
+            <span class="ident">Aborted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;aborted&quot;</span>),
+            <span class="ident">WrongClientImpl</span>(<span class="ident">info</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;wrong client impl: {:?}&quot;</span>, <span class="ident">info</span>),
+            <span class="ident">ConnectionHasDropped</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;connection has dropped&quot;</span>),
+            <span class="ident">NotImplemented</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;not implemented&quot;</span>),
+        }
+    }
+}
+
 
 <span class="doccomment">/// Represents a reconnection strategy when a connection has dropped or is</span>
 <span class="doccomment">/// about to be created.</span>
@@ -1685,8 +1772,8 @@
 <span class="doccomment">/// Holds login and password information.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Credentials</span> {
-    <span class="ident">login</span>: <span class="ident">Bytes</span>,
-    <span class="ident">password</span>: <span class="ident">Bytes</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">login</span>: <span class="ident">Bytes</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">password</span>: <span class="ident">Bytes</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">Credentials</span> {
@@ -2585,293 +2672,6 @@
     <span class="kw">pub</span> <span class="ident">meta_write_roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
-<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">SubEvent</span> {
-    <span class="ident">Confirmed</span> {
-        <span class="ident">id</span>: <span class="ident">Uuid</span>,
-        <span class="ident">last_commit_position</span>: <span class="ident">i64</span>,
-        <span class="ident">last_event_number</span>: <span class="ident">i64</span>,
-        <span class="comment">// If defined, it means we are in a persistent subscription.</span>
-        <span class="ident">persistent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    },
-
-    <span class="ident">EventAppeared</span> {
-        <span class="ident">event</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ResolvedEvent</span><span class="op">&gt;</span>,
-        <span class="ident">retry_count</span>: <span class="ident">usize</span>,
-    },
-
-    <span class="ident">HasBeenConfirmed</span>(<span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>),
-    <span class="ident">Dropped</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">SubEvent</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">event_appeared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ResolvedEvent</span><span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">SubEvent</span>::<span class="ident">EventAppeared</span> { <span class="kw-2">ref</span> <span class="ident">event</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-        }
-    }
-
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_event_appeared</span>(<span class="ident">event</span>: <span class="ident">ResolvedEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SubEvent</span> {
-        <span class="ident">SubEvent</span>::<span class="ident">EventAppeared</span> {
-            <span class="ident">event</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">event</span>),
-            <span class="ident">retry_count</span>: <span class="number">0</span>,
-        }
-    }
-}
-
-<span class="kw">struct</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">SubscriptionConsumer</span><span class="op">&gt;</span> {
-    <span class="ident">consumer</span>: <span class="ident">A</span>,
-    <span class="ident">confirmation_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span>,
-    <span class="ident">persistent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="ident">confirmation_requests</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">buffer</span>: <span class="ident">BytesMut</span>,
-}
-
-<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">SubscriptionConsumer</span><span class="op">&gt;</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">consumer</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
-        <span class="ident">State</span> {
-            <span class="ident">consumer</span>,
-            <span class="ident">confirmation_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">persistent_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">confirmation_requests</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
-            <span class="ident">buffer</span>: <span class="ident">BytesMut</span>::<span class="ident">new</span>(),
-        }
-    }
-
-    <span class="kw">fn</span> <span class="ident">drain_requests</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
-        <span class="kw">for</span> <span class="ident">req</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">confirmation_requests</span>.<span class="ident">drain</span>(..) {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">send</span>(());
-        }
-    }
-}
-
-<span class="kw">enum</span> <span class="ident">OnEvent</span> {
-    <span class="ident">Continue</span>,
-    <span class="ident">Stop</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">OnEvent</span> {
-    <span class="kw">fn</span> <span class="ident">is_stop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
-            <span class="ident">OnEvent</span>::<span class="ident">Continue</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-            <span class="ident">OnEvent</span>::<span class="ident">Stop</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-        }
-    }
-}
-
-<span class="doccomment">/// Gathers every possible Nak actions.</span>
-<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
-<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NakAction</span> {
-    <span class="doccomment">/// Client unknown on action. Let server decide.</span>
-    <span class="ident">Unknown</span>,
-
-    <span class="doccomment">/// Park message do not resend. Put on poison queue.</span>
-    <span class="ident">Park</span>,
-
-    <span class="doccomment">/// Explicity retry the message.</span>
-    <span class="ident">Retry</span>,
-
-    <span class="doccomment">/// Skip this message do not resend do not put in poison queue.</span>
-    <span class="ident">Skip</span>,
-
-    <span class="doccomment">/// Stop the subscription.</span>
-    <span class="ident">Stop</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">NakAction</span> {
-    <span class="kw">fn</span> <span class="ident">build_internal_nak_action</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span> {
-        <span class="kw">match</span> <span class="self">self</span> {
-            <span class="ident">NakAction</span>::<span class="ident">Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Unknown</span>,
-            <span class="ident">NakAction</span>::<span class="ident">Retry</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Retry</span>,
-            <span class="ident">NakAction</span>::<span class="ident">Skip</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Skip</span>,
-            <span class="ident">NakAction</span>::<span class="ident">Park</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Park</span>,
-            <span class="ident">NakAction</span>::<span class="ident">Stop</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Stop</span>,
-        }
-    }
-}
-
-<span class="kw">fn</span> <span class="ident">on_event</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">event</span>: <span class="ident">SubEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnEvent</span>
-<span class="kw">where</span>
-    <span class="ident">C</span>: <span class="ident">SubscriptionConsumer</span>,
-{
-    <span class="kw">match</span> <span class="ident">event</span> {
-        <span class="ident">SubEvent</span>::<span class="ident">Confirmed</span> {
-            <span class="ident">id</span>,
-            <span class="ident">last_commit_position</span>,
-            <span class="ident">last_event_number</span>,
-            <span class="ident">persistent_id</span>,
-        } <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">state</span>.<span class="ident">confirmation_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
-            <span class="ident">state</span>.<span class="ident">persistent_id</span> <span class="op">=</span> <span class="ident">persistent_id</span>;
-            <span class="ident">state</span>.<span class="ident">drain_requests</span>();
-            <span class="ident">state</span>
-                .<span class="ident">consumer</span>
-                .<span class="ident">when_confirmed</span>(<span class="ident">id</span>, <span class="ident">last_commit_position</span>, <span class="ident">last_event_number</span>);
-        }
-
-        <span class="ident">SubEvent</span>::<span class="ident">EventAppeared</span> { <span class="ident">event</span>, <span class="ident">retry_count</span> } <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">decision</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">persistent_id</span>.<span class="ident">as_ref</span>() {
-                <span class="prelude-val">Some</span>(<span class="ident">sub_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">env</span> <span class="op">=</span> <span class="ident">PersistentSubscriptionEnv</span>::<span class="ident">new</span>(<span class="ident">retry_count</span>);
-                    <span class="kw">let</span> <span class="ident">decision</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">consumer</span>.<span class="ident">when_event_appeared</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">env</span>, <span class="ident">event</span>);
-
-                    <span class="kw">let</span> <span class="ident">acks</span> <span class="op">=</span> <span class="ident">env</span>.<span class="ident">acks</span>;
-
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">acks</span>.<span class="ident">is_empty</span>() {
-                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionAckEvents</span>::<span class="ident">new</span>();
-
-                        <span class="ident">msg</span>.<span class="ident">set_subscription_id</span>(<span class="ident">sub_id</span>.<span class="ident">as_str</span>().<span class="ident">into</span>());
-
-                        <span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> <span class="ident">acks</span> {
-                            <span class="comment">// Reserves enough to store an UUID (which is 16 bytes long).</span>
-                            <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">reserve</span>(<span class="number">16</span>);
-                            <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">put_slice</span>(<span class="ident">id</span>.<span class="ident">as_bytes</span>());
-
-                            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">take</span>().<span class="ident">freeze</span>();
-                            <span class="ident">msg</span>.<span class="ident">mut_processed_event_ids</span>().<span class="ident">push</span>(<span class="ident">bytes</span>);
-                        }
-
-                        <span class="kw">let</span> <span class="ident">pkg</span> <span class="op">=</span>
-                            <span class="ident">Pkg</span>::<span class="ident">from_message</span>(<span class="ident">Cmd</span>::<span class="ident">PersistentSubscriptionAckEvents</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>)
-                                .<span class="ident">unwrap</span>();
-
-                        <span class="ident">sender</span>.<span class="ident">clone</span>().<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Send</span>(<span class="ident">pkg</span>)).<span class="ident">wait</span>().<span class="ident">unwrap</span>();
-                    }
-
-                    <span class="kw">let</span> <span class="ident">naks</span> <span class="op">=</span> <span class="ident">env</span>.<span class="ident">naks</span>;
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pkgs</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
-
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">naks</span>.<span class="ident">is_empty</span>() {
-                        <span class="kw">for</span> <span class="ident">naked</span> <span class="kw">in</span> <span class="ident">naks</span> {
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents</span>::<span class="ident">new</span>();
-                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes_vec</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="ident">naked</span>.<span class="ident">ids</span>.<span class="ident">len</span>());
-
-                            <span class="ident">msg</span>.<span class="ident">set_subscription_id</span>(<span class="ident">sub_id</span>.<span class="ident">as_str</span>().<span class="ident">into</span>());
-
-                            <span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> <span class="ident">naked</span>.<span class="ident">ids</span> {
-                                <span class="comment">// Reserves enough to store an UUID (which is 16 bytes long).</span>
-                                <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">reserve</span>(<span class="number">16</span>);
-                                <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">put_slice</span>(<span class="ident">id</span>.<span class="ident">as_bytes</span>());
-
-                                <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">take</span>().<span class="ident">freeze</span>();
-                                <span class="ident">bytes_vec</span>.<span class="ident">push</span>(<span class="ident">bytes</span>);
-                            }
-
-                            <span class="ident">msg</span>.<span class="ident">set_processed_event_ids</span>(<span class="ident">bytes_vec</span>);
-                            <span class="ident">msg</span>.<span class="ident">set_message</span>(<span class="ident">naked</span>.<span class="ident">message</span>);
-                            <span class="ident">msg</span>.<span class="ident">set_action</span>(<span class="ident">naked</span>.<span class="ident">action</span>.<span class="ident">build_internal_nak_action</span>());
-
-                            <span class="kw">let</span> <span class="ident">pkg</span> <span class="op">=</span>
-                                <span class="ident">Pkg</span>::<span class="ident">from_message</span>(<span class="ident">Cmd</span>::<span class="ident">PersistentSubscriptionAckEvents</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>)
-                                    .<span class="ident">unwrap</span>();
-
-                            <span class="ident">pkgs</span>.<span class="ident">push</span>(<span class="ident">pkg</span>);
-                        }
-
-                        <span class="kw">let</span> <span class="ident">pkgs</span> <span class="op">=</span> <span class="ident">pkgs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="ident">Msg</span>::<span class="ident">Send</span>);
-                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">clone</span>().<span class="ident">send_all</span>(<span class="ident">iter_ok</span>(<span class="ident">pkgs</span>)).<span class="ident">wait</span>().<span class="ident">unwrap</span>();
-                    }
-
-                    <span class="ident">decision</span>
-                }
-
-                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span>
-                    .<span class="ident">consumer</span>
-                    .<span class="ident">when_event_appeared</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NoopSubscriptionEnv</span>, <span class="ident">event</span>),
-            };
-
-            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OnEventAppeared</span>::<span class="ident">Drop</span> <span class="op">=</span> <span class="ident">decision</span> {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">state</span>
-                    .<span class="ident">confirmation_id</span>
-                    .<span class="ident">expect</span>(<span class="string">&quot;impossible situation when dropping subscription&quot;</span>);
-                <span class="kw">let</span> <span class="ident">pkg</span> <span class="op">=</span> <span class="ident">Pkg</span>::<span class="ident">new</span>(<span class="ident">Cmd</span>::<span class="ident">UnsubscribeFromStream</span>, <span class="ident">id</span>);
-
-                <span class="ident">sender</span>.<span class="ident">clone</span>().<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Send</span>(<span class="ident">pkg</span>)).<span class="ident">wait</span>().<span class="ident">unwrap</span>();
-                <span class="kw">return</span> <span class="ident">OnEvent</span>::<span class="ident">Stop</span>;
-            }
-        }
-
-        <span class="ident">SubEvent</span>::<span class="ident">Dropped</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">state</span>.<span class="ident">consumer</span>.<span class="ident">when_dropped</span>();
-            <span class="ident">state</span>.<span class="ident">drain_requests</span>();
-        }
-
-        <span class="ident">SubEvent</span>::<span class="ident">HasBeenConfirmed</span>(<span class="ident">req</span>) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">confirmation_id</span>.<span class="ident">is_some</span>() {
-                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">send</span>(());
-            } <span class="kw">else</span> {
-                <span class="ident">state</span>.<span class="ident">confirmation_requests</span>.<span class="ident">push</span>(<span class="ident">req</span>);
-            }
-        }
-    };
-
-    <span class="ident">OnEvent</span>::<span class="ident">Continue</span>
-}
-
-<span class="doccomment">/// Represents the common operations supported by a subscription.</span>
-<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Subscription</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">SubEvent</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">receiver</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">SubEvent</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>,
-}
-
-<span class="kw">impl</span> <span class="ident">Subscription</span> {
-    <span class="doccomment">/// Consumes synchronously the events comming from a subscription.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">consumer</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">SubscriptionConsumer</span>,
-    {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">new</span>(<span class="ident">consumer</span>);
-
-        <span class="kw">for</span> <span class="ident">event</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">wait</span>() {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">event</span> {
-                <span class="kw">let</span> <span class="ident">decision</span> <span class="op">=</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">event</span>);
-
-                <span class="kw">if</span> <span class="ident">decision</span>.<span class="ident">is_stop</span>() {
-                    <span class="kw">break</span>;
-                }
-            } <span class="kw">else</span> {
-                <span class="comment">// It means the queue has been closed by the operation.</span>
-                <span class="kw">break</span>;
-            }
-        }
-
-        <span class="ident">state</span>.<span class="ident">consumer</span>
-    }
-
-    <span class="doccomment">/// Consumes asynchronously the events comming from a subscription.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">consume_async</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">init</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">C</span>, <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span>
-    <span class="kw">where</span>
-        <span class="ident">C</span>: <span class="ident">SubscriptionConsumer</span>,
-    {
-        <span class="kw">let</span> <span class="ident">sender</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">clone</span>();
-
-        <span class="self">self</span>.<span class="ident">receiver</span>
-            .<span class="ident">fold</span>(<span class="ident">State</span>::<span class="ident">new</span>(<span class="ident">init</span>), <span class="kw">move</span> <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">event</span><span class="op">|</span> {
-                <span class="kw">match</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">event</span>) {
-                    <span class="ident">OnEvent</span>::<span class="ident">Continue</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>::<span class="op">&lt;</span><span class="ident">State</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span>(<span class="ident">state</span>),
-                    <span class="ident">OnEvent</span>::<span class="ident">Stop</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Err</span>(()),
-                }
-            })
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">state</span><span class="op">|</span> <span class="ident">state</span>.<span class="ident">consumer</span>)
-    }
-
-    <span class="doccomment">/// You shouldn&#39;t have to use that function as it makes no sense to</span>
-    <span class="doccomment">/// wait for a confirmation from the server. However, for testing</span>
-    <span class="doccomment">/// purpose or weirdos, we expose that function. it returns</span>
-    <span class="doccomment">/// a future waiting the subscription to be confirmed by the server.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">confirmation</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Future</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> (), <span class="ident">Error</span> <span class="op">=</span> ()<span class="op">&gt;</span> {
-        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rcv</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>
-            .<span class="ident">inner</span>
-            .<span class="ident">clone</span>()
-            .<span class="ident">send</span>(<span class="ident">SubEvent</span>::<span class="ident">HasBeenConfirmed</span>(<span class="ident">tx</span>))
-            .<span class="ident">wait</span>();
-
-        <span class="ident">rcv</span>.<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> ())
-    }
-}
-
 <span class="doccomment">/// Outcome to returns when a subscription dispatches an event.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OnEventAppeared</span> {
@@ -2991,6 +2791,272 @@
     <span class="doccomment">/// Called when the subscrition has been dropped whether by the server or</span>
     <span class="doccomment">/// the user themself.</span>
     <span class="kw">fn</span> <span class="ident">when_dropped</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {}
+}
+
+
+
+
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">enum</span> <span class="ident">SubEvent</span> {
+    <span class="ident">Confirmed</span> {
+        <span class="ident">id</span>: <span class="ident">Uuid</span>,
+        <span class="ident">last_commit_position</span>: <span class="ident">i64</span>,
+        <span class="ident">last_event_number</span>: <span class="ident">i64</span>,
+        <span class="comment">// If defined, it means we are in a persistent subscription.</span>
+        <span class="ident">persistent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    },
+
+    <span class="ident">EventAppeared</span> {
+        <span class="ident">event</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="ident">ResolvedEvent</span><span class="op">&gt;</span>,
+        <span class="ident">retry_count</span>: <span class="ident">usize</span>,
+    },
+
+    <span class="ident">HasBeenConfirmed</span>(<span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span>),
+    <span class="ident">Dropped</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">SubEvent</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">event_appeared</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">ResolvedEvent</span><span class="op">&gt;</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">SubEvent</span>::<span class="ident">EventAppeared</span> { <span class="kw-2">ref</span> <span class="ident">event</span>, .. } <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>),
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+        }
+    }
+
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">new_event_appeared</span>(<span class="ident">event</span>: <span class="ident">ResolvedEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SubEvent</span> {
+        <span class="ident">SubEvent</span>::<span class="ident">EventAppeared</span> {
+            <span class="ident">event</span>: <span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">event</span>),
+            <span class="ident">retry_count</span>: <span class="number">0</span>,
+        }
+    }
+}
+
+<span class="kw">struct</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">SubscriptionConsumer</span><span class="op">&gt;</span> {
+    <span class="ident">consumer</span>: <span class="ident">A</span>,
+    <span class="ident">confirmation_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Uuid</span><span class="op">&gt;</span>,
+    <span class="ident">persistent_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="ident">confirmation_requests</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">oneshot</span>::<span class="ident">Sender</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">buffer</span>: <span class="ident">BytesMut</span>,
+}
+
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">A</span>: <span class="ident">SubscriptionConsumer</span><span class="op">&gt;</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">consumer</span>: <span class="ident">A</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">A</span><span class="op">&gt;</span> {
+        <span class="ident">State</span> {
+            <span class="ident">consumer</span>,
+            <span class="ident">confirmation_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">persistent_id</span>: <span class="prelude-val">None</span>,
+            <span class="ident">confirmation_requests</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
+            <span class="ident">buffer</span>: <span class="ident">BytesMut</span>::<span class="ident">new</span>(),
+        }
+    }
+
+    <span class="kw">fn</span> <span class="ident">drain_requests</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">for</span> <span class="ident">req</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">confirmation_requests</span>.<span class="ident">drain</span>(..) {
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">req</span>.<span class="ident">send</span>(());
+        }
+    }
+}
+
+<span class="kw">enum</span> <span class="ident">OnEvent</span> {
+    <span class="ident">Continue</span>,
+    <span class="ident">Stop</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">OnEvent</span> {
+    <span class="kw">fn</span> <span class="ident">is_stop</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
+            <span class="ident">OnEvent</span>::<span class="ident">Continue</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">OnEvent</span>::<span class="ident">Stop</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+        }
+    }
+}
+
+<span class="doccomment">/// Gathers every possible Nak actions.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">PartialEq</span>, <span class="ident">Eq</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">NakAction</span> {
+    <span class="doccomment">/// Client unknown on action. Let server decide.</span>
+    <span class="ident">Unknown</span>,
+
+    <span class="doccomment">/// Park message do not resend. Put on poison queue.</span>
+    <span class="ident">Park</span>,
+
+    <span class="doccomment">/// Explicity retry the message.</span>
+    <span class="ident">Retry</span>,
+
+    <span class="doccomment">/// Skip this message do not resend do not put in poison queue.</span>
+    <span class="ident">Skip</span>,
+
+    <span class="doccomment">/// Stop the subscription.</span>
+    <span class="ident">Stop</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">NakAction</span> {
+    <span class="kw">fn</span> <span class="ident">build_internal_nak_action</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span> {
+        <span class="kw">match</span> <span class="self">self</span> {
+            <span class="ident">NakAction</span>::<span class="ident">Unknown</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Unknown</span>,
+            <span class="ident">NakAction</span>::<span class="ident">Retry</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Retry</span>,
+            <span class="ident">NakAction</span>::<span class="ident">Skip</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Skip</span>,
+            <span class="ident">NakAction</span>::<span class="ident">Park</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Park</span>,
+            <span class="ident">NakAction</span>::<span class="ident">Stop</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents_NakAction</span>::<span class="ident">Stop</span>,
+        }
+    }
+}
+
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">on_event</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">sender</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>, <span class="ident">state</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">State</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">event</span>: <span class="ident">SubEvent</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">OnEvent</span>
+<span class="kw">where</span>
+    <span class="ident">C</span>: <span class="ident">SubscriptionConsumer</span>,
+{
+    <span class="kw">match</span> <span class="ident">event</span> {
+        <span class="ident">SubEvent</span>::<span class="ident">Confirmed</span> {
+            <span class="ident">id</span>,
+            <span class="ident">last_commit_position</span>,
+            <span class="ident">last_event_number</span>,
+            <span class="ident">persistent_id</span>,
+        } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">state</span>.<span class="ident">confirmation_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>);
+            <span class="ident">state</span>.<span class="ident">persistent_id</span> <span class="op">=</span> <span class="ident">persistent_id</span>;
+            <span class="ident">state</span>.<span class="ident">drain_requests</span>();
+            <span class="ident">state</span>
+                .<span class="ident">consumer</span>
+                .<span class="ident">when_confirmed</span>(<span class="ident">id</span>, <span class="ident">last_commit_position</span>, <span class="ident">last_event_number</span>);
+        }
+
+        <span class="ident">SubEvent</span>::<span class="ident">EventAppeared</span> { <span class="ident">event</span>, <span class="ident">retry_count</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">decision</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">state</span>.<span class="ident">persistent_id</span>.<span class="ident">as_ref</span>() {
+                <span class="prelude-val">Some</span>(<span class="ident">sub_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">env</span> <span class="op">=</span> <span class="ident">PersistentSubscriptionEnv</span>::<span class="ident">new</span>(<span class="ident">retry_count</span>);
+                    <span class="kw">let</span> <span class="ident">decision</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">consumer</span>.<span class="ident">when_event_appeared</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">env</span>, <span class="ident">event</span>);
+
+                    <span class="kw">let</span> <span class="ident">acks</span> <span class="op">=</span> <span class="ident">env</span>.<span class="ident">acks</span>;
+
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">acks</span>.<span class="ident">is_empty</span>() {
+                        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionAckEvents</span>::<span class="ident">new</span>();
+
+                        <span class="ident">msg</span>.<span class="ident">set_subscription_id</span>(<span class="ident">sub_id</span>.<span class="ident">as_str</span>().<span class="ident">into</span>());
+
+                        <span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> <span class="ident">acks</span> {
+                            <span class="comment">// Reserves enough to store an UUID (which is 16 bytes long).</span>
+                            <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">reserve</span>(<span class="number">16</span>);
+                            <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">put_slice</span>(<span class="ident">id</span>.<span class="ident">as_bytes</span>());
+
+                            <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">take</span>().<span class="ident">freeze</span>();
+                            <span class="ident">msg</span>.<span class="ident">mut_processed_event_ids</span>().<span class="ident">push</span>(<span class="ident">bytes</span>);
+                        }
+
+                        <span class="kw">let</span> <span class="ident">pkg</span> <span class="op">=</span>
+                            <span class="ident">Pkg</span>::<span class="ident">from_message</span>(<span class="ident">Cmd</span>::<span class="ident">PersistentSubscriptionAckEvents</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>)
+                                .<span class="ident">unwrap</span>();
+
+                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Send</span>(<span class="ident">pkg</span>)).<span class="kw">await</span>;
+                    }
+
+                    <span class="kw">let</span> <span class="ident">naks</span> <span class="op">=</span> <span class="ident">env</span>.<span class="ident">naks</span>;
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">pkgs</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">naks</span>.<span class="ident">is_empty</span>() {
+                        <span class="kw">for</span> <span class="ident">naked</span> <span class="kw">in</span> <span class="ident">naks</span> {
+                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">messages</span>::<span class="ident">PersistentSubscriptionNakEvents</span>::<span class="ident">new</span>();
+                            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes_vec</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">with_capacity</span>(<span class="ident">naked</span>.<span class="ident">ids</span>.<span class="ident">len</span>());
+
+                            <span class="ident">msg</span>.<span class="ident">set_subscription_id</span>(<span class="ident">sub_id</span>.<span class="ident">as_str</span>().<span class="ident">into</span>());
+
+                            <span class="kw">for</span> <span class="ident">id</span> <span class="kw">in</span> <span class="ident">naked</span>.<span class="ident">ids</span> {
+                                <span class="comment">// Reserves enough to store an UUID (which is 16 bytes long).</span>
+                                <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">reserve</span>(<span class="number">16</span>);
+                                <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">put_slice</span>(<span class="ident">id</span>.<span class="ident">as_bytes</span>());
+
+                                <span class="kw">let</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">take</span>().<span class="ident">freeze</span>();
+                                <span class="ident">bytes_vec</span>.<span class="ident">push</span>(<span class="ident">bytes</span>);
+                            }
+
+                            <span class="ident">msg</span>.<span class="ident">set_processed_event_ids</span>(<span class="ident">bytes_vec</span>);
+                            <span class="ident">msg</span>.<span class="ident">set_message</span>(<span class="ident">naked</span>.<span class="ident">message</span>);
+                            <span class="ident">msg</span>.<span class="ident">set_action</span>(<span class="ident">naked</span>.<span class="ident">action</span>.<span class="ident">build_internal_nak_action</span>());
+
+                            <span class="kw">let</span> <span class="ident">pkg</span> <span class="op">=</span>
+                                <span class="ident">Pkg</span>::<span class="ident">from_message</span>(<span class="ident">Cmd</span>::<span class="ident">PersistentSubscriptionAckEvents</span>, <span class="prelude-val">None</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>)
+                                    .<span class="ident">unwrap</span>();
+
+                            <span class="ident">pkgs</span>.<span class="ident">push</span>(<span class="ident">pkg</span>);
+                        }
+
+                        <span class="kw">let</span> <span class="ident">pkgs</span> <span class="op">=</span> <span class="ident">pkgs</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">pkg</span><span class="op">|</span> <span class="prelude-val">Ok</span>(<span class="ident">Msg</span>::<span class="ident">Send</span>(<span class="ident">pkg</span>)));
+                        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">send_all</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">iter</span>(<span class="ident">pkgs</span>)).<span class="kw">await</span>;
+                    }
+
+                    <span class="ident">decision</span>
+                }
+
+                <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">state</span>
+                    .<span class="ident">consumer</span>
+                    .<span class="ident">when_event_appeared</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">NoopSubscriptionEnv</span>, <span class="ident">event</span>),
+            };
+
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OnEventAppeared</span>::<span class="ident">Drop</span> <span class="op">=</span> <span class="ident">decision</span> {
+                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">state</span>
+                    .<span class="ident">confirmation_id</span>
+                    .<span class="ident">expect</span>(<span class="string">&quot;impossible situation when dropping subscription&quot;</span>);
+                <span class="kw">let</span> <span class="ident">pkg</span> <span class="op">=</span> <span class="ident">Pkg</span>::<span class="ident">new</span>(<span class="ident">Cmd</span>::<span class="ident">UnsubscribeFromStream</span>, <span class="ident">id</span>);
+
+                <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">sender</span>.<span class="ident">send</span>(<span class="ident">Msg</span>::<span class="ident">Send</span>(<span class="ident">pkg</span>)).<span class="kw">await</span>;
+                <span class="kw">return</span> <span class="ident">OnEvent</span>::<span class="ident">Stop</span>;
+            }
+        }
+
+        <span class="ident">SubEvent</span>::<span class="ident">Dropped</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">state</span>.<span class="ident">consumer</span>.<span class="ident">when_dropped</span>();
+            <span class="ident">state</span>.<span class="ident">drain_requests</span>();
+        }
+
+        <span class="ident">SubEvent</span>::<span class="ident">HasBeenConfirmed</span>(<span class="kw-2">mut</span> <span class="ident">req</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">confirmation_id</span>.<span class="ident">is_some</span>() {
+                <span class="ident">req</span>.<span class="ident">send</span>(()).<span class="ident">unwrap</span>();
+            } <span class="kw">else</span> {
+                <span class="ident">state</span>.<span class="ident">confirmation_requests</span>.<span class="ident">push</span>(<span class="ident">req</span>);
+            }
+        }
+    };
+
+    <span class="ident">OnEvent</span>::<span class="ident">Continue</span>
+}
+
+<span class="doccomment">/// Represents the common operations supported by a subscription.</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Subscription</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">inner</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">SubEvent</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">receiver</span>: <span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">SubEvent</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">sender</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">Msg</span><span class="op">&gt;</span>,
+}
+
+<span class="kw">impl</span> <span class="ident">Subscription</span> {
+    <span class="doccomment">/// Consumes asynchronously the events comming from a subscription.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">consume_async</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">init</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">C</span>
+    <span class="kw">where</span>
+        <span class="ident">C</span>: <span class="ident">SubscriptionConsumer</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sender</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">sender</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">new</span>(<span class="ident">init</span>);
+
+        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">next</span>().<span class="kw">await</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">OnEvent</span>::<span class="ident">Stop</span> <span class="op">=</span> <span class="ident">on_event</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sender</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">state</span>, <span class="ident">event</span>).<span class="kw">await</span> {
+                <span class="kw">break</span>;
+            }
+        }
+
+        <span class="ident">state</span>.<span class="ident">consumer</span>
+    }
+
+    <span class="doccomment">/// You shouldn&#39;t have to use that function as it makes no sense to</span>
+    <span class="doccomment">/// wait for a confirmation from the server. However, for testing</span>
+    <span class="doccomment">/// purpose or weirdos, we expose that function. it returns</span>
+    <span class="doccomment">/// a future waiting the subscription to be confirmed by the server.</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">confirmation</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+        <span class="kw">let</span> (<span class="ident">tx</span>, <span class="kw-2">mut</span> <span class="ident">rcv</span>) <span class="op">=</span> <span class="ident">oneshot</span>::<span class="ident">channel</span>();
+
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">inner</span>
+            .<span class="ident">send</span>(<span class="ident">SubEvent</span>::<span class="ident">HasBeenConfirmed</span>(<span class="ident">tx</span>))
+            .<span class="kw">await</span>;
+
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">rcv</span>.<span class="kw">await</span>;
+    }
 }
 
 <span class="doccomment">/// System supported consumer strategies for use with persistent subscriptions.</span>

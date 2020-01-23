@@ -150,6 +150,12 @@
 <span id="150">150</span>
 <span id="151">151</span>
 <span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#[<span class="ident">macro_use</span>]</span> <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">tracing</span>;
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">juniper</span>;
@@ -170,7 +176,9 @@
     <span class="ident">http</span>::<span class="ident">header</span>::{<span class="ident">ACCESS_CONTROL_ALLOW_HEADERS</span>, <span class="ident">ACCESS_CONTROL_ALLOW_ORIGIN</span>},
     <span class="ident">http</span>::<span class="ident">HeaderMap</span>
 };
-<span class="kw">use</span> <span class="ident">liquidity</span>::{<span class="ident">Context</span>, <span class="ident">Connection</span>, <span class="ident">Credentials</span>};
+<span class="kw">use</span> <span class="ident">liquidity</span>::{<span class="ident">Connection</span>, <span class="ident">Credentials</span>};
+<span class="kw">use</span> <span class="ident">liquidity_api</span>::{<span class="ident">APIContext</span>, <span class="ident">ElectionResolvers</span>};
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
 <span class="kw">const</span> <span class="ident">JWKS_URL</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;JWKS_URL&quot;</span>;
 <span class="kw">const</span> <span class="ident">JWT_ISSUER</span>: <span class="kw-2">&amp;</span><span class="ident">str</span> <span class="op">=</span> <span class="string">&quot;JWT_ISSUER&quot;</span>;
@@ -185,7 +193,9 @@
     <span class="kw">pub</span> <span class="ident">playground_enabled</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">jwks_url</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">issuer</span>: <span class="ident">String</span>,
-    <span class="kw">pub</span> <span class="ident">audience</span>: <span class="ident">String</span>
+    <span class="kw">pub</span> <span class="ident">audience</span>: <span class="ident">String</span>,
+    <span class="kw">pub</span> <span class="ident">cache_size</span>: <span class="ident">usize</span>,
+    <span class="kw">pub</span> <span class="ident">cache_ttl</span>: <span class="ident">Duration</span>
 }
 
 <span class="kw">impl</span> <span class="ident">Config</span> {
@@ -204,13 +214,18 @@
         <span class="kw">let</span> <span class="ident">jwks_url</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">JWKS_URL</span>).<span class="ident">expect</span>(<span class="string">&quot;JWKS_URL must be set&quot;</span>);
         <span class="kw">let</span> <span class="ident">issuer</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">JWT_ISSUER</span>).<span class="ident">expect</span>(<span class="string">&quot;JWT_ISSUER must be set&quot;</span>);
         <span class="kw">let</span> <span class="ident">audience</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="ident">ENDPOINT_URL</span>).<span class="ident">expect</span>(<span class="string">&quot;ENDPOINT_URL must be set&quot;</span>);
+        <span class="kw">let</span> <span class="ident">cache_size</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;CACHE_MAX_SIZE&quot;</span>).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="string">&quot;500&quot;</span>.<span class="ident">to_string</span>()).<span class="ident">parse</span>().<span class="ident">expect</span>(<span class="string">&quot;Invalid cache size&quot;</span>);
+        <span class="kw">let</span> <span class="ident">cache_ttl</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;CACHE_TIME_TO_LIVE&quot;</span>)
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">parse_duration</span>::<span class="ident">parse</span>(<span class="ident">x</span>.<span class="ident">as_str</span>()).<span class="ident">expect</span>(<span class="string">&quot;Invalid cache TTL&quot;</span>))
+            .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">600</span>));
 
         <span class="ident">Config</span> {
             <span class="ident">port</span>,
             <span class="ident">database_url</span>, <span class="ident">database_login</span>, <span class="ident">database_password</span>,
             <span class="ident">playground_enabled</span>,
             <span class="ident">jwks_url</span>,
-            <span class="ident">issuer</span>, <span class="ident">audience</span>
+            <span class="ident">issuer</span>, <span class="ident">audience</span>,
+            <span class="ident">cache_size</span>, <span class="ident">cache_ttl</span>
         }
     }
 }
@@ -260,32 +275,29 @@
         <span class="ident">Connection</span>::<span class="ident">builder</span>()
             .<span class="ident">with_default_user</span>(<span class="ident">Credentials</span>::<span class="ident">new</span>(<span class="ident">config</span>.<span class="ident">database_login</span>, <span class="ident">config</span>.<span class="ident">database_password</span>))
             .<span class="ident">single_node_connection</span>(<span class="ident">config</span>.<span class="ident">database_url</span>)
+            .<span class="kw">await</span>
     );
 
     <span class="kw">let</span> <span class="ident">key_store</span> <span class="op">=</span> <span class="ident">KeyStore</span>::<span class="ident">new_from</span>(<span class="ident">config</span>.<span class="ident">jwks_url</span>.<span class="ident">as_str</span>()).<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;Failed to create JWKS key store&quot;</span>);
     <span class="kw">let</span> <span class="ident">auth</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">JWTAuth</span>::<span class="ident">new</span>(<span class="ident">key_store</span>, <span class="ident">config</span>.<span class="ident">issuer</span>, <span class="ident">config</span>.<span class="ident">audience</span>));
+    <span class="kw">let</span> <span class="ident">elections</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">ElectionResolvers</span>::<span class="ident">new</span>(<span class="ident">config</span>.<span class="ident">cache_size</span>, <span class="ident">config</span>.<span class="ident">cache_ttl</span>));
+    <span class="kw">let</span> <span class="ident">base_ctx</span> <span class="op">=</span> <span class="ident">APIContext</span>::<span class="ident">new</span>(<span class="ident">db_conn</span>, <span class="prelude-val">None</span>, <span class="ident">elections</span>);
 
     <span class="kw">let</span> <span class="ident">no_auth</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">db_conn</span> <span class="op">=</span> <span class="ident">db_conn</span>.<span class="ident">clone</span>();
-        <span class="ident">warp</span>::<span class="ident">any</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">JWTError</span><span class="op">&gt;</span> {
-            <span class="prelude-val">Ok</span>(<span class="ident">Context</span> {
-                <span class="ident">db</span>: <span class="ident">db_conn</span>.<span class="ident">clone</span>(),
-                <span class="ident">user</span>: <span class="prelude-val">None</span>,
-            })
+        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">base_ctx</span>.<span class="ident">clone</span>();
+        <span class="ident">warp</span>::<span class="ident">any</span>().<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">APIContext</span>, <span class="ident">JWTError</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Ok</span>(<span class="ident">ctx</span>.<span class="ident">clone</span>())
         })
     };
     <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> {
-        <span class="kw">let</span> <span class="ident">db_conn</span> <span class="op">=</span> <span class="ident">db_conn</span>.<span class="ident">clone</span>();
+        <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">base_ctx</span>.<span class="ident">clone</span>();
 
         <span class="ident">warp</span>::<span class="ident">header</span>::<span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>(<span class="string">&quot;Authorization&quot;</span>)
-            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">jwt</span>: <span class="ident">String</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Context</span>, <span class="ident">JWTError</span><span class="op">&gt;</span> {
+            .<span class="ident">map</span>(<span class="kw">move</span> <span class="op">|</span><span class="ident">jwt</span>: <span class="ident">String</span><span class="op">|</span> <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">APIContext</span>, <span class="ident">JWTError</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">auth</span> <span class="op">=</span> <span class="ident">auth</span>.<span class="ident">clone</span>();
                 <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="ident">auth</span>.<span class="ident">validate</span>(<span class="ident">jwt</span>)<span class="question-mark">?</span>;
 
-                <span class="prelude-val">Ok</span>(<span class="ident">Context</span> {
-                    <span class="ident">db</span>: <span class="ident">db_conn</span>.<span class="ident">clone</span>(),
-                    <span class="ident">user</span>: <span class="prelude-val">Some</span>(<span class="ident">user</span>)
-                })
+                <span class="prelude-val">Ok</span>(<span class="ident">ctx</span>.<span class="ident">clone_with_user</span>(<span class="ident">user</span>))
             })
             .<span class="ident">or</span>(<span class="ident">no_auth</span>)
             .<span class="ident">unify</span>()

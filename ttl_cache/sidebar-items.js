@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Entry","A view into a single location in a map, which may be vacant or occupied."]],"struct":[["Iter",""],["IterMut",""],["OccupiedEntry","A view into a single occupied location in the cache that was unexpired at the moment of lookup."],["TtlCache","A time sensitive cache."],["VacantEntry","A view into a single empty location in the cache"]]});
