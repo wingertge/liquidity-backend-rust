@@ -1,3 +1,6 @@
+#[macro_use] extern crate async_trait;
+#[macro_use] extern crate tracing;
+
 use std::error::Error as ErrTrait;
 
 pub use eventstore::{Connection, Credentials};

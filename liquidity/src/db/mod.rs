@@ -2,6 +2,10 @@ pub use eventstore::OperationError;
 use std::fmt;
 use std::error::Error;
 
+mod connection;
+
+pub use connection::{DbConnection, EventType};
+
 pub trait ESResultExt<T> {
     fn map_not_found(self) -> Result<Option<T>, OperationError>;
 }

@@ -22,10 +22,15 @@
       <sourceFolder url="file://$MODULE_DIR$/liquidity/examples" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/liquidity/tests" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/liquidity/benches" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_test_utils/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_test_utils/examples" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_test_utils/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/liquidity_test_utils/benches" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/liquidity/target" />
       <excludeFolder url="file://$MODULE_DIR$/liquidity_api/target" />
       <excludeFolder url="file://$MODULE_DIR$/liquidity_elections/target" />
       <excludeFolder url="file://$MODULE_DIR$/liquidity_server/target" />
+      <excludeFolder url="file://$MODULE_DIR$/liquidity_test_utils/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
