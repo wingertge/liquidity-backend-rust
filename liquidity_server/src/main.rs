@@ -17,7 +17,9 @@ use warp::{
     http::header::{ACCESS_CONTROL_ALLOW_HEADERS, ACCESS_CONTROL_ALLOW_ORIGIN},
     http::HeaderMap
 };
-use liquidity::{Context, Connection, Credentials};
+use liquidity::{Connection, Credentials};
+use liquidity_api::{APIContext, ElectionResolvers};
+use std::time::Duration;
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
@@ -32,7 +34,9 @@ struct Config {
     pub playground_enabled: bool,
     pub jwks_url: String,
     pub issuer: String,
-    pub audience: String
+    pub audience: String,
+    pub cache_size: usize,
+    pub cache_ttl: Duration
 }
 
 impl Config {
@@ -51,13 +55,18 @@ impl Config {
         let jwks_url = std::env::var(JWKS_URL).expect("JWKS_URL must be set");
         let issuer = std::env::var(JWT_ISSUER).expect("JWT_ISSUER must be set");
         let audience = std::env::var(ENDPOINT_URL).expect("ENDPOINT_URL must be set");
+        let cache_size = std::env::var("CACHE_MAX_SIZE").unwrap_or_else(|_| "500".to_string()).parse().expect("Invalid cache size");
+        let cache_ttl = std::env::var("CACHE_TIME_TO_LIVE")
+            .map(|x| parse_duration::parse(x.as_str()).expect("Invalid cache TTL"))
+            .unwrap_or_else(|_| Duration::from_secs(600));
 
         Config {
             port,
             database_url, database_login, database_password,
             playground_enabled,
             jwks_url,
-            issuer, audience
+            issuer, audience,
+            cache_size, cache_ttl
         }
     }
 }
@@ -107,32 +116,29 @@ async fn main() {
         Connection::builder()
             .with_default_user(Credentials::new(config.database_login, config.database_password))
             .single_node_connection(config.database_url)
+            .await
     );
 
     let key_store = KeyStore::new_from(config.jwks_url.as_str()).await.expect("Failed to create JWKS key store");
     let auth = Arc::new(JWTAuth::new(key_store, config.issuer, config.audience));
+    let elections = Arc::new(ElectionResolvers::new(config.cache_size, config.cache_ttl));
+    let base_ctx = APIContext::new(db_conn, None, elections);
 
     let no_auth = {
-        let db_conn = db_conn.clone();
-        warp::any().map(move || -> Result<Context, JWTError> {
-            Ok(Context {
-                db: db_conn.clone(),
-                user: None,
-            })
+        let ctx = base_ctx.clone();
+        warp::any().map(move || -> Result<APIContext, JWTError> {
+            Ok(ctx.clone())
         })
     };
     let context = {
-        let db_conn = db_conn.clone();
+        let ctx = base_ctx.clone();
 
         warp::header::<String>("Authorization")
-            .map(move |jwt: String| -> Result<Context, JWTError> {
+            .map(move |jwt: String| -> Result<APIContext, JWTError> {
                 let auth = auth.clone();
                 let user = auth.validate(jwt)?;
 
-                Ok(Context {
-                    db: db_conn.clone(),
-                    user: Some(user)
-                })
+                Ok(ctx.clone_with_user(user))
             })
             .or(no_auth)
             .unify()

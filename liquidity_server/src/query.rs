@@ -1,12 +1,13 @@
-use liquidity::{Context, Uuid};
-use liquidity_api::elections::{schema::Election, self};
+use liquidity::Uuid;
+use liquidity_api::elections::schema::Election;
 use crate::auth::JWTError;
 use juniper::FieldResult;
+use liquidity_api::APIContext;
 
 pub struct Query;
 
 #[juniper::graphql_object(
-    Context = Result<Context, JWTError>
+    Context = Result<APIContext, JWTError>
 )]
 impl Query {
     #[graphql(
@@ -17,8 +18,8 @@ impl Query {
             )
         )
     )]
-    pub fn election(id: Uuid, context: &Result<Context, JWTError>) -> FieldResult<Option<Election>> {
+    pub async fn election(id: Uuid, context: &Result<APIContext, JWTError>) -> FieldResult<Option<Election>> {
         let context = context.as_ref()?;
-        elections::query::election(id, context).map_err(Into::into)
+        Ok(context.elections().election(id, context).await?)
     }
 }

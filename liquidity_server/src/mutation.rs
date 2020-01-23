@@ -1,12 +1,13 @@
-use liquidity::{Context, Uuid};
-use liquidity_api::elections::{schema::{Election, ElectionInput}, self};
+use liquidity::Uuid;
+use liquidity_api::elections::schema::{Election, ElectionInput};
 use crate::auth::JWTError;
 use juniper::FieldResult;
+use liquidity_api::APIContext;
 
 pub struct Mutation;
 
 #[juniper::graphql_object(
-    Context = Result<Context, JWTError>
+    Context = Result<APIContext, JWTError>
 )]
 impl Mutation {
     #[graphql(
@@ -17,10 +18,10 @@ impl Mutation {
             )
         )
     )]
-    pub async fn create_election(input: ElectionInput, context: &Result<Context, JWTError>) -> FieldResult<Election> {
+    pub async fn create_election(input: ElectionInput, context: &mut Result<APIContext, JWTError>) -> FieldResult<Election> {
         let context = context.as_ref()?;
 
-        elections::mutation::create_election(input, context).await.map_err(Into::into)
+        Ok(context.elections().create_election(input, context).await?)
     }
 
     #[graphql(
@@ -34,9 +35,9 @@ impl Mutation {
             )
         )
     )]
-    pub fn edit_election(id: Uuid, input: ElectionInput, context: &Result<Context, JWTError>) -> FieldResult<Election> {
+    pub async fn edit_election(id: Uuid, input: ElectionInput, context: &mut Result<APIContext, JWTError>) -> FieldResult<Election> {
         let context = context.as_ref()?;
-        let result = elections::mutation::edit_election(id, input, context)?;
+        let result = context.elections().edit_election(id, input, context).await?;
         Ok(result)
     }
 }

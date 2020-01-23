@@ -2,6 +2,7 @@
 
 members = [
     "liquidity",
+    "liquidity_test_utils",
 	"liquidity_server",
 	"liquidity_api",
 	"liquidity_elections"

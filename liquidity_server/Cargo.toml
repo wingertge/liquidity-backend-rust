@@ -14,6 +14,7 @@ futures = "0.3" # Required because of juniper macros
 
 dotenv = "0.15.0"
 env_logger = "0.7.1"
+parse_duration = "2"
 
 liquidity = {path = "../liquidity"}
 liquidity_api = {path = "../liquidity_api"}
