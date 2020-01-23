@@ -50,7 +50,7 @@ impl ElectionRepository {
     /// # use liquidity_elections::{repository::ElectionRepository, schema::ElectionInput};
     /// # use liquidity_test_utils::connection::MockConnection;
     /// # use std::time::Duration;
-    /// # let conn = MockConnection::new();
+    /// # let conn = MockConnection::default();
     /// # let repository = ElectionRepository::new(0, Duration::from_secs(0));
     ///
     /// let election_input = ElectionInput {
@@ -119,7 +119,7 @@ impl ElectionRepository {
     /// # use liquidity_elections::{repository::ElectionRepository, schema::ElectionInput};
     /// # use liquidity_test_utils::connection::MockConnection;
     /// # use std::time::Duration;
-    /// # let conn = MockConnection::new();
+    /// # let conn = MockConnection::default();
     /// # let repository = ElectionRepository::new(0, Duration::from_secs(0));
     ///
     /// let election_input = ElectionInput {
@@ -187,7 +187,7 @@ impl ElectionRepository {
     /// # use liquidity_elections::repository::ElectionRepository;
     /// # use liquidity_test_utils::connection::MockConnection;
     /// # use std::time::Duration;
-    /// # let conn = MockConnection::new();
+    /// # let conn = MockConnection::default();
     /// # let repository = ElectionRepository::new(0, Duration::from_secs(0));
     ///
     /// let id = Uuid::new_v4();
@@ -234,7 +234,7 @@ mod test {
     use serde_json::Value;
 
     fn conn() -> MockConnection {
-        MockConnection::new()
+        MockConnection::default()
     }
 
     fn repository() -> Arc<ElectionRepository> {

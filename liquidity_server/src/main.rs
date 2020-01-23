@@ -131,14 +131,12 @@ async fn main() {
         })
     };
     let context = {
-        let ctx = base_ctx.clone();
-
         warp::header::<String>("Authorization")
             .map(move |jwt: String| -> Result<APIContext, JWTError> {
                 let auth = auth.clone();
                 let user = auth.validate(jwt)?;
 
-                Ok(ctx.clone_with_user(user))
+                Ok(base_ctx.clone_with_user(user))
             })
             .or(no_auth)
             .unify()

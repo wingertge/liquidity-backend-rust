@@ -7,22 +7,17 @@ use liquidity::db::{DbConnection, EventType, DatabaseError};
 use liquidity::Merge;
 use serde_json::Value;
 
+type Data = Arc<Mutex<HashMap<String, Vec<(EventType, Value)>>>>;
+
+#[derive(Default)]
 pub struct MockConnection {
-    pub data: Arc<Mutex<HashMap<String, Vec<(EventType, Value)>>>>
+    pub data: Data
 }
 
 impl Clone for MockConnection {
     fn clone(&self) -> Self {
         MockConnection {
             data: self.data.clone()
-        }
-    }
-}
-
-impl MockConnection {
-    pub fn new() -> Self {
-        MockConnection {
-            data: Arc::new(Mutex::new(HashMap::new()))
         }
     }
 }
@@ -48,17 +43,17 @@ impl DbConnection for MockConnection {
 
         if iter.is_none() { return Ok(None) }
 
-        let mut iter = iter.unwrap().into_iter().map(|e| Ok::<(EventType, Value), DatabaseError>(e));
+        let mut iter = iter.unwrap().into_iter().map(Ok::<(EventType, Value), DatabaseError>);
 
         let res = iter.try_fold(None, move |acc: Option<T>, event| {
             let (event_type, value) = event?;
-            match event_type.to_owned().into() {
+            match event_type {
                 EventType::Create => {
                     let payload = serde_json::from_value::<C>(value)?;
                     Ok(Some(payload.into()))
                 },
                 EventType::Update => {
-                    match acc.clone() {
+                    match acc {
                         Some(acc) => {
                             let payload = serde_json::from_value::<U>(value)?;
                             Ok(Some(acc.merge_with(payload)))
