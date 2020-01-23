@@ -27,7 +27,7 @@ impl From<String> for ElectionEventType {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub(crate) struct CreateElectionEvent {
     pub id: Uuid,
     pub name: String,
@@ -53,7 +53,7 @@ impl From<CreateElectionEvent> for Election {
     }
 }
 
-#[derive(Clone, Serialize, Deserialize)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub(crate) struct UpdateElectionEvent {
     #[serde(skip_serializing_if = "Option::is_none")]
     #[serde(default)]

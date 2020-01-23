@@ -1,52 +1,20 @@
-pub mod query {
-    use liquidity::{Context, Uuid, permissions, Error};
-    use futures::executor::block_on;
-    use crate::schema::Election;
+use crate::repository::ElectionRepository;
+use liquidity::{Uuid, Context, Error, permissions};
+use crate::schema::{Election, ElectionInput};
+use std::time::Duration;
+use liquidity::db::DbConnection;
 
-    /// Fetch an election by id
-    ///
-    /// # Arguments
-    ///
-    /// `id` - The id to look up the election by
-    /// `context` - The request context, passed automatically
-    ///
-    /// # Permissions Required
-    ///
-    /// `view:election`
-    ///
-    /// # Returns
-    ///
-    /// The election if it exists, None if it doesn't, Error if an issue has occurred
-    ///
-    /// # Example
-    ///
-    /// ```ignore
-    /// query {
-    ///     election(id: "some_uuid") {
-    ///         id
-    ///         name
-    ///         choices
-    ///     }
-    /// }
-    /// ```
-    pub fn election(id: Uuid, context: &Context) -> Result<Option<Election>, Error> {
-        let span = trace_span!("election", "id: {}, context: {:?}", id, context);
-
-        span.in_scope(|| {
-            permissions::check("view:election", &context.user)?;
-            use crate::repository::find_election;
-
-            let db = context.db.clone();
-            let result = block_on(find_election(&id, db)); //TODO: Don't block as soon as futures 0.3 support arrives for eventstore
-            result.map_err(Into::into)
-        })
-    }
+#[derive(Debug)]
+pub struct ElectionResolvers {
+    repository: ElectionRepository
 }
 
-pub mod mutation {
-    use futures::executor::block_on;
-    use liquidity::{Context, permissions, Error, Uuid};
-    use crate::schema::{Election, ElectionInput};
+impl ElectionResolvers {
+    pub fn new(cache_capacity: usize, cache_ttl: Duration) -> ElectionResolvers {
+        ElectionResolvers {
+            repository: ElectionRepository::new(cache_capacity, cache_ttl)
+        }
+    }
 
     /// Create a new election
     ///
@@ -74,20 +42,19 @@ pub mod mutation {
     ///     }
     /// }
     /// ```
-    pub async fn create_election(
+    #[instrument]
+    pub async fn create_election<T: DbConnection, C: Context<T>>(
+        &self,
         input: ElectionInput,
-        context: &Context
+        context: &C
     ) -> Result<Election, Error> {
-        let span = trace_span!("create_election", "input: {:?}, context: {:?}", input, context);
-        let _enter = span.enter();
-        permissions::check("create:election", &context.user)?;
+        permissions::check("create:election", context.user())?;
         if input.name.is_none() { return Err("Name cannot be null".into()) }
 
-        let db = context.db.clone();
-        let user = context.user.as_ref().unwrap();
+        let db = context.db();
+        let user = context.user().as_ref().unwrap();
 
-        use crate::repository::create_election;
-        let result = create_election(input, &user.id, db).await?;
+        let result = self.repository.create_election(input, &user.id, db).await?;
         Ok(result)
     }
 
@@ -119,16 +86,51 @@ pub mod mutation {
     /// }
     /// ```
     #[instrument]
-    pub fn edit_election(
+    pub async fn edit_election<T: DbConnection, C: Context<T>>(
+        &self,
         id: Uuid,
         input: ElectionInput,
-        context: &Context
+        context: &C
     ) -> Result<Election, Error> {
-        permissions::check("update:election", &context.user)?;
-        let db = context.db.clone();
+        permissions::check("update:election", &context.user())?;
+        let db = context.db();
 
-        use crate::repository::update_election;
-        let result = block_on(update_election(&id, input, db))?;
+        let result = self.repository.update_election(&id, input, db).await?;
+        Ok(result)
+    }
+
+    /// Fetch an election by id
+    ///
+    /// # Arguments
+    ///
+    /// `id` - The id to look up the election by
+    /// `context` - The request context, passed automatically
+    ///
+    /// # Permissions Required
+    ///
+    /// `view:election`
+    ///
+    /// # Returns
+    ///
+    /// The election if it exists, None if it doesn't, Error if an issue has occurred
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// query {
+    ///     election(id: "some_uuid") {
+    ///         id
+    ///         name
+    ///         choices
+    ///     }
+    /// }
+    /// ```
+    #[instrument]
+    pub async fn election<T: DbConnection, C: Context<T>>(&self, id: Uuid, context: &C) -> Result<Option<Election>, Error> {
+        permissions::check("view:election", &context.user())?;
+
+        let db = context.db();
+        let result = self.repository.find_election(&id, db).await?;
         Ok(result)
     }
 }
