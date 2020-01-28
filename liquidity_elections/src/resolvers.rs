@@ -1,5 +1,5 @@
 use crate::repository::ElectionRepository;
-use liquidity::{Uuid, Context, Error, permissions};
+use liquidity::{Uuid, Context, Error};
 use crate::schema::{Election, ElectionInput};
 use std::time::Duration;
 use liquidity::db::DbConnection;
@@ -42,19 +42,17 @@ impl ElectionResolvers {
     ///     }
     /// }
     /// ```
+    #[authorized("create:election")]
     #[instrument]
     pub async fn create_election<T: DbConnection, C: Context<T>>(
         &self,
         input: ElectionInput,
         context: &C
     ) -> Result<Election, Error> {
-        permissions::check("create:election", context.user())?;
         if input.name.is_none() { return Err("Name cannot be null".into()) }
-
-        let db = context.db();
         let user = context.user().as_ref().unwrap();
 
-        let result = self.repository.create_election(input, &user.id, db).await?;
+        let result = self.repository.create_election(input, &user.id, context.db()).await?;
         Ok(result)
     }
 
@@ -85,6 +83,7 @@ impl ElectionResolvers {
     ///     }
     /// }
     /// ```
+    #[authorized("update:election")]
     #[instrument]
     pub async fn edit_election<T: DbConnection, C: Context<T>>(
         &self,
@@ -92,10 +91,7 @@ impl ElectionResolvers {
         input: ElectionInput,
         context: &C
     ) -> Result<Election, Error> {
-        permissions::check("update:election", &context.user())?;
-        let db = context.db();
-
-        let result = self.repository.update_election(&id, input, db).await?;
+        let result = self.repository.update_election(&id, input, context.db()).await?;
         Ok(result)
     }
 
@@ -125,12 +121,10 @@ impl ElectionResolvers {
     ///     }
     /// }
     /// ```
+    #[authorized("view:election")]
     #[instrument]
     pub async fn election<T: DbConnection, C: Context<T>>(&self, id: Uuid, context: &C) -> Result<Option<Election>, Error> {
-        permissions::check("view:election", &context.user())?;
-
-        let db = context.db();
-        let result = self.repository.find_election(&id, db).await?;
+        let result = self.repository.find_election(&id, context.db()).await?;
         Ok(result)
     }
 }

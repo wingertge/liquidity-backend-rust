@@ -1,6 +1,5 @@
 use chrono::{DateTime, Utc};
 use crate::schema::{Importance, Election};
-use serde::{Serialize, Deserialize};
 use liquidity::{Uuid, Merge};
 
 pub(crate) enum ElectionEventType {
