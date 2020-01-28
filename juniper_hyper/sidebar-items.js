@@ -1,1 +1,1 @@
-initSidebarItems({"fn":[["graphiql",""],["graphql",""],["playground",""]]});
+initSidebarItems({"fn":[["graphiql",""],["graphql",""],["graphql_async",""],["playground",""]]});
