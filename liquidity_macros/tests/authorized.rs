@@ -20,12 +20,12 @@ impl Context<MockConnection> for TestContext {
 }
 
 #[authorized]
-pub fn requires_authentication(context: TestContext) -> Result<i32, Error> {
+fn requires_authentication(context: TestContext) -> Result<i32, Error> {
     Ok(1)
 }
 
 #[authorized("pass:test")]
-pub fn requires_authorization(context: TestContext) -> Result<i32, Error> {
+fn requires_authorization(context: TestContext) -> Result<i32, Error> {
     Ok(1)
 }
 
