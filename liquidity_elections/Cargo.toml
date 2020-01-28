@@ -15,7 +15,7 @@ tracing-futures = "0.2"
 chrono = {version = "0.4", features = ["serde"]}
 serde = "1"
 serde_json = "1"
-juniper = { git = "https://github.com/graphql-rust/juniper", branch = "async-await", features = ["async"] }
+juniper = { git = "https://github.com/wingertge/juniper.git", branch = "hyper-0.13", features = ["async"] }
 ttl_cache = "0.5"
 
 [dev-dependencies]

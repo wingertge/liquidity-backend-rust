@@ -1,8 +1,5 @@
 #[macro_use] extern crate tracing;
-extern crate juniper;
-extern crate warp;
-extern crate juniper_warp;
-extern crate tracing_subscriber;
+#[macro_use] extern crate juniper;
 
 mod query;
 mod mutation;
@@ -11,15 +8,16 @@ mod auth;
 use std::{sync::Arc, net::SocketAddr};
 use juniper::RootNode;
 use jwks_client::keyset::KeyStore;
-use crate::{auth::{JWTAuth, JWTError}, query::Query, mutation::Mutation};
-use warp::{
-    Filter,
-    http::header::{ACCESS_CONTROL_ALLOW_HEADERS, ACCESS_CONTROL_ALLOW_ORIGIN},
-    http::HeaderMap
-};
+use crate::{auth::JWTAuth, query::Query, mutation::Mutation};
 use liquidity::{Connection, Credentials};
 use liquidity_api::{APIContext, ElectionResolvers};
 use std::time::Duration;
+use hyper::{HeaderMap, Body, Response, Method, StatusCode, Server, Request};
+use hyper::header::{ACCESS_CONTROL_ALLOW_ORIGIN, ACCESS_CONTROL_ALLOW_HEADERS, AUTHORIZATION};
+use hyper::service::{service_fn, make_service_fn};
+use tracing_futures::Instrument;
+use hyper::server::conn::AddrStream;
+use crate::auth::JWTError;
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
@@ -89,14 +87,26 @@ fn init_tracing() {
 
 type Schema = RootNode<'static, Query, Mutation>;
 
-fn schema() -> Schema {
-    Schema::new(Query, Mutation)
+fn schema() -> Arc<Schema> {
+    Arc::new(Schema::new(Query, Mutation))
 }
 fn headers() -> HeaderMap {
     let mut headers = HeaderMap::new();
     headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, "*".parse().unwrap());
     headers.insert(ACCESS_CONTROL_ALLOW_HEADERS, "*".parse().unwrap());
     headers
+}
+
+fn render_auth_error(err: JWTError) -> Response<Body> {
+    let message = format!("{}", err);
+    let errors = vec![serde_json::json!({
+        "message": message
+    })];
+    let json = serde_json::json!({
+        "errors": errors
+    }).to_string();
+    let resp = Response::new(Body::from(json));
+    resp
 }
 
 #[tokio::main]
@@ -108,49 +118,89 @@ async fn main() {
     let config = Config::from_env();
     let addr: SocketAddr = ([127, 0, 0, 1], config.port).into();
 
-    let log = warp::log("warp_server");
-
-    info!("Listening on {}", addr.to_string());
-
     let db_conn = Arc::new(
         Connection::builder()
-            .with_default_user(Credentials::new(config.database_login, config.database_password))
+            .with_default_user(Credentials::new(config.database_login.clone(), config.database_password.clone()))
             .single_node_connection(config.database_url)
             .await
     );
 
     let key_store = KeyStore::new_from(config.jwks_url.as_str()).await.expect("Failed to create JWKS key store");
-    let auth = Arc::new(JWTAuth::new(key_store, config.issuer, config.audience));
+    let auth = Arc::new(JWTAuth::new(key_store, config.issuer.clone(), config.audience.clone()));
     let elections = Arc::new(ElectionResolvers::new(config.cache_size, config.cache_ttl));
     let base_ctx = APIContext::new(db_conn, None, elections);
+    let schema = schema();
+    let playground_enabled = config.playground_enabled.clone();
 
-    let no_auth = {
+    #[instrument(skip(req, schema, auth))]
+    async fn handle_request(req: Request<Body>, schema: Arc<Schema>, ctx: APIContext, auth: Arc<JWTAuth>, playground_enabled: bool) -> Result<Response<Body>, hyper::Error> {
+        let res: Result<_, hyper::Error> = match (req.method(), req.uri().path()) {
+            (&Method::GET, "/") => {
+                let response = if playground_enabled {
+                    juniper_hyper::playground("/graphql").await?
+                } else {
+                    let mut response = Response::new(Body::empty());
+                    *response.status_mut() = StatusCode::NOT_FOUND;
+                    response
+                };
+                Ok(response)
+            }
+            (&Method::GET, "/graphql") | (&Method::POST, "/graphql") => {
+                let user = req.headers().get(AUTHORIZATION).map(|value| {
+                    let token = value.to_str().unwrap().to_string();
+                    auth.validate(token)
+                });
+                let ctx = user.map(|res| {
+                    res.map(|user| ctx.clone_with_user(user))
+                }).unwrap_or_else(|| Ok(ctx.clone()));
+
+                match ctx {
+                    Ok(ctx) => {
+                        let mut response = juniper_hyper::graphql_async(schema, Arc::new(ctx), req).await?;
+                        *response.headers_mut() = headers();
+                        Ok(response)
+                    },
+                    Err(err) => Ok(render_auth_error(err))
+                }
+            },
+            (&Method::OPTIONS, "/graphql") => {
+                let mut response = Response::new(Body::empty());
+                *response.headers_mut() = headers();
+                Ok(response)
+            },
+            _ => {
+                let mut response = Response::new(Body::empty());
+                *response.status_mut() = StatusCode::NOT_FOUND;
+                Ok(response)
+            }
+        };
+        res
+    }
+
+    let make_service = make_service_fn(move |conn: &AddrStream| {
+        let schema = schema.clone();
         let ctx = base_ctx.clone();
-        warp::any().map(move || -> Result<APIContext, JWTError> {
-            Ok(ctx.clone())
-        })
-    };
-    let context = {
-        warp::header::<String>("Authorization")
-            .map(move |jwt: String| -> Result<APIContext, JWTError> {
-                let auth = auth.clone();
-                let user = auth.validate(jwt)?;
+        let auth = auth.clone();
+        let playground_enabled = playground_enabled.clone();
 
-                Ok(base_ctx.clone_with_user(user))
-            })
-            .or(no_auth)
-            .unify()
-    };
+        async move {
+            Ok::<_, hyper::Error>(service_fn(move |req| {
+                handle_request(
+                    req,
+                    schema.clone(),
+                    ctx.clone(),
+                    auth.clone(),
+                    playground_enabled.clone()
+                )
+            }))
+        }.instrument(trace_span!("handle_connection", "ip: {}", conn.remote_addr()))
+    });
 
-    let options = warp::options().map(warp::reply).with(warp::reply::with::headers(headers()));
-    let graphql_filter = juniper_warp::make_graphql_filter(schema(), context.boxed());
+    let server = Server::bind(&addr).serve(make_service);
 
-    warp::serve(
-        warp::get2()
-            .and(warp::path::end())
-            .and(juniper_warp::playground_filter("/graphql"))
-            .or(warp::path("graphql").and(graphql_filter).with(warp::reply::with::headers(headers())))
-            .or(options)
-            .with(log)
-    ).run(addr)
+    info!("Listening on {}", addr.to_string());
+
+    if let Err(e) = server.await {
+        error!("server error: {}", e)
+    }
 }

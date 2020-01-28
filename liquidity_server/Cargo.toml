@@ -19,11 +19,12 @@ parse_duration = "2"
 liquidity = {path = "../liquidity"}
 liquidity_api = {path = "../liquidity_api"}
 
-warp = "0.1.20"
+hyper = "0.13"
 jwks-client = "0.2"
 
-juniper = { git = "https://github.com/graphql-rust/juniper", branch = "async-await", features = ["async"] }
-juniper_warp = { git = "https://github.com/graphql-rust/juniper", branch = "async-await", features = ["async"] }
+juniper = { git = "https://github.com/wingertge/juniper.git", branch = "hyper-0.13", features = ["async"] }
+juniper_hyper = { git = "https://github.com/wingertge/juniper.git", branch = "hyper-0.13", features = ["async"] }
+serde_json = "1"
 
 # Tracing
 opentelemetry = "0.1.5"
