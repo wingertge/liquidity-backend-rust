@@ -54,6 +54,7 @@ ALIASES["linked_hash_map"] = {};
 ALIASES["liquidity"] = {};
 ALIASES["liquidity_api"] = {};
 ALIASES["liquidity_elections"] = {};
+ALIASES["liquidity_macros"] = {};
 ALIASES["liquidity_server"] = {};
 ALIASES["liquidity_test_utils"] = {};
 ALIASES["log"] = {};

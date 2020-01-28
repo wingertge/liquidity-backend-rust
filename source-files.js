@@ -54,6 +54,7 @@ sourcesIndex["linked_hash_map"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["liquidity"] = {"name":"","dirs":[{"name":"db","files":["connection.rs","mod.rs"]}],"files":["context.rs","lib.rs","permissions.rs"]};
 sourcesIndex["liquidity_api"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["liquidity_elections"] = {"name":"","files":["lib.rs","models.rs","repository.rs","resolvers.rs","schema.rs"]};
+sourcesIndex["liquidity_macros"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["liquidity_server"] = {"name":"","files":["auth.rs","main.rs","mutation.rs","query.rs"]};
 sourcesIndex["liquidity_test_utils"] = {"name":"","files":["connection.rs","lib.rs"]};
 sourcesIndex["log"] = {"name":"","files":["lib.rs","macros.rs"]};

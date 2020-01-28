@@ -1,0 +1,1 @@
+initSidebarItems({"attr":[["authorized","This is used internally only, so it's really really dumb and doesn't do error handling at all"]]});
