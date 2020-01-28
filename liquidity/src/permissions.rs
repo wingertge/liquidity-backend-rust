@@ -10,18 +10,15 @@ pub enum PermissionError {
 
 impl fmt::Display for PermissionError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "PermissionError: {:?}", self)
+        let description = match self {
+            PermissionError::NotLoggedIn => "You must be logged in to do that",
+            PermissionError::NotAllowed => "You don't have the permission to do that"
+        };
+        write!(f, "Unauthorized: {}", description)
     }
 }
 
-impl Error for PermissionError {
-    fn description(&self) -> &str {
-        match self {
-            PermissionError::NotLoggedIn => "Must be logged in to do that",
-            PermissionError::NotAllowed => "You don't have permission to do that"
-        }
-    }
-}
+impl Error for PermissionError {}
 
 /// Check the user's permissions to ensure they are allowed to use the API function
 /// # Arguments
