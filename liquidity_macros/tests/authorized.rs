@@ -1,8 +1,8 @@
 use liquidity::context::User;
-use liquidity::{Context, Error};
 use liquidity::permissions::PermissionError;
-use liquidity_test_utils::connection::MockConnection;
+use liquidity::{Context, Error};
 use liquidity_macros::authorized;
+use liquidity_test_utils::connection::MockConnection;
 
 #[derive(Debug)]
 struct TestContext {
@@ -48,7 +48,10 @@ fn authentication_missing() {
 
     let result = requires_authentication(ctx);
 
-    assert_eq!(format!("{}", result.unwrap_err()), format!("{}", PermissionError::NotLoggedIn))
+    assert_eq!(
+        format!("{}", result.unwrap_err()),
+        format!("{}", PermissionError::NotLoggedIn)
+    )
 }
 
 #[test]
@@ -70,7 +73,10 @@ fn authorization_not_logged_in() {
 
     let result = requires_authorization(ctx);
 
-    assert_eq!(format!("{}", result.unwrap_err()), format!("{}", PermissionError::NotLoggedIn));
+    assert_eq!(
+        format!("{}", result.unwrap_err()),
+        format!("{}", PermissionError::NotLoggedIn)
+    );
 }
 
 #[test]
@@ -83,5 +89,8 @@ fn authorization_missing() {
 
     let result = requires_authorization(ctx);
 
-    assert_eq!(format!("{}", result.unwrap_err()), format!("{}", PermissionError::NotAllowed));
+    assert_eq!(
+        format!("{}", result.unwrap_err()),
+        format!("{}", PermissionError::NotAllowed)
+    );
 }

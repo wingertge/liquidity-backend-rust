@@ -1,16 +1,20 @@
-#[macro_use] extern crate async_trait;
-#[macro_use] extern crate tracing;
+#[macro_use]
+extern crate async_trait;
+#[macro_use]
+extern crate tracing;
 
 use std::error::Error as ErrTrait;
 
 pub use eventstore::{Connection, Credentials};
 pub use uuid::Uuid;
 
-pub mod db;
 pub mod context;
+pub mod db;
 pub mod permissions;
 
 pub use context::Context;
+use std::fmt::Debug;
+use std::fmt::Display;
 
 pub type Error = Box<dyn ErrTrait>;
 
@@ -26,7 +30,7 @@ impl<T: Debug, E: Display> Loggable for Result<T, E> {
     fn log_value(self) -> Self {
         match self {
             Ok(ref result) => debug!("{:?}", result),
-            Err(ref err) => error!("{}", err),
+            Err(ref err) => error!("{}", err)
         };
         self
     }

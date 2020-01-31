@@ -1,10 +1,8 @@
 use crate::repository::ElectionRepository;
-use liquidity::{Uuid, Context, Error};
 use crate::schema::{Election, ElectionInput};
 use liquidity::{db::DbConnection, Loggable};
 use liquidity::{Context, Error, Uuid};
 use std::time::Duration;
-use liquidity::db::DbConnection;
 
 #[derive(Debug)]
 pub struct ElectionResolvers {
@@ -51,7 +49,9 @@ impl ElectionResolvers {
         input: ElectionInput,
         context: &C
     ) -> Result<Election, Error> {
-        if input.name.is_none() { return Err("Name cannot be null".into()) }
+        if input.name.is_none() {
+            return Err("Name cannot be null".into());
+        }
         let user = context.user().as_ref().unwrap();
 
         let result = self
@@ -136,7 +136,7 @@ impl ElectionResolvers {
     pub async fn election<T: DbConnection, C: Context<T>>(
         &self,
         id: Uuid,
-        context: &C,
+        context: &C
     ) -> Result<Option<Election>, Error> {
         let result = self
             .repository

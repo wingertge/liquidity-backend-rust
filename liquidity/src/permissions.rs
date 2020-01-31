@@ -1,6 +1,6 @@
 use super::context::User;
-use std::fmt;
 use std::error::Error;
+use std::fmt;
 
 #[derive(Debug, PartialEq)]
 pub enum PermissionError {
@@ -51,7 +51,8 @@ impl Error for PermissionError {}
 /// assert_eq!(Err(PermissionError::NotLoggedIn), not_logged_in);
 /// ```
 pub fn check<T: ToString>(key: T, user: &Option<User>) -> Result<(), PermissionError> {
-    let has_permission = || -> Option<bool> { Some(user.as_ref()?.permissions.contains(&key.to_string())) };
+    let has_permission =
+        || -> Option<bool> { Some(user.as_ref()?.permissions.contains(&key.to_string())) };
     match has_permission() {
         None => Err(PermissionError::NotLoggedIn),
         Some(false) => Err(PermissionError::NotAllowed),

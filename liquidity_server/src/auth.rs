@@ -1,10 +1,7 @@
-use jwks_client::{
-    keyset::KeyStore,
-    jwt::Payload
-};
-use std::{error::Error, fmt};
-use crate::auth::JWTError::{InvalidJWTFormat, InvalidSignature, InvalidMetadata};
+use crate::auth::JWTError::{InvalidJWTFormat, InvalidMetadata, InvalidSignature};
+use jwks_client::{jwt::Payload, keyset::KeyStore};
 use liquidity::context::User;
+use std::{error::Error, fmt};
 
 /// Authentication validator
 ///
@@ -41,36 +38,50 @@ fn audience_valid(aud: String, payload: &Payload) -> Result<(), JWTError> {
     let audiences = payload.get_array("aud");
     let valid = match audiences {
         Some(audiences) => {
-            let audiences: Result<Vec<String>, JWTError> = audiences.iter()
+            let audiences: Result<Vec<String>, JWTError> = audiences
+                .iter()
                 .map(|x| {
                     x.as_str()
-                        .ok_or_else(|| InvalidJWTFormat("Audiences array contains non-strings".to_string()))
+                        .ok_or_else(|| {
+                            InvalidJWTFormat("Audiences array contains non-strings".to_string())
+                        })
                         .map(|s| s.to_string())
                 })
                 .collect();
             audiences?.contains(&aud)
-        },
+        }
         None => {
-            let audience = payload.aud().ok_or_else(|| InvalidJWTFormat("Missing audience from JWT".to_string()))?;
+            let audience = payload
+                .aud()
+                .ok_or_else(|| InvalidJWTFormat("Missing audience from JWT".to_string()))?;
             audience.eq(&aud)
         }
     };
-    if valid { Ok(()) }
-    else {
-        Err(InvalidMetadata("Token wasn't issued for this service".to_string()))
+    if valid {
+        Ok(())
+    } else {
+        Err(InvalidMetadata(
+            "Token wasn't issued for this service".to_string()
+        ))
     }
 }
 
 fn issuer_valid(iss: String, payload: &Payload) -> Result<(), JWTError> {
-    let issuer = payload.iss().ok_or_else(|| InvalidJWTFormat("Missing issuer from JWT".to_string()))?;
-    if issuer.eq(&iss) { Ok(()) }
-    else {
-        Err(InvalidMetadata("Token wasn't issued by a trusted party".to_string()))
+    let issuer = payload
+        .iss()
+        .ok_or_else(|| InvalidJWTFormat("Missing issuer from JWT".to_string()))?;
+    if issuer.eq(&iss) {
+        Ok(())
+    } else {
+        Err(InvalidMetadata(
+            "Token wasn't issued by a trusted party".to_string()
+        ))
     }
 }
 
 fn parse_user(payload: &Payload) -> Result<User, JWTError> {
-    let id = payload.sub()
+    let id = payload
+        .sub()
         .ok_or_else(|| InvalidJWTFormat("Missing subject from JWT".to_string()))?
         .to_string();
     let empty = Vec::new();
@@ -78,12 +89,13 @@ fn parse_user(payload: &Payload) -> Result<User, JWTError> {
         .get_array("permissions")
         .unwrap_or_else(|| &empty)
         .iter()
-        .map(|x| x.as_str().expect("Can't convert permission to string").to_string())
+        .map(|x| {
+            x.as_str()
+                .expect("Can't convert permission to string")
+                .to_string()
+        })
         .collect();
-    Ok(User {
-        id,
-        permissions
-    })
+    Ok(User { id, permissions })
 }
 
 impl JWTAuth {
@@ -151,13 +163,20 @@ impl JWTAuth {
     /// ```
     #[instrument]
     pub fn validate(&self, token: String) -> Result<User, JWTError> {
-        if !token.starts_with("Bearer ") { return Err(JWTError::NotAToken) }
+        if !token.starts_with("Bearer ") {
+            return Err(JWTError::NotAToken);
+        }
         let token = token.replace("Bearer ", "");
         let decoded = {
             let span = trace_span!("verify_token");
             let _enter = span.enter();
-            let res = self.jwks_store.verify(token.as_str()).map_err(InvalidSignature);
-            if let Err(e) = &res { error!("{:?}", e) }
+            let res = self
+                .jwks_store
+                .verify(token.as_str())
+                .map_err(InvalidSignature);
+            if let Err(e) = &res {
+                error!("{:?}", e)
+            }
             res
         }?;
         audience_valid(self.audience.to_owned(), decoded.payload())?;

@@ -1,10 +1,10 @@
 pub use liquidity_elections as elections;
 pub use liquidity_elections::ElectionResolvers;
 
-use liquidity::{Connection, Context};
-use std::sync::Arc;
 use liquidity::context::User;
+use liquidity::{Connection, Context};
 use std::fmt;
+use std::sync::Arc;
 
 pub struct APIContext {
     db: Arc<Connection>,
@@ -29,7 +29,9 @@ impl APIContext {
         }
     }
 
-    pub fn elections(&self) -> Arc<ElectionResolvers> { self.elections.clone() }
+    pub fn elections(&self) -> Arc<ElectionResolvers> {
+        self.elections.clone()
+    }
 }
 
 impl Clone for APIContext {
@@ -43,8 +45,12 @@ impl Clone for APIContext {
 }
 
 impl Context<Arc<Connection>> for APIContext {
-    fn db(&self) -> Arc<Connection> { self.db.clone() }
-    fn user(&self) -> &Option<User> { &self.user }
+    fn db(&self) -> Arc<Connection> {
+        self.db.clone()
+    }
+    fn user(&self) -> &Option<User> {
+        &self.user
+    }
 }
 
 impl fmt::Debug for APIContext {

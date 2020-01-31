@@ -7,7 +7,7 @@ pub struct User {
     pub permissions: Vec<String>
 }
 
-pub trait Context<DB: DbConnection> : fmt::Debug {
+pub trait Context<DB: DbConnection>: fmt::Debug {
     fn db(&self) -> DB;
     fn user(&self) -> &Option<User>;
 }

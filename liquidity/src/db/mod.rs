@@ -1,6 +1,6 @@
 pub use eventstore::OperationError;
-use std::fmt;
 use std::error::Error;
+use std::fmt;
 
 mod connection;
 
@@ -10,7 +10,7 @@ pub trait ESResultExt<T> {
     fn map_not_found(self) -> Result<Option<T>, OperationError>;
 }
 
-impl <T> ESResultExt<T> for Result<Option<T>, OperationError> {
+impl<T> ESResultExt<T> for Result<Option<T>, OperationError> {
     /// Map "not found"-type errors as None
     ///
     /// # Returns
@@ -33,11 +33,9 @@ impl <T> ESResultExt<T> for Result<Option<T>, OperationError> {
     fn map_not_found(self) -> Result<Option<T>, OperationError> {
         match self {
             Ok(x) => Ok(x),
-            Err(e) => {
-                match e {
-                    OperationError::StreamNotFound(_) | OperationError::StreamDeleted(_) => Ok(None),
-                    _ => Err(e)
-                }
+            Err(e) => match e {
+                OperationError::StreamNotFound(_) | OperationError::StreamDeleted(_) => Ok(None),
+                _ => Err(e)
             }
         }
     }
@@ -70,9 +68,15 @@ impl From<OperationError> for DatabaseError {
     fn from(e: OperationError) -> Self {
         match e.clone() {
             OperationError::AccessDenied(s) => DatabaseError::AccessDenied(s),
-            OperationError::AuthenticationRequired => DatabaseError::AccessDenied("Not authenticated".to_string()),
-            OperationError::StreamDeleted(_) | OperationError::StreamNotFound(_) => DatabaseError::NotFound,
-            OperationError::Aborted | OperationError::ConnectionHasDropped => DatabaseError::ConnectionFailed,
+            OperationError::AuthenticationRequired => {
+                DatabaseError::AccessDenied("Not authenticated".to_string())
+            }
+            OperationError::StreamDeleted(_) | OperationError::StreamNotFound(_) => {
+                DatabaseError::NotFound
+            }
+            OperationError::Aborted | OperationError::ConnectionHasDropped => {
+                DatabaseError::ConnectionFailed
+            }
             _ => DatabaseError::DatabaseError(e)
         }
     }

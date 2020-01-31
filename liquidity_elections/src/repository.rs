@@ -1,14 +1,14 @@
-use chrono::Utc;
-use crate::schema::{Election, Importance::Regular, ElectionInput};
 use super::models::CreateElectionEvent;
-use liquidity::{Uuid, Merge};
-use crate::models::{UpdateElectionEvent};
-use liquidity::db::{DatabaseError, DbConnection};
+use crate::models::UpdateElectionEvent;
+use crate::schema::{Election, ElectionInput, Importance::Regular};
+use chrono::Utc;
 use futures::lock::Mutex;
-use std::sync::Arc;
+use liquidity::db::{DatabaseError, DbConnection};
+use liquidity::{Merge, Uuid};
 use std::fmt;
-use ttl_cache::TtlCache;
+use std::sync::Arc;
 use std::time::Duration;
+use ttl_cache::TtlCache;
 
 type Cache = Arc<Mutex<TtlCache<Uuid, Election>>>;
 
@@ -67,7 +67,12 @@ impl ElectionRepository {
     /// # })
     /// ```
     #[instrument(skip(conn))]
-    pub async fn create_election<T: DbConnection>(&self, election: ElectionInput, creator_id: &str, conn: T) -> Result<Election, DatabaseError> {
+    pub async fn create_election<T: DbConnection>(
+        &self,
+        election: ElectionInput,
+        creator_id: &str,
+        conn: T
+    ) -> Result<Election, DatabaseError> {
         let id = Uuid::new_v4();
         let stream_id = format!("election-{}", id);
 
@@ -82,9 +87,7 @@ impl ElectionRepository {
             choices: election.choices.unwrap_or_else(|| vec![])
         };
 
-        let result = conn
-            .create(stream_id, event_data.clone())
-            .await;
+        let result = conn.create(stream_id, event_data.clone()).await;
 
         match &result {
             Ok(event_data) => debug!("{:?}", event_data),
@@ -134,13 +137,22 @@ impl ElectionRepository {
     /// # })
     /// ```
     #[instrument(skip(conn))]
-    pub async fn update_election<T: DbConnection>(&self, id: &Uuid, input: ElectionInput, conn: T) -> Result<Election, DatabaseError> {
+    pub async fn update_election<T: DbConnection>(
+        &self,
+        id: &Uuid,
+        input: ElectionInput,
+        conn: T
+    ) -> Result<Election, DatabaseError> {
         let stream_id = format!("election-{}", id);
 
-        let original = self.find_election(id, conn.clone()).await?
+        let original = self
+            .find_election(id, conn.clone())
+            .await?
             .ok_or(DatabaseError::NotFound)?;
 
-        if input.eq(&ElectionInput::default()) { return Ok(original) }
+        if input.eq(&ElectionInput::default()) {
+            return Ok(original);
+        }
 
         let event_data = UpdateElectionEvent {
             name: input.name,
@@ -151,9 +163,7 @@ impl ElectionRepository {
             importance: input.importance
         };
 
-        let result = conn
-            .update(stream_id, event_data.clone())
-            .await;
+        let result = conn.update(stream_id, event_data.clone()).await;
 
         match &result {
             Ok(event_data) => debug!("{:?}", event_data),
@@ -198,7 +208,11 @@ impl ElectionRepository {
     /// # })
     /// ```
     #[instrument(skip(conn))]
-    pub async fn find_election<T: DbConnection>(&self, id: &Uuid, conn: T) -> Result<Option<Election>, DatabaseError> {
+    pub async fn find_election<T: DbConnection>(
+        &self,
+        id: &Uuid,
+        conn: T
+    ) -> Result<Option<Election>, DatabaseError> {
         let mut cache = self.cache.lock().await;
         let cached_result = cache.get(id).map(|election| Election::to_owned(election));
 
@@ -223,15 +237,15 @@ impl ElectionRepository {
 
 #[cfg(test)]
 mod test {
-    use std::sync::Arc;
-    use tokio_test::block_on;
-    use crate::schema::{ElectionInput, Importance, Election};
-    use liquidity::db::EventType;
-    use crate::models::{UpdateElectionEvent, CreateElectionEvent};
+    use crate::models::{CreateElectionEvent, UpdateElectionEvent};
     use crate::repository::ElectionRepository;
-    use std::time::Duration;
+    use crate::schema::{Election, ElectionInput, Importance};
+    use liquidity::db::EventType;
     use liquidity_test_utils::connection::MockConnection;
     use serde_json::Value;
+    use std::sync::Arc;
+    use std::time::Duration;
+    use tokio_test::block_on;
 
     fn conn() -> MockConnection {
         MockConnection::default()
@@ -263,24 +277,32 @@ mod test {
             let conn = conn();
             let repository = repository();
 
-            let election = repository.create_election(test_election_input(), "test_creator_id", conn.clone())
+            let election = repository
+                .create_election(test_election_input(), "test_creator_id", conn.clone())
                 .await
                 .expect("Creating the election shouldn't fail");
 
             assert_eq!(election.name, "test_name".to_string());
             assert_eq!(election.description, "test_description".to_string());
-            assert_eq!(election.choices, vec!["test1".to_string(), "test2".to_string()]);
+            assert_eq!(
+                election.choices,
+                vec!["test1".to_string(), "test2".to_string()]
+            );
             assert_eq!(election.importance, Importance::Regular);
 
             let sent = conn.data.lock().unwrap();
             let stream_id = format!("election-{}", election.id);
             let (event_type, value): (EventType, Value) = sent[&stream_id][0].clone();
-            let payload: CreateElectionEvent = serde_json::from_value(value).expect("The event payload should have the right type");
+            let payload: CreateElectionEvent = serde_json::from_value(value)
+                .expect("The event payload should have the right type");
 
             assert_eq!(event_type, EventType::Create);
             assert_eq!(payload.id, election.id);
             assert_eq!(payload.description, "test_description");
-            assert_eq!(payload.choices, vec!["test1".to_string(), "test2".to_string()])
+            assert_eq!(
+                payload.choices,
+                vec!["test1".to_string(), "test2".to_string()]
+            )
         })
     }
 
@@ -290,11 +312,13 @@ mod test {
             let conn = conn();
             let repository = repository();
 
-            let election = repository.create_election(test_election_input(), "test_creator_id", conn.clone())
+            let election = repository
+                .create_election(test_election_input(), "test_creator_id", conn.clone())
                 .await
                 .expect("Creating the election shouldn't fail");
 
-            let updated = repository.update_election(&election.id, test_update_input(), conn.clone())
+            let updated = repository
+                .update_election(&election.id, test_update_input(), conn.clone())
                 .await
                 .expect("Updating the election shouldn't fail");
 
@@ -304,7 +328,10 @@ mod test {
             assert_ne!(election.description, updated.description);
 
             let stream_id = format!("election-{}", election.id);
-            let events = conn.data.lock().unwrap()
+            let events = conn
+                .data
+                .lock()
+                .unwrap()
                 .get(&stream_id)
                 .expect("Stream should've been created")
                 .clone();
@@ -319,7 +346,10 @@ mod test {
             assert_eq!(create_event.0, EventType::Create);
             assert_eq!(create_payload.name, "test_name".to_string());
             assert_eq!(update_payload.name, None);
-            assert_eq!(update_payload.description, Some("test_description_2".to_string()));
+            assert_eq!(
+                update_payload.description,
+                Some("test_description_2".to_string())
+            );
         })
     }
 
@@ -329,11 +359,13 @@ mod test {
             let conn = conn();
             let repository = repository();
 
-            let election = repository.create_election(test_election_input(), "test_creator_id", conn.clone())
+            let election = repository
+                .create_election(test_election_input(), "test_creator_id", conn.clone())
                 .await
                 .expect("Creating the election shouldn't fail");
 
-            let read = repository.find_election(&election.id, conn.clone())
+            let read = repository
+                .find_election(&election.id, conn.clone())
                 .await
                 .expect("Finding the election shouldn't fail")
                 .expect("The returned election shouldn't be none");
@@ -341,17 +373,24 @@ mod test {
             assert_eq!(read.name, "test_name".to_string());
             assert_eq!(read.description, "test_description".to_string());
 
-            let cache_entry: Election = repository.cache.lock().await.get(&election.id).cloned()
+            let cache_entry: Election = repository
+                .cache
+                .lock()
+                .await
+                .get(&election.id)
+                .cloned()
                 .expect("Election should exist in the cache");
 
             assert_eq!(cache_entry.name, election.name);
             assert_eq!(cache_entry.description, election.description);
 
-            let updated = repository.update_election(&election.id, test_update_input(), conn.clone())
+            let updated = repository
+                .update_election(&election.id, test_update_input(), conn.clone())
                 .await
                 .expect("Updating the election shouldn't fail");
 
-            let read = repository.find_election(&election.id, conn.clone())
+            let read = repository
+                .find_election(&election.id, conn.clone())
                 .await
                 .expect("Finding the election shouldn't fail")
                 .expect("The returned election shouldn't be none");
@@ -359,7 +398,12 @@ mod test {
             assert_eq!(read.name, election.name);
             assert_eq!(read.description, updated.description);
 
-            let cache_entry: Election = repository.cache.lock().await.get(&election.id).cloned()
+            let cache_entry: Election = repository
+                .cache
+                .lock()
+                .await
+                .get(&election.id)
+                .cloned()
                 .expect("Election should exist in the cache");
 
             assert_eq!(cache_entry.description, updated.description);

@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use serde::{Serialize, Deserialize};
 use liquidity::Uuid;
+use serde::{Deserialize, Serialize};
 
 #[derive(juniper::GraphQLInputObject, Debug, PartialEq)]
 pub struct PermissionSet {
