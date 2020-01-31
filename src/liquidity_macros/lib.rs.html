@@ -41,12 +41,18 @@
 <span id="41">41</span>
 <span id="42">42</span>
 <span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proc_macro</span>;
 
 <span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
-<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">ItemFn</span>, <span class="ident">AttributeArgs</span>, <span class="ident">NestedMeta</span>, <span class="ident">Lit</span>};
 <span class="kw">use</span> <span class="ident">quote</span>::<span class="ident">quote</span>;
+<span class="kw">use</span> <span class="ident">syn</span>::{<span class="ident">AttributeArgs</span>, <span class="ident">ItemFn</span>, <span class="ident">Lit</span>, <span class="ident">NestedMeta</span>};
 
 <span class="doccomment">/// This is used internally only, so it&#39;s really really dumb and doesn&#39;t do error handling at all</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
@@ -54,10 +60,14 @@
     <span class="kw">let</span> <span class="ident">args</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">args</span> <span class="kw">as</span> <span class="ident">AttributeArgs</span>);
     <span class="kw">let</span> <span class="ident">input</span> <span class="op">=</span> <span class="ident">syn</span>::<span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">ItemFn</span>);
 
-    <span class="kw">let</span> <span class="ident">permission</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">is_empty</span>() { <span class="prelude-val">None</span> } <span class="kw">else</span> {
+    <span class="kw">let</span> <span class="ident">permission</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">args</span>.<span class="ident">is_empty</span>() {
+        <span class="prelude-val">None</span>
+    } <span class="kw">else</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">NestedMeta</span>::<span class="ident">Lit</span>(<span class="ident">Lit</span>::<span class="ident">Str</span>(<span class="ident">literal</span>))) <span class="op">=</span> <span class="ident">args</span>.<span class="ident">first</span>() {
             <span class="prelude-val">Some</span>(<span class="ident">literal</span>.<span class="ident">value</span>())
-        } <span class="kw">else</span> { <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Argument must be a string literal&quot;</span>) }
+        } <span class="kw">else</span> {
+            <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;Argument must be a string literal&quot;</span>)
+        }
     };
 
     <span class="kw">let</span> <span class="ident">other_attr</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">attrs</span>;
@@ -65,15 +75,17 @@
     <span class="kw">let</span> <span class="ident">signature</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">sig</span>;
     <span class="kw">let</span> <span class="ident">statements</span> <span class="op">=</span> <span class="ident">input</span>.<span class="ident">block</span>.<span class="ident">stmts</span>;
 
-    <span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="ident">permission</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> {
-        <span class="macro">quote</span><span class="macro">!</span> {
-            <span class="ident">liquidity</span>::<span class="ident">permissions</span>::<span class="ident">check</span>(#<span class="ident">key</span>, <span class="ident">context</span>.<span class="ident">user</span>())<span class="question-mark">?</span>;
-        }
-    }).<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-        <span class="macro">quote</span><span class="macro">!</span> {
-            <span class="ident">context</span>.<span class="ident">user</span>().<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">PermissionError</span>::<span class="ident">NotLoggedIn</span>)<span class="question-mark">?</span>;
-        }
-    });
+    <span class="kw">let</span> <span class="ident">check</span> <span class="op">=</span> <span class="ident">permission</span>
+        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">key</span><span class="op">|</span> {
+            <span class="macro">quote</span><span class="macro">!</span> {
+                <span class="ident">liquidity</span>::<span class="ident">permissions</span>::<span class="ident">check</span>(#<span class="ident">key</span>, <span class="ident">context</span>.<span class="ident">user</span>())<span class="question-mark">?</span>;
+            }
+        })
+        .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> {
+            <span class="macro">quote</span><span class="macro">!</span> {
+                <span class="ident">context</span>.<span class="ident">user</span>().<span class="ident">as_ref</span>().<span class="ident">ok_or</span>(<span class="ident">PermissionError</span>::<span class="ident">NotLoggedIn</span>)<span class="question-mark">?</span>;
+            }
+        });
 
     <span class="kw">let</span> <span class="ident">tokens</span> <span class="op">=</span> <span class="macro">quote</span><span class="macro">!</span> {
         #(#<span class="ident">other_attr</span>)<span class="op">*</span>
@@ -84,5 +96,6 @@
     };
 
     <span class="ident">tokens</span>.<span class="ident">into</span>()
-}</pre></div>
+}
+</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "liquidity_macros";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script><script defer src="../../search-index.js"></script></body></html>
