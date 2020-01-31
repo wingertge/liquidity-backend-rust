@@ -109,6 +109,12 @@ fn render_auth_error(err: JWTError) -> Response<Body> {
     resp
 }
 
+fn not_found() -> Result<Response<Body>, hyper::Error> {
+    let mut response = Response::new(Body::empty());
+    *response.status_mut() = StatusCode::NOT_FOUND;
+    Ok(response)
+}
+
 #[tokio::main]
 async fn main() {
     env_logger::init();
@@ -120,7 +126,11 @@ async fn main() {
 
     let db_conn = Arc::new(
         Connection::builder()
-            .with_default_user(Credentials::new(config.database_login.clone(), config.database_password.clone()))
+            .with_default_user(Credentials::new(
+                config.database_login.clone(),
+                config.database_password.clone(),
+            ))
+            .with_connection_name("eventstore")
             .single_node_connection(config.database_url)
             .await
     );
@@ -136,14 +146,11 @@ async fn main() {
     async fn handle_request(req: Request<Body>, schema: Arc<Schema>, ctx: APIContext, auth: Arc<JWTAuth>, playground_enabled: bool) -> Result<Response<Body>, hyper::Error> {
         let res: Result<_, hyper::Error> = match (req.method(), req.uri().path()) {
             (&Method::GET, "/") => {
-                let response = if playground_enabled {
-                    juniper_hyper::playground("/graphql").await?
+                if playground_enabled {
+                    juniper_hyper::playground("/graphql").await
                 } else {
-                    let mut response = Response::new(Body::empty());
-                    *response.status_mut() = StatusCode::NOT_FOUND;
-                    response
-                };
-                Ok(response)
+                    not_found()
+                }
             }
             (&Method::GET, "/graphql") | (&Method::POST, "/graphql") => {
                 let user = req.headers().get(AUTHORIZATION).map(|value| {
@@ -173,6 +180,7 @@ async fn main() {
                 *response.status_mut() = StatusCode::NOT_FOUND;
                 Ok(response)
             }
+            _ => not_found(),
         };
         res
     }
@@ -182,6 +190,7 @@ async fn main() {
         let ctx = base_ctx.clone();
         let auth = auth.clone();
         let playground_enabled = playground_enabled.clone();
+        let remote_addr = conn.remote_addr();
 
         async move {
             Ok::<_, hyper::Error>(service_fn(move |req| {
@@ -190,10 +199,11 @@ async fn main() {
                     schema.clone(),
                     ctx.clone(),
                     auth.clone(),
-                    playground_enabled.clone()
+                    playground_enabled.clone(),
+                    remote_addr.clone(),
                 )
             }))
-        }.instrument(trace_span!("handle_connection", "ip: {}", conn.remote_addr()))
+        }
     });
 
     let server = Server::bind(&addr).serve(make_service);

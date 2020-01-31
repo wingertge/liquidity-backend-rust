@@ -1,6 +1,8 @@
 use crate::repository::ElectionRepository;
 use liquidity::{Uuid, Context, Error};
 use crate::schema::{Election, ElectionInput};
+use liquidity::{db::DbConnection, Loggable};
+use liquidity::{Context, Error, Uuid};
 use std::time::Duration;
 use liquidity::db::DbConnection;
 
@@ -52,7 +54,11 @@ impl ElectionResolvers {
         if input.name.is_none() { return Err("Name cannot be null".into()) }
         let user = context.user().as_ref().unwrap();
 
-        let result = self.repository.create_election(input, &user.id, context.db()).await?;
+        let result = self
+            .repository
+            .create_election(input, &user.id, context.db())
+            .await
+            .log_value()?;
         Ok(result)
     }
 
@@ -91,7 +97,11 @@ impl ElectionResolvers {
         input: ElectionInput,
         context: &C
     ) -> Result<Election, Error> {
-        let result = self.repository.update_election(&id, input, context.db()).await?;
+        let result = self
+            .repository
+            .update_election(&id, input, context.db())
+            .await
+            .log_value()?;
         Ok(result)
     }
 
@@ -123,8 +133,16 @@ impl ElectionResolvers {
     /// ```
     #[authorized("view:election")]
     #[instrument]
-    pub async fn election<T: DbConnection, C: Context<T>>(&self, id: Uuid, context: &C) -> Result<Option<Election>, Error> {
-        let result = self.repository.find_election(&id, context.db()).await?;
+    pub async fn election<T: DbConnection, C: Context<T>>(
+        &self,
+        id: Uuid,
+        context: &C,
+    ) -> Result<Option<Election>, Error> {
+        let result = self
+            .repository
+            .find_election(&id, context.db())
+            .await
+            .log_value()?;
         Ok(result)
     }
 }
