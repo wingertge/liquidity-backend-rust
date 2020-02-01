@@ -9,15 +9,15 @@ name = "liquidity_server"
 path = "src/main.rs"
 
 [dependencies]
-tokio = { version = "0.2", features = ["macros"]}
+tokio = { version = "0.2", features = ["macros"] }
 futures = "0.3" # Required because of juniper macros
 
 dotenv = "0.15.0"
 env_logger = "0.7.1"
 parse_duration = "2"
 
-liquidity = {path = "../liquidity"}
-liquidity_api = {path = "../liquidity_api"}
+liquidity = { path = "../liquidity" }
+liquidity_api = { path = "../liquidity_api" }
 
 hyper = "0.13"
 jwks-client = "0.2"
@@ -32,3 +32,6 @@ tracing = "0.1.11"
 tracing-subscriber = "0.2.0-alpha.2"
 tracing-futures = "0.2.0"
 tracing-opentelemetry = "0.1.0"
+
+[dev-dependencies]
+liquidity_test_utils = { path = "../liquidity_test_utils" }
