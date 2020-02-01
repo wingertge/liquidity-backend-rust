@@ -20,8 +20,8 @@ impl ElectionResolvers {
     ///
     /// # Arguments
     ///
-    /// `input` - The election user input object
-    /// `context` - The request context, passed automatically
+    /// * `input` - The election user input object
+    /// * `context` - The request context, passed automatically
     ///
     /// # Permissions Required
     ///
@@ -66,9 +66,9 @@ impl ElectionResolvers {
     ///
     /// # Arguments
     ///
-    /// `id` - The id of the election to be edited
-    /// `input` - The fields to edit
-    /// `context` - The request context, passed automatically
+    /// * `id` - The id of the election to be edited
+    /// * `input` - The fields to edit
+    /// * `context` - The request context, passed automatically
     ///
     /// # Permissions Required
     ///
@@ -109,8 +109,8 @@ impl ElectionResolvers {
     ///
     /// # Arguments
     ///
-    /// `id` - The id to look up the election by
-    /// `context` - The request context, passed automatically
+    /// * `id` - The id to look up the election by
+    /// * `context` - The request context, passed automatically
     ///
     /// # Permissions Required
     ///

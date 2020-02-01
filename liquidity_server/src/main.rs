@@ -6,6 +6,7 @@ extern crate juniper;
 mod auth;
 mod mutation;
 mod query;
+mod test;
 
 use crate::auth::JWTError;
 use crate::{auth::JWTAuth, mutation::Mutation, query::Query};
@@ -173,10 +174,14 @@ async fn main() {
                 }
             }
             (&Method::GET, "/graphql") | (&Method::POST, "/graphql") => {
-                let user = req.headers().get(AUTHORIZATION).map(|value| {
-                    let token = value.to_str().unwrap().to_string();
-                    auth.validate(token)
-                });
+                let user = if cfg!(test) {
+                    test::create_test_user()
+                } else {
+                    req.headers().get(AUTHORIZATION).map(|value| {
+                        let token = value.to_str().unwrap().to_string();
+                        auth.validate(token)
+                    })
+                };
                 let ctx = user
                     .map(|res| res.map(|user| ctx.clone_with_user(user)))
                     .unwrap_or_else(|| Ok(ctx.clone()));
