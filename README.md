@@ -1,1 +1,2 @@
 ![](https://github.com/wingertge/liquidity-backend-rust/workflows/Linux%20%28GNU%29/badge.svg)
+[![dependency status](https://deps.rs/repo/github/wingertge/liquidity-backend-rust/status.svg)](https://deps.rs/repo/github/wingertge/liquidity-backend-rust)
