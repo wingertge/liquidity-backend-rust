@@ -8,18 +8,25 @@ mod mutation;
 mod query;
 mod test;
 
-use crate::auth::JWTError;
-use crate::{auth::JWTAuth, mutation::Mutation, query::Query};
-use hyper::header::{ACCESS_CONTROL_ALLOW_HEADERS, ACCESS_CONTROL_ALLOW_ORIGIN, AUTHORIZATION};
-use hyper::server::conn::AddrStream;
-use hyper::service::{make_service_fn, service_fn};
-use hyper::{Body, HeaderMap, Method, Request, Response, Server, StatusCode};
+#[cfg(test)]
+mod integration;
+
+use crate::{
+    auth::{JWTAuth, JWTError},
+    mutation::Mutation,
+    query::Query
+};
+use hyper::{
+    header::{ACCESS_CONTROL_ALLOW_HEADERS, ACCESS_CONTROL_ALLOW_ORIGIN, AUTHORIZATION},
+    server::conn::AddrStream,
+    service::{make_service_fn, service_fn},
+    Body, HeaderMap, Method, Request, Response, Server, StatusCode
+};
 use juniper::RootNode;
 use jwks_client::keyset::KeyStore;
 use liquidity::{Connection, Credentials};
 use liquidity_api::{APIContext, ElectionResolvers};
-use std::time::Duration;
-use std::{net::SocketAddr, sync::Arc};
+use std::{net::SocketAddr, sync::Arc, time::Duration};
 
 const JWKS_URL: &str = "JWKS_URL";
 const JWT_ISSUER: &str = "JWT_ISSUER";
@@ -123,8 +130,7 @@ fn not_found() -> Result<Response<Body>, hyper::Error> {
     Ok(response)
 }
 
-#[tokio::main]
-async fn main() {
+pub(crate) async fn run() {
     env_logger::init();
     dotenv::dotenv().ok();
     init_tracing();
@@ -236,5 +242,10 @@ async fn main() {
 
     if let Err(e) = server.await {
         error!("server error: {}", e)
-    }
+    };
+}
+
+#[tokio::main]
+async fn main() {
+    run().await
 }

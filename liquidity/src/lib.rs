@@ -13,8 +13,7 @@ pub mod db;
 pub mod permissions;
 
 pub use context::Context;
-use std::fmt::Debug;
-use std::fmt::Display;
+use std::fmt::{Debug, Display};
 
 pub type Error = Box<dyn ErrTrait>;
 

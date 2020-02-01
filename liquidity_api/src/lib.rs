@@ -1,10 +1,8 @@
 pub use liquidity_elections as elections;
 pub use liquidity_elections::ElectionResolvers;
 
-use liquidity::context::User;
-use liquidity::{Connection, Context};
-use std::fmt;
-use std::sync::Arc;
+use liquidity::{context::User, Connection, Context};
+use std::{fmt, sync::Arc};
 
 pub struct APIContext {
     db: Arc<Connection>,

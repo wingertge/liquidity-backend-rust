@@ -1,13 +1,15 @@
 use super::models::CreateElectionEvent;
-use crate::models::UpdateElectionEvent;
-use crate::schema::{Election, ElectionInput, Importance::Regular};
+use crate::{
+    models::UpdateElectionEvent,
+    schema::{Election, ElectionInput, Importance::Regular}
+};
 use chrono::Utc;
 use futures::lock::Mutex;
-use liquidity::db::{DatabaseError, DbConnection};
-use liquidity::{Merge, Uuid};
-use std::fmt;
-use std::sync::Arc;
-use std::time::Duration;
+use liquidity::{
+    db::{DatabaseError, DbConnection},
+    Merge, Uuid
+};
+use std::{fmt, sync::Arc, time::Duration};
 use ttl_cache::TtlCache;
 
 type Cache = Arc<Mutex<TtlCache<Uuid, Election>>>;
@@ -237,14 +239,15 @@ impl ElectionRepository {
 
 #[cfg(test)]
 mod test {
-    use crate::models::{CreateElectionEvent, UpdateElectionEvent};
-    use crate::repository::ElectionRepository;
-    use crate::schema::{Election, ElectionInput, Importance};
+    use crate::{
+        models::{CreateElectionEvent, UpdateElectionEvent},
+        repository::ElectionRepository,
+        schema::{Election, ElectionInput, Importance}
+    };
     use liquidity::db::EventType;
     use liquidity_test_utils::connection::MockConnection;
     use serde_json::Value;
-    use std::sync::Arc;
-    use std::time::Duration;
+    use std::{sync::Arc, time::Duration};
     use tokio_test::block_on;
 
     fn conn() -> MockConnection {

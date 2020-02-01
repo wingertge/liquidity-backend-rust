@@ -1,6 +1,5 @@
 pub use eventstore::OperationError;
-use std::error::Error;
-use std::fmt;
+use std::{error::Error, fmt};
 
 mod connection;
 

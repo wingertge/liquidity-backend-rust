@@ -1,7 +1,8 @@
-use crate::repository::ElectionRepository;
-use crate::schema::{Election, ElectionInput};
-use liquidity::{db::DbConnection, Loggable};
-use liquidity::{Context, Error, Uuid};
+use crate::{
+    repository::ElectionRepository,
+    schema::{Election, ElectionInput}
+};
+use liquidity::{db::DbConnection, Context, Error, Loggable, Uuid};
 use std::time::Duration;
 
 #[derive(Debug)]

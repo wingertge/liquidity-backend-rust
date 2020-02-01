@@ -1,6 +1,5 @@
 use super::context::User;
-use std::error::Error;
-use std::fmt;
+use std::{error::Error, fmt};
 
 #[derive(Debug, PartialEq)]
 pub enum PermissionError {

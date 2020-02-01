@@ -1,10 +1,8 @@
-use crate::db::DatabaseError;
-use crate::{Connection, Merge};
+use crate::{db::DatabaseError, Connection, Merge};
 use eventstore::{EventData, ResolvedEvent};
 use futures::TryStreamExt;
 use serde::{de::DeserializeOwned, Serialize};
-use std::fmt::Debug;
-use std::sync::Arc;
+use std::{fmt::Debug, sync::Arc};
 use tracing_futures::Instrument;
 
 #[derive(Debug, Clone, PartialEq)]

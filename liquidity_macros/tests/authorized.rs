@@ -1,6 +1,4 @@
-use liquidity::context::User;
-use liquidity::permissions::PermissionError;
-use liquidity::{Context, Error};
+use liquidity::{context::User, permissions::PermissionError, Context, Error};
 use liquidity_macros::authorized;
 use liquidity_test_utils::connection::MockConnection;
 

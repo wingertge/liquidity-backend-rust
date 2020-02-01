@@ -1,11 +1,14 @@
-use liquidity::db::{DatabaseError, DbConnection, EventType};
-use liquidity::Merge;
-use serde::de::DeserializeOwned;
-use serde::Serialize;
+use liquidity::{
+    db::{DatabaseError, DbConnection, EventType},
+    Merge
+};
+use serde::{de::DeserializeOwned, Serialize};
 use serde_json::Value;
-use std::collections::HashMap;
-use std::fmt::Debug;
-use std::sync::{Arc, Mutex};
+use std::{
+    collections::HashMap,
+    fmt::Debug,
+    sync::{Arc, Mutex}
+};
 
 type Data = Arc<Mutex<HashMap<String, Vec<(EventType, Value)>>>>;
 

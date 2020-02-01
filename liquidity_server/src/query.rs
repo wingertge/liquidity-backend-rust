@@ -1,7 +1,6 @@
 use juniper::FieldResult;
 use liquidity::Uuid;
-use liquidity_api::elections::schema::Election;
-use liquidity_api::APIContext;
+use liquidity_api::{elections::schema::Election, APIContext};
 
 pub struct Query;
 

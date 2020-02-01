@@ -1,7 +1,9 @@
 use juniper::FieldResult;
 use liquidity::Uuid;
-use liquidity_api::elections::schema::{Election, ElectionInput};
-use liquidity_api::APIContext;
+use liquidity_api::{
+    elections::schema::{Election, ElectionInput},
+    APIContext
+};
 
 pub struct Mutation;
 

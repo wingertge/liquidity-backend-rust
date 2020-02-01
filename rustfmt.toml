@@ -1,1 +1,2 @@
 trailing_comma = "Never"
+merge_imports = true
