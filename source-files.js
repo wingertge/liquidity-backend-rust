@@ -152,7 +152,7 @@ sourcesIndex["unicode_xid"] = {"name":"","files":["lib.rs","tables.rs"]};
 sourcesIndex["untrusted"] = {"name":"","files":["untrusted.rs"]};
 sourcesIndex["url"] = {"name":"","files":["form_urlencoded.rs","host.rs","lib.rs","origin.rs","parser.rs","path_segments.rs","query_encoding.rs","quirks.rs","slicing.rs"]};
 sourcesIndex["utf8_ranges"] = {"name":"","files":["char_utf8.rs","lib.rs"]};
-sourcesIndex["uuid"] = {"name":"","dirs":[{"name":"adapter","dirs":[{"name":"core_support","files":["mod.rs"]}],"files":["compact.rs","mod.rs"]},{"name":"parser","files":["core_support.rs","mod.rs","std_support.rs"]}],"files":["builder.rs","core_support.rs","lib.rs","prelude.rs","serde_support.rs","std_support.rs","v4.rs"]};
+sourcesIndex["uuid"] = {"name":"","dirs":[{"name":"adapter","files":["compact.rs","mod.rs"]},{"name":"builder","files":["error.rs","mod.rs"]},{"name":"parser","files":["error.rs","mod.rs"]}],"files":["error.rs","lib.rs","prelude.rs","serde_support.rs","v4.rs"]};
 sourcesIndex["vec1"] = {"name":"","files":["lib.rs"]};
 sourcesIndex["want"] = {"name":"","files":["lib.rs"]};
 createSourceSidebar();
