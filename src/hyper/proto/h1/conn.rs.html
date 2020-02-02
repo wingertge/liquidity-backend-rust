@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.13.1/src/proto/h1/conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../hyper/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/hyper-0.13.2/src/proto/h1/conn.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>conn.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../hyper/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -1294,6 +1294,17 @@
 <span id="1294">1294</span>
 <span id="1295">1295</span>
 <span id="1296">1296</span>
+<span id="1297">1297</span>
+<span id="1298">1298</span>
+<span id="1299">1299</span>
+<span id="1300">1300</span>
+<span id="1301">1301</span>
+<span id="1302">1302</span>
+<span id="1303">1303</span>
+<span id="1304">1304</span>
+<span id="1305">1305</span>
+<span id="1306">1306</span>
+<span id="1307">1307</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">io</span>::{<span class="self">self</span>};
@@ -1305,12 +1316,12 @@
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">io</span>::{<span class="ident">AsyncRead</span>, <span class="ident">AsyncWrite</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">io</span>::<span class="ident">Buffered</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="comment">/*Decode,*/</span> <span class="ident">Decoder</span>, <span class="ident">Encode</span>, <span class="ident">EncodedBuf</span>, <span class="ident">Encoder</span>, <span class="ident">Http1Transaction</span>, <span class="ident">ParseContext</span>,};
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">Decoder</span>, <span class="ident">Encode</span>, <span class="ident">EncodedBuf</span>, <span class="ident">Encoder</span>, <span class="ident">Http1Transaction</span>, <span class="ident">ParseContext</span>, <span class="ident">Wants</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">common</span>::{<span class="ident">task</span>, <span class="ident">Pin</span>, <span class="ident">Poll</span>, <span class="ident">Unpin</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">headers</span>::<span class="ident">connection_keep_alive</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">proto</span>::{<span class="ident">BodyLength</span>, <span class="ident">DecodedLength</span>, <span class="ident">MessageHead</span>};
 
-<span class="kw">const</span> <span class="ident">H2_PREFACE</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> [<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n&quot;</span>;
+<span class="kw">const</span> <span class="ident">H2_PREFACE</span>: <span class="kw-2">&amp;</span>[<span class="ident">u8</span>] <span class="op">=</span> <span class="string">b&quot;PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n&quot;</span>;
 
 <span class="doccomment">/// This handles a connection, which will have been established over an</span>
 <span class="doccomment">/// `AsyncRead + AsyncWrite` (like a socket), and will likely include multiple</span>
@@ -1411,7 +1422,7 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_read_body</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
-            <span class="ident">Reading</span>::<span class="ident">Body</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
+            <span class="ident">Reading</span>::<span class="ident">Body</span>(..) <span class="op">|</span> <span class="ident">Reading</span>::<span class="ident">Continue</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
         }
     }
@@ -1426,10 +1437,10 @@
         <span class="ident">read_buf</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">24</span> <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">read_buf</span>[..<span class="number">24</span>] <span class="op">=</span><span class="op">=</span> <span class="kw-2">*</span><span class="ident">H2_PREFACE</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">poll_read_head</span>(
+    <span class="kw">pub</span>(<span class="kw">super</span>) <span class="kw">fn</span> <span class="ident">poll_read_head</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
         <span class="ident">cx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">task</span>::<span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">crate</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>, <span class="ident">DecodedLength</span>, <span class="ident">bool</span>)<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">crate</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>(<span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Incoming</span><span class="op">&gt;</span>, <span class="ident">DecodedLength</span>, <span class="ident">Wants</span>)<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">can_read_head</span>());
         <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;Conn::read_head&quot;</span>);
 
@@ -1453,23 +1464,28 @@
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">keep_alive</span> <span class="kw-2">&amp;</span><span class="op">=</span> <span class="ident">msg</span>.<span class="ident">keep_alive</span>;
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">head</span>.<span class="ident">version</span>;
 
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">wants</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">wants_upgrade</span> {
+            <span class="ident">Wants</span>::<span class="ident">UPGRADE</span>
+        } <span class="kw">else</span> {
+            <span class="ident">Wants</span>::<span class="ident">EMPTY</span>
+        };
+
         <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">decode</span> <span class="op">=</span><span class="op">=</span> <span class="ident">DecodedLength</span>::<span class="ident">ZERO</span> {
-            <span class="kw">if</span> <span class="macro">log_enabled</span><span class="macro">!</span>(<span class="ident">log</span>::<span class="ident">Level</span>::<span class="ident">Debug</span>) <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="ident">msg</span>.<span class="ident">expect_continue</span> {
+            <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">expect_continue</span> {
                 <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;ignoring expect-continue since body is empty&quot;</span>);
             }
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading</span>::<span class="ident">KeepAlive</span>;
             <span class="kw">if</span> <span class="op">!</span><span class="ident">T</span>::<span class="ident">should_read_first</span>() {
                 <span class="self">self</span>.<span class="ident">try_keep_alive</span>(<span class="ident">cx</span>);
             }
+        } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">expect_continue</span> {
+            <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading</span>::<span class="ident">Continue</span>(<span class="ident">Decoder</span>::<span class="ident">new</span>(<span class="ident">msg</span>.<span class="ident">decode</span>));
+            <span class="ident">wants</span> <span class="op">=</span> <span class="ident">wants</span>.<span class="ident">add</span>(<span class="ident">Wants</span>::<span class="ident">EXPECT</span>);
         } <span class="kw">else</span> {
-            <span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">expect_continue</span> {
-                <span class="kw">let</span> <span class="ident">cont</span> <span class="op">=</span> <span class="string">b&quot;HTTP/1.1 100 Continue\r\n\r\n&quot;</span>;
-                <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">headers_buf</span>().<span class="ident">extend_from_slice</span>(<span class="ident">cont</span>);
-            }
             <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading</span>::<span class="ident">Body</span>(<span class="ident">Decoder</span>::<span class="ident">new</span>(<span class="ident">msg</span>.<span class="ident">decode</span>));
-        };
+        }
 
-        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="ident">msg</span>.<span class="ident">head</span>, <span class="ident">msg</span>.<span class="ident">decode</span>, <span class="ident">msg</span>.<span class="ident">wants_upgrade</span>))))
+        <span class="ident">Poll</span>::<span class="ident">Ready</span>(<span class="prelude-val">Some</span>(<span class="prelude-val">Ok</span>((<span class="ident">msg</span>.<span class="ident">head</span>, <span class="ident">msg</span>.<span class="ident">decode</span>, <span class="ident">wants</span>))))
     }
 
     <span class="kw">fn</span> <span class="ident">on_read_head_error</span><span class="op">&lt;</span><span class="ident">Z</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">e</span>: <span class="kw">crate</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw">crate</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Z</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -1536,7 +1552,19 @@
                     }
                 }
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;read_body invalid state: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span>),
+            <span class="ident">Reading</span>::<span class="ident">Continue</span>(<span class="kw-2">ref</span> <span class="ident">decoder</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="comment">// Write the 100 Continue if not already responded...</span>
+                <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Writing</span>::<span class="ident">Init</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
+                    <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;automatically sending 100 Continue&quot;</span>);
+                    <span class="kw">let</span> <span class="ident">cont</span> <span class="op">=</span> <span class="string">b&quot;HTTP/1.1 100 Continue\r\n\r\n&quot;</span>;
+                    <span class="self">self</span>.<span class="ident">io</span>.<span class="ident">headers_buf</span>().<span class="ident">extend_from_slice</span>(<span class="ident">cont</span>);
+                }
+
+                <span class="comment">// And now recurse once in the Reading::Body state...</span>
+                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">Reading</span>::<span class="ident">Body</span>(<span class="ident">decoder</span>.<span class="ident">clone</span>());
+                <span class="kw">return</span> <span class="self">self</span>.<span class="ident">poll_read_body</span>(<span class="ident">cx</span>);
+            }
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">unreachable</span><span class="macro">!</span>(<span class="string">&quot;poll_read_body invalid state: {:?}&quot;</span>, <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span>),
         };
 
         <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> <span class="op">=</span> <span class="ident">reading</span>;
@@ -1643,7 +1671,9 @@
         <span class="comment">// would finish.</span>
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
-            <span class="ident">Reading</span>::<span class="ident">Body</span>(..) <span class="op">|</span> <span class="ident">Reading</span>::<span class="ident">KeepAlive</span> <span class="op">|</span> <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span>,
+            <span class="ident">Reading</span>::<span class="ident">Continue</span>(..) <span class="op">|</span> <span class="ident">Reading</span>::<span class="ident">Body</span>(..) <span class="op">|</span> <span class="ident">Reading</span>::<span class="ident">KeepAlive</span> <span class="op">|</span> <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">return</span>
+            }
             <span class="ident">Reading</span>::<span class="ident">Init</span> <span class="op">=</span><span class="op">&gt;</span> (),
         };
 
@@ -1688,9 +1718,8 @@
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">can_write_head</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">T</span>::<span class="ident">should_read_first</span>() {
-            <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
-                <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Reading</span>::<span class="ident">Closed</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">reading</span> {
+                <span class="kw">return</span> <span class="bool-val">false</span>;
             }
         }
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
@@ -1783,7 +1812,7 @@
         <span class="kw">let</span> <span class="ident">outgoing_is_keep_alive</span> <span class="op">=</span> <span class="ident">head</span>
             .<span class="ident">headers</span>
             .<span class="ident">get</span>(<span class="ident">CONNECTION</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">value</span><span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">connection_keep_alive</span>(<span class="ident">value</span>)))
+            .<span class="ident">map</span>(<span class="ident">connection_keep_alive</span>)
             .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>);
 
         <span class="kw">if</span> <span class="op">!</span><span class="ident">outgoing_is_keep_alive</span> {
@@ -1807,20 +1836,16 @@
     <span class="comment">// If we know the remote speaks an older version, we try to fix up any messages</span>
     <span class="comment">// to work with our older peer.</span>
     <span class="kw">fn</span> <span class="ident">enforce_version</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">head</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">MessageHead</span><span class="op">&lt;</span><span class="ident">T</span>::<span class="ident">Outgoing</span><span class="op">&gt;</span>) {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">version</span> {
-            <span class="ident">Version</span>::<span class="ident">HTTP_10</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="comment">// Fixes response or connection when keep-alive header is not present</span>
-                <span class="self">self</span>.<span class="ident">fix_keep_alive</span>(<span class="ident">head</span>);
-                <span class="comment">// If the remote only knows HTTP/1.0, we should force ourselves</span>
-                <span class="comment">// to do only speak HTTP/1.0 as well.</span>
-                <span class="ident">head</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">Version</span>::<span class="ident">HTTP_10</span>;
-            }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="comment">// If the remote speaks HTTP/1.1, then it *should* be fine with</span>
-                <span class="comment">// both HTTP/1.0 and HTTP/1.1 from us. So again, we just let</span>
-                <span class="comment">// the user&#39;s headers be.</span>
-            }
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Version</span>::<span class="ident">HTTP_10</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">version</span> {
+            <span class="comment">// Fixes response or connection when keep-alive header is not present</span>
+            <span class="self">self</span>.<span class="ident">fix_keep_alive</span>(<span class="ident">head</span>);
+            <span class="comment">// If the remote only knows HTTP/1.0, we should force ourselves</span>
+            <span class="comment">// to do only speak HTTP/1.0 as well.</span>
+            <span class="ident">head</span>.<span class="ident">version</span> <span class="op">=</span> <span class="ident">Version</span>::<span class="ident">HTTP_10</span>;
         }
+        <span class="comment">// If the remote speaks HTTP/1.1, then it *should* be fine with</span>
+        <span class="comment">// both HTTP/1.0 and HTTP/1.1 from us. So again, we just let</span>
+        <span class="comment">// the user&#39;s headers be.</span>
     }
 
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">write_body</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">chunk</span>: <span class="ident">B</span>) {
@@ -1900,21 +1925,18 @@
     <span class="comment">// - Client: there is nothing we can do</span>
     <span class="comment">// - Server: if Response hasn&#39;t been written yet, we can send a 4xx response</span>
     <span class="kw">fn</span> <span class="ident">on_parse_error</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">err</span>: <span class="kw">crate</span>::<span class="ident">Error</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">crate</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
-        <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
-            <span class="ident">Writing</span>::<span class="ident">Init</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_h2_prefix</span>() {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="kw">crate</span>::<span class="ident">Error</span>::<span class="ident">new_version_h2</span>());
-                }
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="ident">T</span>::<span class="ident">on_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>) {
-                    <span class="comment">// Drop the cached headers so as to not trigger a debug</span>
-                    <span class="comment">// assert in `write_head`...</span>
-                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span>.<span class="ident">take</span>();
-                    <span class="self">self</span>.<span class="ident">write_head</span>(<span class="ident">msg</span>, <span class="prelude-val">None</span>);
-                    <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
-                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
-                }
+        <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Writing</span>::<span class="ident">Init</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">writing</span> {
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">has_h2_prefix</span>() {
+                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="kw">crate</span>::<span class="ident">Error</span>::<span class="ident">new_version_h2</span>());
             }
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">msg</span>) <span class="op">=</span> <span class="ident">T</span>::<span class="ident">on_error</span>(<span class="kw-2">&amp;</span><span class="ident">err</span>) {
+                <span class="comment">// Drop the cached headers so as to not trigger a debug</span>
+                <span class="comment">// assert in `write_head`...</span>
+                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">cached_headers</span>.<span class="ident">take</span>();
+                <span class="self">self</span>.<span class="ident">write_head</span>(<span class="ident">msg</span>, <span class="prelude-val">None</span>);
+                <span class="self">self</span>.<span class="ident">state</span>.<span class="ident">error</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">err</span>);
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(());
+            }
         }
 
         <span class="comment">// fallback is pass the error back up</span>
@@ -2016,6 +2038,7 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">enum</span> <span class="ident">Reading</span> {
     <span class="ident">Init</span>,
+    <span class="ident">Continue</span>(<span class="ident">Decoder</span>),
     <span class="ident">Body</span>(<span class="ident">Decoder</span>),
     <span class="ident">KeepAlive</span>,
     <span class="ident">Closed</span>,
@@ -2062,7 +2085,7 @@
     }
 }
 
-<span class="kw">impl</span> ::<span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">BitAndAssign</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KA</span> {
+<span class="kw">impl</span> <span class="ident">std</span>::<span class="ident">ops</span>::<span class="ident">BitAndAssign</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">KA</span> {
     <span class="kw">fn</span> <span class="ident">bitand_assign</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">enabled</span>: <span class="ident">bool</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">enabled</span> {
             <span class="macro">trace</span><span class="macro">!</span>(<span class="string">&quot;remote disabling keep-alive&quot;</span>);
@@ -2207,7 +2230,6 @@
     }
 
     <span class="kw">fn</span> <span class="ident">prepare_upgrade</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">crate</span>::<span class="ident">upgrade</span>::<span class="ident">OnUpgrade</span> {
-        <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="self">self</span>.<span class="ident">upgrade</span>.<span class="ident">is_none</span>());
         <span class="kw">let</span> (<span class="ident">tx</span>, <span class="ident">rx</span>) <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">upgrade</span>::<span class="ident">pending</span>();
         <span class="self">self</span>.<span class="ident">upgrade</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">tx</span>);
         <span class="ident">rx</span>
@@ -2327,7 +2349,7 @@
         conn.state.idle();
 
         match conn.poll() {
-            Err(ref err) if err.kind() == ::std::io::ErrorKind::UnexpectedEof =&gt; {},
+            Err(ref err) if err.kind() == std::io::ErrorKind::UnexpectedEof =&gt; {},
             other =&gt; panic!(&quot;unexpected frame: {:?}&quot;, other)
         }
     }
@@ -2351,7 +2373,7 @@
             conn.state.busy();
 
             match conn.poll() {
-                Err(ref err) if err.kind() == ::std::io::ErrorKind::UnexpectedEof =&gt; {},
+                Err(ref err) if err.kind() == std::io::ErrorKind::UnexpectedEof =&gt; {},
                 other =&gt; panic!(&quot;unexpected frame: {:?}&quot;, other)
             }
             Ok(())

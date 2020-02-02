@@ -98,7 +98,7 @@ executed on the same thread pool used by the <a href="Runtime"><code>Runtime</co
     })
 }</pre></div>
 <h2 id="runtime-configurations" class="section-header"><a href="#runtime-configurations">Runtime Configurations</a></h2>
-<p>Tokio provides multiple task scheding strategies, suitable for different
+<p>Tokio provides multiple task scheduling strategies, suitable for different
 applications. The <a href="crate::runtime::Builder">runtime builder</a> or <code>#[tokio::main]</code> attribute may be
 used to select which scheduler to use.</p>
 <h4 id="basic-scheduler" class="section-header"><a href="#basic-scheduler">Basic Scheduler</a></h4>
@@ -149,4 +149,5 @@ Any tasks that have not yet completed will be dropped.</p>
 <table><tr class='module-item'><td><a class="struct" href="struct.Builder.html" title='tokio::runtime::Builder struct'>Builder</a></td><td class='docblock-short'><p>Builds Tokio Runtime with custom configuration values.</p>
 </td></tr><tr class='module-item'><td><a class="struct" href="struct.Handle.html" title='tokio::runtime::Handle struct'>Handle</a></td><td class='docblock-short'><p>Handle to the runtime</p>
 </td></tr><tr class='module-item'><td><a class="struct" href="struct.Runtime.html" title='tokio::runtime::Runtime struct'>Runtime</a></td><td class='docblock-short'><p>The Tokio runtime.</p>
+</td></tr><tr class='module-item'><td><a class="struct" href="struct.TryCurrentError.html" title='tokio::runtime::TryCurrentError struct'>TryCurrentError</a></td><td class='docblock-short'><p>Error returned by <code>try_current</code> when no Runtime has been started</p>
 </td></tr></table></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../";window.currentCrate = "tokio";</script><script src="../../aliases.js"></script><script src="../../main.js"></script><script defer src="../../search-index.js"></script></body></html>

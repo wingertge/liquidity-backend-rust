@@ -111,17 +111,25 @@
 <span id="111">111</span>
 <span id="112">112</span>
 <span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">liquidity</span>::<span class="ident">db</span>::{<span class="ident">DatabaseError</span>, <span class="ident">DbConnection</span>, <span class="ident">EventType</span>};
-<span class="kw">use</span> <span class="ident">liquidity</span>::<span class="ident">Merge</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">DeserializeOwned</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">Serialize</span>;
+<span class="kw">use</span> <span class="ident">liquidity</span>::{
+    <span class="ident">db</span>::{<span class="ident">DatabaseError</span>, <span class="ident">DbConnection</span>, <span class="ident">EventType</span>},
+    <span class="ident">Merge</span>
+};
+<span class="kw">use</span> <span class="ident">serde</span>::{<span class="ident">de</span>::<span class="ident">DeserializeOwned</span>, <span class="ident">Serialize</span>};
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Debug</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>};
+<span class="kw">use</span> <span class="ident">std</span>::{
+    <span class="ident">collections</span>::<span class="ident">HashMap</span>,
+    <span class="ident">fmt</span>::<span class="ident">Debug</span>,
+    <span class="ident">sync</span>::{<span class="ident">Arc</span>, <span class="ident">Mutex</span>}
+};
 
-<span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">EventType</span>, <span class="ident">Value</span>)<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">Data</span> <span class="op">=</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Value</span>)<span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MockConnection</span> {
@@ -138,23 +146,25 @@
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">DbConnection</span> <span class="kw">for</span> <span class="ident">MockConnection</span> {
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_event</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">P</span><span class="op">&gt;</span>(
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">write_event</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">E</span>, <span class="ident">P</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">stream</span>: <span class="ident">S</span>,
-        <span class="ident">event_type</span>: <span class="ident">EventType</span>,
+        <span class="ident">event_type</span>: <span class="ident">E</span>,
         <span class="ident">payload</span>: <span class="ident">P</span>
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">DatabaseError</span><span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">S</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Debug</span>,
+        <span class="ident">E</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Debug</span>,
         <span class="ident">P</span>: <span class="ident">Serialize</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Debug</span>
     {
         <span class="kw">let</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_value</span>(<span class="ident">payload</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">event_type</span> <span class="op">=</span> <span class="ident">event_type</span>.<span class="ident">as_ref</span>();
         <span class="self">self</span>.<span class="ident">data</span>
             .<span class="ident">lock</span>()
             .<span class="ident">unwrap</span>()
             .<span class="ident">entry</span>(<span class="ident">stream</span>.<span class="ident">as_ref</span>().<span class="ident">to_string</span>())
-            .<span class="ident">and_modify</span>(<span class="op">|</span><span class="ident">vec</span><span class="op">|</span> <span class="ident">vec</span>.<span class="ident">push</span>((<span class="ident">event_type</span>.<span class="ident">clone</span>(), <span class="ident">data</span>.<span class="ident">clone</span>())))
-            .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">event_type</span>.<span class="ident">clone</span>(), <span class="ident">data</span>.<span class="ident">clone</span>())]);
+            .<span class="ident">and_modify</span>(<span class="op">|</span><span class="ident">vec</span><span class="op">|</span> <span class="ident">vec</span>.<span class="ident">push</span>((<span class="ident">event_type</span>.<span class="ident">to_string</span>(), <span class="ident">data</span>.<span class="ident">clone</span>())))
+            .<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="macro">vec</span><span class="macro">!</span>[(<span class="ident">event_type</span>.<span class="ident">to_string</span>(), <span class="ident">data</span>.<span class="ident">clone</span>())]);
         <span class="prelude-val">Ok</span>(())
     }
 
@@ -183,11 +193,11 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">iter</span> <span class="op">=</span> <span class="ident">iter</span>
             .<span class="ident">unwrap</span>()
             .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="prelude-val">Ok</span>::<span class="op">&lt;</span>(<span class="ident">EventType</span>, <span class="ident">Value</span>), <span class="ident">DatabaseError</span><span class="op">&gt;</span>);
+            .<span class="ident">map</span>(<span class="prelude-val">Ok</span>::<span class="op">&lt;</span>(<span class="ident">String</span>, <span class="ident">Value</span>), <span class="ident">DatabaseError</span><span class="op">&gt;</span>);
 
         <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">iter</span>.<span class="ident">try_fold</span>(<span class="prelude-val">None</span>, <span class="kw">move</span> <span class="op">|</span><span class="ident">acc</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">event</span><span class="op">|</span> {
             <span class="kw">let</span> (<span class="ident">event_type</span>, <span class="ident">value</span>) <span class="op">=</span> <span class="ident">event</span><span class="question-mark">?</span>;
-            <span class="kw">match</span> <span class="ident">event_type</span> {
+            <span class="kw">match</span> <span class="ident">event_type</span>.<span class="ident">into</span>() {
                 <span class="ident">EventType</span>::<span class="ident">Create</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">value</span>)<span class="question-mark">?</span>;
                     <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">payload</span>.<span class="ident">into</span>()))

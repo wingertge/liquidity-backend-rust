@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.9/src/io/util/async_write_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>async_write_ext.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../tokio/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.11/src/io/util/async_write_ext.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>async_write_ext.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../../light.css" id="themeStyle"><script src="../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../tokio/index.html'><div class='logo-container'><img src='../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../../settings.html"><img src="../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -700,7 +700,7 @@
 <span class="kw">use</span> <span class="ident">bytes</span>::<span class="ident">Buf</span>;
 
 <span class="macro">cfg_io_util</span><span class="macro">!</span> {
-    <span class="doccomment">/// Define numeric writer</span>
+    <span class="doccomment">/// Defines numeric writer</span>
     <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">write_impl</span> {
         (
             $(
@@ -717,7 +717,7 @@
         }
     }
 
-    <span class="doccomment">/// Write bytes to a sink.</span>
+    <span class="doccomment">/// Writes bytes to a sink.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Implemented as an extention trait, adding utility methods to all</span>
     <span class="doccomment">/// [`AsyncWrite`] types. Callers will tend to import this trait instead of</span>
@@ -750,7 +750,7 @@
     <span class="doccomment">/// [`AsyncWrite`]: AsyncWrite</span>
     <span class="doccomment">/// [`prelude`]: crate::prelude</span>
     <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">AsyncWriteExt</span>: <span class="ident">AsyncWrite</span> {
-        <span class="doccomment">/// Write a buffer into this writer, returning how many bytes were</span>
+        <span class="doccomment">/// Writes a buffer into this writer, returning how many bytes were</span>
         <span class="doccomment">/// written.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// Equivalent to:</span>
@@ -803,7 +803,7 @@
             <span class="ident">write</span>(<span class="self">self</span>, <span class="ident">src</span>)
         }
 
-        <span class="doccomment">/// Write a buffer into this writer, advancing the buffer&#39;s internal</span>
+        <span class="doccomment">/// Writes a buffer into this writer, advancing the buffer&#39;s internal</span>
         <span class="doccomment">/// cursor.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// Equivalent to:</span>
@@ -1300,7 +1300,7 @@
             <span class="kw">fn</span> <span class="ident">write_i128</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">n</span>: <span class="ident">i128</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">WriteI128</span>;
         }
 
-        <span class="doccomment">/// Flush this output stream, ensuring that all intermediately buffered</span>
+        <span class="doccomment">/// Flushes this output stream, ensuring that all intermediately buffered</span>
         <span class="doccomment">/// contents reach their destination.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// Equivalent to:</span>

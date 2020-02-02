@@ -131,21 +131,21 @@ over and...</p>
 </td></tr></table><h2 id='enums' class='section-header'><a href="#enums">Enums</a></h2>
 <table><tr class='module-item'><td><a class="enum" href="enum.ErrorKind.html" title='tokio::io::ErrorKind enum'>ErrorKind</a></td><td class='docblock-short'><p>A list specifying general categories of I/O error.</p>
 </td></tr></table><h2 id='traits' class='section-header'><a href="#traits">Traits</a></h2>
-<table><tr class='module-item'><td><a class="trait" href="trait.AsyncBufRead.html" title='tokio::io::AsyncBufRead trait'>AsyncBufRead</a></td><td class='docblock-short'><p>Read bytes asynchronously.</p>
+<table><tr class='module-item'><td><a class="trait" href="trait.AsyncBufRead.html" title='tokio::io::AsyncBufRead trait'>AsyncBufRead</a></td><td class='docblock-short'><p>Reads bytes asynchronously.</p>
 </td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncBufReadExt.html" title='tokio::io::AsyncBufReadExt trait'>AsyncBufReadExt</a></td><td class='docblock-short'><p>An extension trait which adds utility methods to <a href="crate::io::AsyncBufRead"><code>AsyncBufRead</code></a> types.</p>
-</td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncRead.html" title='tokio::io::AsyncRead trait'>AsyncRead</a></td><td class='docblock-short'><p>Read bytes from a source.</p>
-</td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncReadExt.html" title='tokio::io::AsyncReadExt trait'>AsyncReadExt</a></td><td class='docblock-short'><p>Read bytes from a source.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncRead.html" title='tokio::io::AsyncRead trait'>AsyncRead</a></td><td class='docblock-short'><p>Reads bytes from a source.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncReadExt.html" title='tokio::io::AsyncReadExt trait'>AsyncReadExt</a></td><td class='docblock-short'><p>Reads bytes from a source.</p>
 </td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncSeek.html" title='tokio::io::AsyncSeek trait'>AsyncSeek</a></td><td class='docblock-short'><p>Seek bytes asynchronously.</p>
 </td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncSeekExt.html" title='tokio::io::AsyncSeekExt trait'>AsyncSeekExt</a></td><td class='docblock-short'><p>An extension trait which adds utility methods to <code>AsyncSeek</code> types.</p>
 </td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncWrite.html" title='tokio::io::AsyncWrite trait'>AsyncWrite</a></td><td class='docblock-short'><p>Writes bytes asynchronously.</p>
-</td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncWriteExt.html" title='tokio::io::AsyncWriteExt trait'>AsyncWriteExt</a></td><td class='docblock-short'><p>Write bytes to a sink.</p>
+</td></tr><tr class='module-item'><td><a class="trait" href="trait.AsyncWriteExt.html" title='tokio::io::AsyncWriteExt trait'>AsyncWriteExt</a></td><td class='docblock-short'><p>Writes bytes to a sink.</p>
 </td></tr></table><h2 id='functions' class='section-header'><a href="#functions">Functions</a></h2>
 <table><tr class='module-item'><td><a class="fn" href="fn.copy.html" title='tokio::io::copy fn'>copy</a></td><td class='docblock-short'><p>Asynchronously copies the entire contents of a reader into a writer.</p>
 </td></tr><tr class='module-item'><td><a class="fn" href="fn.empty.html" title='tokio::io::empty fn'>empty</a></td><td class='docblock-short'><p>Creates a new empty async reader.</p>
 </td></tr><tr class='module-item'><td><a class="fn" href="fn.repeat.html" title='tokio::io::repeat fn'>repeat</a></td><td class='docblock-short'><p>Creates an instance of an async reader that infinitely repeats one byte.</p>
 </td></tr><tr class='module-item'><td><a class="fn" href="fn.sink.html" title='tokio::io::sink fn'>sink</a></td><td class='docblock-short'><p>Creates an instance of an async writer which will successfully consume all
 data.</p>
-</td></tr><tr class='module-item'><td><a class="fn" href="fn.split.html" title='tokio::io::split fn'>split</a></td><td class='docblock-short'><p>Split a single value implementing <code>AsyncRead + AsyncWrite</code> into separate
+</td></tr><tr class='module-item'><td><a class="fn" href="fn.split.html" title='tokio::io::split fn'>split</a></td><td class='docblock-short'><p>Splits a single value implementing <code>AsyncRead + AsyncWrite</code> into separate
 <code>AsyncRead</code> and <code>AsyncWrite</code> handles.</p>
 </td></tr></table><h2 id='types' class='section-header'><a href="#types">Type Definitions</a></h2>
 <table><tr class='module-item'><td><a class="type" href="type.Result.html" title='tokio::io::Result type'>Result</a></td><td class='docblock-short'><p>A specialized <a href="../result/enum.Result.html"><code>Result</code></a> type for I/O

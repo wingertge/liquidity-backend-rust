@@ -38,11 +38,15 @@
 <span id="38">38</span>
 <span id="39">39</span>
 <span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">juniper</span>::<span class="ident">FieldResult</span>;
 <span class="kw">use</span> <span class="ident">liquidity</span>::<span class="ident">Uuid</span>;
-<span class="kw">use</span> <span class="ident">liquidity_api</span>::<span class="ident">elections</span>::<span class="ident">schema</span>::{<span class="ident">Election</span>, <span class="ident">ElectionInput</span>};
-<span class="kw">use</span> <span class="ident">liquidity_api</span>::<span class="ident">APIContext</span>;
+<span class="kw">use</span> <span class="ident">liquidity_api</span>::{
+    <span class="ident">elections</span>::<span class="ident">schema</span>::{<span class="ident">Election</span>, <span class="ident">ElectionInput</span>},
+    <span class="ident">APIContext</span>
+};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Mutation</span>;
 

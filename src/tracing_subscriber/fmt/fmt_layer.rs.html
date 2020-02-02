@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.2.0-alpha.2/src/fmt/fmt_layer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fmt_layer.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../tracing_subscriber/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tracing-subscriber-0.2.0-alpha.5/src/fmt/fmt_layer.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>fmt_layer.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../tracing_subscriber/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -507,6 +507,79 @@
 <span id="507">507</span>
 <span id="508">508</span>
 <span id="509">509</span>
+<span id="510">510</span>
+<span id="511">511</span>
+<span id="512">512</span>
+<span id="513">513</span>
+<span id="514">514</span>
+<span id="515">515</span>
+<span id="516">516</span>
+<span id="517">517</span>
+<span id="518">518</span>
+<span id="519">519</span>
+<span id="520">520</span>
+<span id="521">521</span>
+<span id="522">522</span>
+<span id="523">523</span>
+<span id="524">524</span>
+<span id="525">525</span>
+<span id="526">526</span>
+<span id="527">527</span>
+<span id="528">528</span>
+<span id="529">529</span>
+<span id="530">530</span>
+<span id="531">531</span>
+<span id="532">532</span>
+<span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
+<span id="536">536</span>
+<span id="537">537</span>
+<span id="538">538</span>
+<span id="539">539</span>
+<span id="540">540</span>
+<span id="541">541</span>
+<span id="542">542</span>
+<span id="543">543</span>
+<span id="544">544</span>
+<span id="545">545</span>
+<span id="546">546</span>
+<span id="547">547</span>
+<span id="548">548</span>
+<span id="549">549</span>
+<span id="550">550</span>
+<span id="551">551</span>
+<span id="552">552</span>
+<span id="553">553</span>
+<span id="554">554</span>
+<span id="555">555</span>
+<span id="556">556</span>
+<span id="557">557</span>
+<span id="558">558</span>
+<span id="559">559</span>
+<span id="560">560</span>
+<span id="561">561</span>
+<span id="562">562</span>
+<span id="563">563</span>
+<span id="564">564</span>
+<span id="565">565</span>
+<span id="566">566</span>
+<span id="567">567</span>
+<span id="568">568</span>
+<span id="569">569</span>
+<span id="570">570</span>
+<span id="571">571</span>
+<span id="572">572</span>
+<span id="573">573</span>
+<span id="574">574</span>
+<span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
+<span id="582">582</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">field</span>::<span class="ident">RecordFields</span>,
@@ -521,6 +594,20 @@
 };
 
 <span class="doccomment">/// A [`Layer`] that logs formatted representations of `tracing` events.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Constructing a default fmt subscriber via the Layer API:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use tracing_subscriber::{fmt, registry::Registry};</span>
+<span class="doccomment">/// use tracing_subscriber::prelude::*;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let subscriber = fmt::Layer::default()</span>
+<span class="doccomment">///     .with_subscriber(Registry::default());</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// tracing::subscriber::set_global_default(subscriber).unwrap();</span>
+<span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Layer`]: ../layer/trait.Layer.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -538,6 +625,48 @@
 
 <span class="doccomment">/// A builder for [`Layer`](struct.Layer.html) that logs formatted representations of `tracing`</span>
 <span class="doccomment">/// events and spans.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ## Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Constructing a layer with the default configuration:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use tracing_subscriber::fmt;</span>
+<span class="doccomment">/// use tracing_subscriber::prelude::*;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let fmt_layer = fmt::Layer::builder().finish();</span>
+<span class="doccomment">/// # let subscriber = fmt_layer.with_subscriber(tracing_subscriber::registry::Registry::default());</span>
+<span class="doccomment">/// # tracing::subscriber::set_global_default(subscriber).unwrap();</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Overriding the layer&#39;s behavior:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use tracing_subscriber::fmt;</span>
+<span class="doccomment">/// use tracing_subscriber::prelude::*;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let fmt_layer = fmt::Layer::builder()</span>
+<span class="doccomment">///    .with_target(false) // don&#39;t include event targets when logging</span>
+<span class="doccomment">///    .finish();</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # let subscriber = fmt_layer.with_subscriber(tracing_subscriber::registry::Registry::default());</span>
+<span class="doccomment">/// # tracing::subscriber::set_global_default(subscriber).unwrap();</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Setting a custom  event formatter:</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```rust</span>
+<span class="doccomment">/// use tracing_subscriber::fmt::{self, format::Format, time};</span>
+<span class="doccomment">/// use tracing_subscriber::prelude::*;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// let fmt = Format::default().with_timer(time::Uptime::default());</span>
+<span class="doccomment">/// let fmt_layer = fmt::Layer::builder()</span>
+<span class="doccomment">///     .event_format(fmt)</span>
+<span class="doccomment">///     .with_target(false)</span>
+<span class="doccomment">///     .finish();</span>
+<span class="doccomment">/// # let subscriber = fmt_layer.with_subscriber(tracing_subscriber::registry::Registry::default());</span>
+<span class="doccomment">/// # tracing::subscriber::set_global_default(subscriber).unwrap();</span>
+<span class="doccomment">/// ```</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">LayerBuilder</span><span class="op">&lt;</span>
     <span class="ident">S</span>,
@@ -672,6 +801,7 @@
 
     <span class="doccomment">/// Enable ANSI encoding for formatted events.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;ansi&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">with_ansi</span>(<span class="self">self</span>, <span class="ident">ansi</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LayerBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">N</span>, <span class="ident">format</span>::<span class="ident">Format</span><span class="op">&lt;</span><span class="ident">L</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">W</span><span class="op">&gt;</span> {
         <span class="ident">LayerBuilder</span> {
             <span class="ident">fmt_event</span>: <span class="self">self</span>.<span class="ident">fmt_event</span>.<span class="ident">with_ansi</span>(<span class="ident">ansi</span>),
@@ -706,6 +836,7 @@
 
     <span class="doccomment">/// Sets the layer being built to use a [JSON formatter](../fmt/format/struct.Json.html).</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)]</span>
+    <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;json&quot;</span>)))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">json</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">LayerBuilder</span><span class="op">&lt;</span><span class="ident">S</span>, <span class="ident">format</span>::<span class="ident">JsonFields</span>, <span class="ident">format</span>::<span class="ident">Format</span><span class="op">&lt;</span><span class="ident">format</span>::<span class="ident">Json</span>, <span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">W</span><span class="op">&gt;</span> {
         <span class="ident">LayerBuilder</span> {
             <span class="ident">fmt_event</span>: <span class="self">self</span>.<span class="ident">fmt_event</span>.<span class="ident">json</span>(),
@@ -804,6 +935,16 @@
     <span class="kw">pub</span> <span class="ident">fields</span>: <span class="ident">String</span>,
 }
 
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
+    <span class="doccomment">/// Returns a new `FormattedFields`.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">fields</span>: <span class="ident">String</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span> {
+            <span class="ident">fields</span>,
+            <span class="ident">_format_event</span>: <span class="ident">PhantomData</span>,
+        }
+    }
+}
+
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;FormattedFields&quot;</span>)
@@ -837,14 +978,19 @@
     <span class="kw">fn</span> <span class="ident">new_span</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">attrs</span>: <span class="kw-2">&amp;</span><span class="ident">Attributes</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>, <span class="ident">id</span>: <span class="kw-2">&amp;</span><span class="ident">Id</span>, <span class="ident">ctx</span>: <span class="ident">Context</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">S</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">span</span>(<span class="ident">id</span>).<span class="ident">expect</span>(<span class="string">&quot;Span not found, this is a bug&quot;</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">extensions_mut</span>();
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fmt_fields</span>.<span class="ident">format_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="ident">attrs</span>).<span class="ident">is_ok</span>() {
-            <span class="kw">let</span> <span class="ident">fmt_fields</span> <span class="op">=</span> <span class="ident">FormattedFields</span> {
-                <span class="ident">fields</span>: <span class="ident">buf</span>,
-                <span class="ident">_format_event</span>: <span class="ident">PhantomData</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">N</span>)<span class="op">&gt;</span>,
-            };
-            <span class="ident">extensions</span>.<span class="ident">insert</span>(<span class="ident">fmt_fields</span>);
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">FormattedFields</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>, .. }) <span class="op">=</span>
+            <span class="ident">extensions</span>.<span class="ident">get_mut</span>::<span class="op">&lt;</span><span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+        {
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fmt_fields</span>.<span class="ident">format_fields</span>(<span class="ident">fields</span>, <span class="ident">attrs</span>);
+        } <span class="kw">else</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">new</span>();
+            <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fmt_fields</span>.<span class="ident">format_fields</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>, <span class="ident">attrs</span>).<span class="ident">is_ok</span>() {
+                <span class="kw">let</span> <span class="ident">fmt_fields</span> <span class="op">=</span> <span class="ident">FormattedFields</span> {
+                    <span class="ident">fields</span>: <span class="ident">buf</span>,
+                    <span class="ident">_format_event</span>: <span class="ident">PhantomData</span>::<span class="op">&lt;</span><span class="kw">fn</span>(<span class="ident">N</span>)<span class="op">&gt;</span>,
+                };
+                <span class="ident">extensions</span>.<span class="ident">insert</span>(<span class="ident">fmt_fields</span>);
+            }
         }
     }
 
@@ -852,7 +998,7 @@
         <span class="kw">let</span> <span class="ident">span</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">span</span>(<span class="ident">id</span>).<span class="ident">expect</span>(<span class="string">&quot;Span not found, this is a bug&quot;</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">extensions</span> <span class="op">=</span> <span class="ident">span</span>.<span class="ident">extensions_mut</span>();
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">FormattedFields</span> { <span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">fields</span>, .. }) <span class="op">=</span>
-            <span class="ident">extensions</span>.<span class="ident">get_mut</span>::<span class="op">&lt;</span><span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span><span class="op">&gt;</span>()
+            <span class="ident">extensions</span>.<span class="ident">get_mut</span>::<span class="op">&lt;</span><span class="ident">FormattedFields</span><span class="op">&lt;</span><span class="ident">N</span><span class="op">&gt;</span><span class="op">&gt;</span>()
         {
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">fmt_fields</span>.<span class="ident">format_fields</span>(<span class="ident">fields</span>, <span class="ident">values</span>);
         } <span class="kw">else</span> {

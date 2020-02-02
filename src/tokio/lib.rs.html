@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.9/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../tokio/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.11/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../tokio/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -352,9 +352,45 @@
 <span id="352">352</span>
 <span id="353">353</span>
 <span id="354">354</span>
+<span id="355">355</span>
+<span id="356">356</span>
+<span id="357">357</span>
+<span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
+<span id="361">361</span>
+<span id="362">362</span>
+<span id="363">363</span>
+<span id="364">364</span>
+<span id="365">365</span>
+<span id="366">366</span>
+<span id="367">367</span>
+<span id="368">368</span>
+<span id="369">369</span>
+<span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tokio/0.2.9&quot;</span>)]</span>
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">cognitive_complexity</span>, <span class="ident">clippy</span>::<span class="ident">needless_doctest_main</span>)]</span>
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_root_url</span> <span class="op">=</span> <span class="string">&quot;https://docs.rs/tokio/0.2.11&quot;</span>)]</span>
+<span class="attribute">#![<span class="ident">allow</span>(
+    <span class="ident">clippy</span>::<span class="ident">cognitive_complexity</span>,
+    <span class="ident">clippy</span>::<span class="ident">large_enum_variant</span>,
+    <span class="ident">clippy</span>::<span class="ident">needless_doctest_main</span>
+)]</span>
 <span class="attribute">#![<span class="ident">warn</span>(
     <span class="ident">missing_debug_implementations</span>,
     <span class="ident">missing_docs</span>,
@@ -395,7 +431,7 @@
 <span class="doccomment">//! [signal]: crate::signal</span>
 <span class="doccomment">//! [fs]: crate::fs</span>
 <span class="doccomment">//! [runtime]: crate::runtime</span>
-<span class="doccomment">//! [website]: https://tokio.rs/docs/</span>
+<span class="doccomment">//! [website]: https://tokio.rs/docs/overview/</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! # A Tour of Tokio</span>
 <span class="doccomment">//!</span>
@@ -417,13 +453,13 @@
 <span class="doccomment">//! is possible to just enable certain features over others. By default, Tokio</span>
 <span class="doccomment">//! does not enable any features but allows one to enable a subset for their use</span>
 <span class="doccomment">//! case. Below is a list of the available feature flags. You may also notice</span>
-<span class="doccomment">//! above each function, struct and trait there is a set of feature flags</span>
-<span class="doccomment">//! that are required for that item to be enabled. If you are new to Tokio it is</span>
-<span class="doccomment">//! recommended that you use the `full` feature flag which will enable everything.</span>
+<span class="doccomment">//! above each function, struct and trait there is listed one or more feature flags</span>
+<span class="doccomment">//! that are required for that item to be used. If you are new to Tokio it is</span>
+<span class="doccomment">//! recommended that you use the `full` feature flag which will enable all public APIs.</span>
 <span class="doccomment">//! Beware though that this will pull in many extra dependencies that you may not</span>
 <span class="doccomment">//! need.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! - `full`: Enables all Tokio features and every API will be available.</span>
+<span class="doccomment">//! - `full`: Enables all Tokio public API features listed below.</span>
 <span class="doccomment">//! - `rt-core`: Enables `tokio::spawn` and the basic (single-threaded) scheduler.</span>
 <span class="doccomment">//! - `rt-threaded`: Enables the heavier, multi-threaded, work-stealing scheduler.</span>
 <span class="doccomment">//! - `rt-util`: Enables non-scheduler utilities.</span>
@@ -446,15 +482,25 @@
 <span class="doccomment">//! - `test-util`: Enables testing based infrastructure for the Tokio runtime.</span>
 <span class="doccomment">//! - `blocking`: Enables `block_in_place` and `spawn_blocking`.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! _Note: `AsyncRead` and `AsyncWrite` do not require any features and are</span>
-<span class="doccomment">//! enabled by default._</span>
+<span class="doccomment">//! _Note: `AsyncRead` and `AsyncWrite` traits do not require any features and are</span>
+<span class="doccomment">//! always available._</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ### Internal features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! These features do not expose any new API, but influence internal</span>
+<span class="doccomment">//! implementation aspects of Tokio, and can pull in additional</span>
+<span class="doccomment">//! dependencies. They are not included in `full`:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `parking_lot`: As a potential optimization, use the _parking_lot_ crate&#39;s</span>
+<span class="doccomment">//! synchronization primitives internally. MSRV may increase according to the</span>
+<span class="doccomment">//! _parking_lot_ release in use.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! [feature flags]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-features-section</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! ### Authoring applications</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Tokio is great for writing applications and most users in this case shouldn&#39;t</span>
-<span class="doccomment">//! worry to much about what features they should pick. If you&#39;re unsure, we suggest</span>
+<span class="doccomment">//! worry too much about what features they should pick. If you&#39;re unsure, we suggest</span>
 <span class="doccomment">//! going with `full` to ensure that you don&#39;t run into any road blocks while you&#39;re</span>
 <span class="doccomment">//! building your application.</span>
 <span class="doccomment">//!</span>
@@ -633,15 +679,20 @@
 <span class="doccomment">//! }</span>
 <span class="doccomment">//! ```</span>
 
-<span class="comment">// macros used internally</span>
+<span class="comment">// Includes re-exports used by macros.</span>
+<span class="comment">//</span>
+<span class="comment">// This module is not intended to be part of the public API. In general, any</span>
+<span class="comment">// `doc(hidden)` code is not part of Tokio&#39;s public and stable API.</span>
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
-<span class="kw">mod</span> <span class="ident">macros</span>;
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span>;
 
 <span class="macro">cfg_fs</span><span class="macro">!</span> {
     <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">fs</span>;
 }
 
-<span class="kw">mod</span> <span class="ident">future</span>;
+<span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">future</span>;
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">io</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">net</span>;
@@ -684,6 +735,12 @@
 <span class="kw">mod</span> <span class="ident">util</span>;
 
 <span class="macro">cfg_macros</span><span class="macro">!</span> {
+    <span class="doccomment">/// Implementation detail of the `select!` macro. This macro is **not**</span>
+    <span class="doccomment">/// intended to be used as part of the public API and is permitted to</span>
+    <span class="doccomment">/// change.</span>
+    <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">select_priv_declare_output_enum</span>;
+
     <span class="macro">doc_rt_core</span><span class="macro">!</span> {
         <span class="macro">cfg_rt_threaded</span><span class="macro">!</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span> <span class="comment">// Work around for rust-lang/rust#62127</span>
@@ -696,6 +753,13 @@
             <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">main_basic</span> <span class="kw">as</span> <span class="ident">main</span>;
             <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">test_basic</span> <span class="kw">as</span> <span class="ident">test</span>;
         }
+    }
+
+    <span class="comment">// Maintains old behavior</span>
+    <span class="macro">cfg_not_rt_core</span><span class="macro">!</span> {
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">test</span>))]</span>
+        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">main</span>;
+        <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">tokio_macros</span>::<span class="ident">test</span>;
     }
 }
 

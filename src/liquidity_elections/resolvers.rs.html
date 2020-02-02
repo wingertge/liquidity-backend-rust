@@ -146,11 +146,13 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
+<span id="149">149</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">repository</span>::<span class="ident">ElectionRepository</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">schema</span>::{<span class="ident">Election</span>, <span class="ident">ElectionInput</span>};
-<span class="kw">use</span> <span class="ident">liquidity</span>::{<span class="ident">db</span>::<span class="ident">DbConnection</span>, <span class="ident">Loggable</span>};
-<span class="kw">use</span> <span class="ident">liquidity</span>::{<span class="ident">Context</span>, <span class="ident">Error</span>, <span class="ident">Uuid</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::{
+    <span class="ident">repository</span>::<span class="ident">ElectionRepository</span>,
+    <span class="ident">schema</span>::{<span class="ident">Election</span>, <span class="ident">ElectionInput</span>}
+};
+<span class="kw">use</span> <span class="ident">liquidity</span>::{<span class="ident">db</span>::<span class="ident">DbConnection</span>, <span class="ident">Context</span>, <span class="ident">Error</span>, <span class="ident">Loggable</span>, <span class="ident">Uuid</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -169,8 +171,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// `input` - The election user input object</span>
-    <span class="doccomment">/// `context` - The request context, passed automatically</span>
+    <span class="doccomment">/// * `input` - The election user input object</span>
+    <span class="doccomment">/// * `context` - The request context, passed automatically</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Permissions Required</span>
     <span class="doccomment">///</span>
@@ -215,9 +217,9 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// `id` - The id of the election to be edited</span>
-    <span class="doccomment">/// `input` - The fields to edit</span>
-    <span class="doccomment">/// `context` - The request context, passed automatically</span>
+    <span class="doccomment">/// * `id` - The id of the election to be edited</span>
+    <span class="doccomment">/// * `input` - The fields to edit</span>
+    <span class="doccomment">/// * `context` - The request context, passed automatically</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Permissions Required</span>
     <span class="doccomment">///</span>
@@ -258,8 +260,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Arguments</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// `id` - The id to look up the election by</span>
-    <span class="doccomment">/// `context` - The request context, passed automatically</span>
+    <span class="doccomment">/// * `id` - The id to look up the election by</span>
+    <span class="doccomment">/// * `context` - The request context, passed automatically</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Permissions Required</span>
     <span class="doccomment">///</span>

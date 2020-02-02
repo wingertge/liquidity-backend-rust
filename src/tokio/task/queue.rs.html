@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.9/src/task/queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>queue.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../tokio/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/tokio-0.2.11/src/task/queue.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>queue.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css"><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="shortcut icon" href="../../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../tokio/index.html'><div class='logo-container'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -388,7 +388,7 @@
     <span class="doccomment">/// FIFO list of tasks</span>
     <span class="ident">queue</span>: <span class="ident">VecDeque</span><span class="op">&lt;</span><span class="ident">Task</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 
-    <span class="doccomment">/// `true` when a task can be pushed into the queue, false otherwise.</span>
+    <span class="doccomment">/// `true` when a task can be pushed into the queue, `false` otherwise.</span>
     <span class="ident">open</span>: <span class="ident">bool</span>,
 }
 
@@ -415,7 +415,7 @@
         }
     }
 
-    <span class="doccomment">/// Add a new task to the scheduler.</span>
+    <span class="doccomment">/// Adds a new task to the scheduler.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
@@ -424,7 +424,7 @@
         (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">owned_tasks</span>.<span class="ident">get</span>()).<span class="ident">insert</span>(<span class="ident">task</span>);
     }
 
-    <span class="doccomment">/// Push a task to the local queue.</span>
+    <span class="doccomment">/// Pushes a task to the local queue.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
@@ -433,7 +433,7 @@
         (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">local_queue</span>.<span class="ident">get</span>()).<span class="ident">push_back</span>(<span class="ident">task</span>);
     }
 
-    <span class="doccomment">/// Remove a task from the local queue.</span>
+    <span class="doccomment">/// Removes a task from the local queue.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
@@ -442,7 +442,7 @@
         (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">owned_tasks</span>.<span class="ident">get</span>()).<span class="ident">remove</span>(<span class="ident">task</span>);
     }
 
-    <span class="doccomment">/// Lock the remote queue, returning a `MutexGuard`.</span>
+    <span class="doccomment">/// Locks the remote queue, returning a `MutexGuard`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This can be used to push to the remote queue and perform other</span>
     <span class="doccomment">/// operations while holding the lock.</span>
@@ -456,7 +456,7 @@
             .<span class="ident">expect</span>(<span class="string">&quot;failed to lock remote queue&quot;</span>)
     }
 
-    <span class="doccomment">/// Release a task from outside of the thread that owns the scheduler.</span>
+    <span class="doccomment">/// Releases a task from outside of the thread that owns the scheduler.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This simply pushes the task to the pending drop queue.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">release_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">task</span>: <span class="ident">Task</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>) {
@@ -512,7 +512,7 @@
         <span class="ident">lock</span>.<span class="ident">queue</span>.<span class="ident">pop_front</span>()
     }
 
-    <span class="doccomment">/// Returns true if any owned tasks are still bound to this scheduler.</span>
+    <span class="doccomment">/// Returns `true` if any owned tasks are still bound to this scheduler.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
@@ -521,7 +521,7 @@
         <span class="op">!</span>(<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">owned_tasks</span>.<span class="ident">get</span>()).<span class="ident">is_empty</span>()
     }
 
-    <span class="doccomment">/// Drain any tasks that have previously been released from other threads.</span>
+    <span class="doccomment">/// Drains any tasks that have previously been released from other threads.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
@@ -533,7 +533,7 @@
         }
     }
 
-    <span class="doccomment">/// Shut down the queues.</span>
+    <span class="doccomment">/// Shuts down the queues.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This performs the following operations:</span>
     <span class="doccomment">///</span>
@@ -572,7 +572,7 @@
         <span class="self">self</span>.<span class="ident">drain_pending_drop</span>();
     }
 
-    <span class="doccomment">/// Drain both the local and remote run queues, shutting down any tasks.</span>
+    <span class="doccomment">/// Drains both the local and remote run queues, shutting down any tasks.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
@@ -582,7 +582,7 @@
         <span class="self">self</span>.<span class="ident">close_remote</span>();
     }
 
-    <span class="doccomment">/// Shut down the scheduler&#39;s owned task list.</span>
+    <span class="doccomment">/// Shuts down the scheduler&#39;s owned task list.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>
@@ -591,7 +591,7 @@
         (<span class="kw-2">*</span><span class="self">self</span>.<span class="ident">owned_tasks</span>.<span class="ident">get</span>()).<span class="ident">shutdown</span>();
     }
 
-    <span class="doccomment">/// Drain the remote queue, and shut down its tasks.</span>
+    <span class="doccomment">/// Drains the remote queue, and shut down its tasks.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This closes the remote queue. Any additional tasks added to it will be</span>
     <span class="doccomment">/// shut down instead.</span>
@@ -623,7 +623,7 @@
         }
     }
 
-    <span class="doccomment">/// Drain the local queue, and shut down its tasks.</span>
+    <span class="doccomment">/// Drains the local queue, and shut down its tasks.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Safety</span>
     <span class="doccomment">///</span>

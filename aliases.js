@@ -61,7 +61,6 @@ ALIASES["log"] = {};
 ALIASES["match_cfg"] = {};
 ALIASES["matchers"] = {};
 ALIASES["matches"] = {};
-ALIASES["maybe_uninit"] = {};
 ALIASES["memchr"] = {};
 ALIASES["mime"] = {};
 ALIASES["mime_guess"] = {};

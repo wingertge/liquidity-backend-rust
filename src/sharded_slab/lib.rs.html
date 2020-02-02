@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.0.7/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../sharded_slab/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `/home/runner/.cargo/registry/src/github.com-1ecc6299db9ec823/sharded-slab-0.0.8/src/lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css"><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="shortcut icon" href="../../favicon.ico"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../sharded_slab/index.html'><div class='logo-container'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form js-only"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -750,6 +750,13 @@
 <span id="750">750</span>
 <span id="751">751</span>
 <span id="752">752</span>
+<span id="753">753</span>
+<span id="754">754</span>
+<span id="755">755</span>
+<span id="756">756</span>
+<span id="757">757</span>
+<span id="758">758</span>
+<span id="759">759</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A lock-free concurrent slab.</span>
 <span class="doccomment">//!</span>
@@ -930,7 +937,7 @@
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">test_println</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>:<span class="ident">tt</span>)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">test</span>) {
+        <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">test</span>) <span class="kw-2">&amp;</span><span class="op">&amp;</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">slab_print</span>) {
             <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{:?} {}&quot;</span>, <span class="kw">crate</span>::<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="kw">crate</span>::<span class="ident">DefaultConfig</span><span class="op">&gt;</span>::<span class="ident">current</span>(), <span class="macro">format_args</span><span class="macro">!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">arg</span>)<span class="kw-2">*</span>))
         }
     }
@@ -1105,10 +1112,12 @@
         <span class="kw">let</span> <span class="ident">tid</span> <span class="op">=</span> <span class="ident">C</span>::<span class="ident">unpack_tid</span>(<span class="ident">idx</span>);
 
         <span class="macro">test_println</span><span class="macro">!</span>(<span class="string">&quot;rm_deferred {:?}&quot;</span>, <span class="ident">tid</span>);
-        <span class="self">self</span>.<span class="ident">shards</span>
-            .<span class="ident">get</span>(<span class="ident">tid</span>.<span class="ident">as_usize</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">shard</span><span class="op">|</span> <span class="ident">shard</span>.<span class="ident">remove</span>(<span class="ident">idx</span>))
-            .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shards</span>.<span class="ident">get</span>(<span class="ident">tid</span>.<span class="ident">as_usize</span>());
+        <span class="kw">if</span> <span class="ident">tid</span>.<span class="ident">is_current</span>() {
+            <span class="ident">shard</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">shard</span><span class="op">|</span> <span class="ident">shard</span>.<span class="ident">remove_local</span>(<span class="ident">idx</span>)).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        } <span class="kw">else</span> {
+            <span class="ident">shard</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">shard</span><span class="op">|</span> <span class="ident">shard</span>.<span class="ident">remove_remote</span>(<span class="ident">idx</span>)).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>)
+        }
     }
 
     <span class="doccomment">/// Removes the value associated with the given key from the slab, returning</span>
@@ -1164,9 +1173,9 @@
         <span class="macro">test_println</span><span class="macro">!</span>(<span class="string">&quot;rm {:?}&quot;</span>, <span class="ident">tid</span>);
         <span class="kw">let</span> <span class="ident">shard</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shards</span>[<span class="ident">tid</span>.<span class="ident">as_usize</span>()];
         <span class="kw">if</span> <span class="ident">tid</span>.<span class="ident">is_current</span>() {
-            <span class="ident">shard</span>.<span class="ident">remove_local</span>(<span class="ident">idx</span>)
+            <span class="ident">shard</span>.<span class="ident">take_local</span>(<span class="ident">idx</span>)
         } <span class="kw">else</span> {
-            <span class="ident">shard</span>.<span class="ident">remove_remote</span>(<span class="ident">idx</span>)
+            <span class="ident">shard</span>.<span class="ident">take_remote</span>(<span class="ident">idx</span>)
         }
     }
 
@@ -1257,12 +1266,6 @@
         <span class="self">Self</span> { <span class="ident">tid</span>, <span class="ident">local</span>, <span class="ident">shared</span> }
     }
 
-    <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">page_indices</span>(<span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">page</span>::<span class="ident">Addr</span><span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>, <span class="ident">usize</span>) {
-        <span class="kw">let</span> <span class="ident">addr</span> <span class="op">=</span> <span class="ident">C</span>::<span class="ident">unpack_addr</span>(<span class="ident">idx</span>);
-        (<span class="ident">addr</span>, <span class="ident">addr</span>.<span class="ident">index</span>())
-    }
-
     <span class="kw">fn</span> <span class="ident">insert</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>);
 
@@ -1283,7 +1286,7 @@
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
     <span class="kw">fn</span> <span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guard</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span>, <span class="ident">T</span>, <span class="ident">C</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>::<span class="ident">from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="self">Self</span>::<span class="ident">page_indices</span>(<span class="ident">idx</span>);
+        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page</span>::<span class="ident">indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
         <span class="macro">test_println</span><span class="macro">!</span>(<span class="string">&quot;-&gt; {:?}&quot;</span>, <span class="ident">addr</span>);
         <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
@@ -1298,41 +1301,52 @@
         })
     }
 
-    <span class="kw">fn</span> <span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">remove_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>::<span class="ident">from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="self">Self</span>::<span class="ident">page_indices</span>(<span class="ident">idx</span>);
+        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page</span>::<span class="ident">indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
         <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
 
-        <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">remove</span>(<span class="ident">addr</span>, <span class="ident">C</span>::<span class="ident">unpack_gen</span>(<span class="ident">idx</span>))
+        <span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>].<span class="ident">remove</span>(<span class="ident">addr</span>, <span class="ident">C</span>::<span class="ident">unpack_gen</span>(<span class="ident">idx</span>), <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>))
+    }
+
+    <span class="kw">fn</span> <span class="ident">remove_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>::<span class="ident">from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
+        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page</span>::<span class="ident">indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
+
+        <span class="kw">if</span> <span class="ident">page_index</span> <span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">len</span>() {
+            <span class="kw">return</span> <span class="bool-val">false</span>;
+        }
+
+        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shared</span>[<span class="ident">page_index</span>];
+        <span class="ident">shared</span>.<span class="ident">remove</span>(<span class="ident">addr</span>, <span class="ident">C</span>::<span class="ident">unpack_gen</span>(<span class="ident">idx</span>), <span class="ident">shared</span>.<span class="ident">free_list</span>())
     }
 
     <span class="doccomment">/// Remove an item on the shard&#39;s local thread.</span>
-    <span class="kw">fn</span> <span class="ident">remove_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_local</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>::<span class="ident">from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="self">Self</span>::<span class="ident">page_indices</span>(<span class="ident">idx</span>);
+        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page</span>::<span class="ident">indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
         <span class="macro">test_println</span><span class="macro">!</span>(<span class="string">&quot;-&gt; remove_local {:?}&quot;</span>, <span class="ident">addr</span>);
 
         <span class="self">self</span>.<span class="ident">shared</span>
             .<span class="ident">get</span>(<span class="ident">page_index</span>)<span class="question-mark">?</span>
-            .<span class="ident">remove_local</span>(<span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>), <span class="ident">addr</span>, <span class="ident">C</span>::<span class="ident">unpack_gen</span>(<span class="ident">idx</span>))
+            .<span class="ident">take</span>(<span class="ident">addr</span>, <span class="ident">C</span>::<span class="ident">unpack_gen</span>(<span class="ident">idx</span>), <span class="self">self</span>.<span class="ident">local</span>(<span class="ident">page_index</span>))
     }
 
     <span class="doccomment">/// Remove an item, while on a different thread from the shard&#39;s local thread.</span>
-    <span class="kw">fn</span> <span class="ident">remove_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">take_remote</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">idx</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="macro">debug_assert_eq</span><span class="macro">!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>::<span class="ident">from_packed</span>(<span class="ident">idx</span>).<span class="ident">as_usize</span>(), <span class="self">self</span>.<span class="ident">tid</span>);
         <span class="macro">debug_assert</span><span class="macro">!</span>(<span class="ident">Tid</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>::<span class="ident">current</span>().<span class="ident">as_usize</span>() <span class="op">!</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">tid</span>);
 
-        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="self">Self</span>::<span class="ident">page_indices</span>(<span class="ident">idx</span>);
+        <span class="kw">let</span> (<span class="ident">addr</span>, <span class="ident">page_index</span>) <span class="op">=</span> <span class="ident">page</span>::<span class="ident">indices</span>::<span class="op">&lt;</span><span class="ident">C</span><span class="op">&gt;</span>(<span class="ident">idx</span>);
 
-        <span class="macro">test_println</span><span class="macro">!</span>(<span class="string">&quot;-&gt; remove_remote {:?}; page {:?}&quot;</span>, <span class="ident">addr</span>, <span class="ident">page_index</span>);
+        <span class="macro">test_println</span><span class="macro">!</span>(<span class="string">&quot;-&gt; take_remote {:?}; page {:?}&quot;</span>, <span class="ident">addr</span>, <span class="ident">page_index</span>);
 
-        <span class="self">self</span>.<span class="ident">shared</span>
-            .<span class="ident">get</span>(<span class="ident">page_index</span>)<span class="question-mark">?</span>
-            .<span class="ident">remove_remote</span>(<span class="ident">addr</span>, <span class="ident">C</span>::<span class="ident">unpack_gen</span>(<span class="ident">idx</span>))
+        <span class="kw">let</span> <span class="ident">shared</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shared</span>.<span class="ident">get</span>(<span class="ident">page_index</span>)<span class="question-mark">?</span>;
+        <span class="ident">shared</span>.<span class="ident">take</span>(<span class="ident">addr</span>, <span class="ident">C</span>::<span class="ident">unpack_gen</span>(<span class="ident">idx</span>), <span class="ident">shared</span>.<span class="ident">free_list</span>())
     }
 
     <span class="attribute">#[<span class="ident">inline</span>(<span class="ident">always</span>)]</span>
