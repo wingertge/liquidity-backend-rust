@@ -10,7 +10,7 @@ use std::{
     sync::{Arc, Mutex}
 };
 
-type Data = Arc<Mutex<HashMap<String, Vec<(EventType, Value)>>>>;
+type Data = Arc<Mutex<HashMap<String, Vec<(String, Value)>>>>;
 
 #[derive(Default)]
 pub struct MockConnection {
@@ -27,23 +27,25 @@ impl Clone for MockConnection {
 
 #[async_trait]
 impl DbConnection for MockConnection {
-    async fn write_event<S, P>(
+    async fn write_event<S, E, P>(
         &self,
         stream: S,
-        event_type: EventType,
+        event_type: E,
         payload: P
     ) -> Result<(), DatabaseError>
     where
         S: AsRef<str> + Send + Debug,
+        E: AsRef<str> + Send + Debug,
         P: Serialize + Send + Debug
     {
         let data = serde_json::to_value(payload)?;
+        let event_type = event_type.as_ref();
         self.data
             .lock()
             .unwrap()
             .entry(stream.as_ref().to_string())
-            .and_modify(|vec| vec.push((event_type.clone(), data.clone())))
-            .or_insert_with(|| vec![(event_type.clone(), data.clone())]);
+            .and_modify(|vec| vec.push((event_type.to_string(), data.clone())))
+            .or_insert_with(|| vec![(event_type.to_string(), data.clone())]);
         Ok(())
     }
 
@@ -72,11 +74,11 @@ impl DbConnection for MockConnection {
         let mut iter = iter
             .unwrap()
             .into_iter()
-            .map(Ok::<(EventType, Value), DatabaseError>);
+            .map(Ok::<(String, Value), DatabaseError>);
 
         let res = iter.try_fold(None, move |acc: Option<T>, event| {
             let (event_type, value) = event?;
-            match event_type {
+            match event_type.into() {
                 EventType::Create => {
                     let payload = serde_json::from_value::<C>(value)?;
                     Ok(Some(payload.into()))

@@ -295,11 +295,11 @@ mod test {
 
             let sent = conn.data.lock().unwrap();
             let stream_id = format!("election-{}", election.id);
-            let (event_type, value): (EventType, Value) = sent[&stream_id][0].clone();
+            let (event_type, value): (String, Value) = sent[&stream_id][0].clone();
             let payload: CreateElectionEvent = serde_json::from_value(value)
                 .expect("The event payload should have the right type");
 
-            assert_eq!(event_type, EventType::Create);
+            assert_eq!(event_type, EventType::Create.as_ref());
             assert_eq!(payload.id, election.id);
             assert_eq!(payload.description, "test_description");
             assert_eq!(
@@ -346,7 +346,7 @@ mod test {
             let update_payload = serde_json::from_value::<UpdateElectionEvent>(update_event.1)
                 .expect("Update event should be of the right type");
 
-            assert_eq!(create_event.0, EventType::Create);
+            assert_eq!(create_event.0, EventType::Create.as_ref());
             assert_eq!(create_payload.name, "test_name".to_string());
             assert_eq!(update_payload.name, None);
             assert_eq!(

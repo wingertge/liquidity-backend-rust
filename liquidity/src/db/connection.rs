@@ -35,14 +35,15 @@ impl From<String> for EventType {
 
 #[async_trait]
 pub trait DbConnection: Clone {
-    async fn write_event<S, P>(
+    async fn write_event<S, E, P>(
         &self,
         stream: S,
-        event_type: EventType,
+        event_type: E,
         payload: P
     ) -> Result<(), DatabaseError>
     where
         S: AsRef<str> + Send + Debug,
+        E: AsRef<str> + Send + Debug,
         P: Serialize + Send + Debug;
 
     async fn create<S, P>(&self, stream: S, payload: P) -> Result<(), DatabaseError>
@@ -70,14 +71,15 @@ pub trait DbConnection: Clone {
 
 #[async_trait]
 impl DbConnection for Arc<Connection> {
-    async fn write_event<S, P>(
+    async fn write_event<S, E, P>(
         &self,
         stream: S,
-        event_type: EventType,
+        event_type: E,
         payload: P
     ) -> Result<(), DatabaseError>
     where
         S: AsRef<str> + Send + Debug,
+        E: AsRef<str> + Send + Debug,
         P: Serialize + Send + Debug
     {
         let event_data = EventData::json(event_type, payload)?;
