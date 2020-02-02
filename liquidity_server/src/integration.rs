@@ -1,3 +1,4 @@
+use crate::Config;
 use liquidity::Uuid;
 use reqwest::{Client, Response, Url};
 use serde::{Deserialize, Serialize};
@@ -31,7 +32,20 @@ struct GQLRequest<T: Serialize> {
 
 #[tokio::test]
 async fn gateway_integration_test() {
-    let (server, close_handle) = futures::future::abortable(crate::run());
+    let config = Config {
+        playground_enabled: false,
+        cache_ttl: Duration::from_secs(10),
+        cache_size: 500,
+        issuer: "".to_string(),
+        audience: "".to_string(),
+        jwks_url: "".to_string(),
+        database_url: ([127, 0, 0, 1], 1113).into(),
+        database_login: "admin".to_string(),
+        database_password: "changeit".to_string(),
+        port: 4000
+    };
+
+    let (server, close_handle) = futures::future::abortable(crate::run(config));
     tokio::spawn(server);
     tokio::time::delay_for(Duration::from_millis(100)).await; // Let it bind and connect to DB
 

@@ -109,6 +109,7 @@ type Schema = RootNode<'static, Query, Mutation>;
 fn schema() -> Arc<Schema> {
     Arc::new(Schema::new(Query, Mutation))
 }
+
 fn headers() -> HeaderMap {
     let mut headers = HeaderMap::new();
     headers.insert(ACCESS_CONTROL_ALLOW_ORIGIN, "*".parse().unwrap());
@@ -130,12 +131,7 @@ fn not_found() -> Result<Response<Body>, hyper::Error> {
     Ok(response)
 }
 
-pub(crate) async fn run() {
-    env_logger::init();
-    dotenv::dotenv().ok();
-    init_tracing();
-
-    let config = Config::from_env();
+pub(crate) async fn run(config: Config) {
     let addr: SocketAddr = ([127, 0, 0, 1], config.port).into();
 
     let db_conn = Arc::new(
@@ -149,9 +145,13 @@ pub(crate) async fn run() {
             .await
     );
 
-    let key_store = KeyStore::new_from(config.jwks_url.as_str())
-        .await
-        .expect("Failed to create JWKS key store");
+    let key_store = if cfg!(test) {
+        KeyStore::new()
+    } else {
+        KeyStore::new_from(config.jwks_url.as_str())
+            .await
+            .expect("Failed to create JWKS key store")
+    };
     let auth = Arc::new(JWTAuth::new(
         key_store,
         config.issuer.clone(),
@@ -247,5 +247,11 @@ pub(crate) async fn run() {
 
 #[tokio::main]
 async fn main() {
-    run().await
+    env_logger::init();
+    dotenv::dotenv().ok();
+    init_tracing();
+
+    let config = Config::from_env();
+
+    run(config).await
 }
